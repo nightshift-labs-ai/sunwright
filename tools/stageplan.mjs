@@ -75,11 +75,43 @@ function planFor(run, scars) {
   return undefined;
 }
 
+/** How many beetles stand on lit cells of the current sun's light through this grid. */
+function litBeetles(run, grid) {
+  const lit = traceBeams(grid, run.aperture, beamModsFor(run.boons)).lit;
+  return run.enemies.filter((e) => {
+    const c = Math.floor(e.x);
+    const r = Math.floor(e.y);
+    return c >= 0 && r >= 0 && c < grid.cols && r < grid.rows && lit[r * grid.cols + c] > 0;
+  }).length;
+}
+
+/** Chasing the swarm the way a player does: the one live turn that puts >= 2 more beetles in the light. */
+function bestChaseTurn(run) {
+  const base = litBeetles(run, run.grid);
+  let best = null;
+  run.grid.pieces.forEach((p, i) => {
+    if (!p || p.type === 'pillar') return;
+    for (const dir of [1, -1]) {
+      const old = p.rot;
+      p.rot = (p.rot + (dir > 0 ? 1 : 3)) & 3;
+      const n = litBeetles(run, run.grid);
+      p.rot = old;
+      if (n >= base + 2 && (!best || n > best.n)) best = { c: i % run.grid.cols, r: Math.floor(i / run.grid.cols), dir, n };
+    }
+  });
+  return best;
+}
+
 export function makeDirector(K, scars = null) {
   let wave = -1;
   let turned = null;
   const director = (run) => {
     const orders = [];
+    // STAGE_CHASE=1: on the cover sun, turn glass live onto the swarm (every half second at most).
+    if (process.env.STAGE_CHASE === '1' && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.tick % 30 === 0) {
+      const turn = bestChaseTurn(run);
+      if (turn) orders.push({ type: 'rotate', c: turn.c, r: turn.r, dir: turn.dir });
+    }
     const plan = planFor(run, scars);
     if (plan === undefined) return orders;
     const target = plan.to;

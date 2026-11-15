@@ -243,6 +243,10 @@
   win 8/10); 2112 has 3 lit beetles but no floaters and a flawless 10/10 win. In 2013's sun 5 no clean
   tick has more than 1 lit beetle (STAGE_DUMP=1 lists all 866 candidates): the beams and the swarm's
   path barely cross, so >= 4 burning needs a director that aims glass at the path, not tick picking.
+  Tried STAGE_CHASE=1 (on the cover sun, the one live turn that puts >= 2 more beetles in the light,
+  every 0.5 s): 2013 gets worse (10 beetles, 1 lit, 0 floaters: kills come faster and floaters next to
+  moving beams fail the no-text-on-beam rule); 2112 reaches 5 lit / 13 beetles but 0 floaters and a
+  flawless 10/10 win. Off by default; 2013 K=1 stays the staging.
 
 ## Known bugs
 - Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.
