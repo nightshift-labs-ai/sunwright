@@ -49,6 +49,12 @@ export function announceEvents(run, events) {
   }
 }
 
+/** The run's win and lose conditions with the real count of suns still to hold (current included). */
+export function winLoseHeadline(run) {
+  const left = WAVE_COUNT - run.stats.wavesCleared;
+  return `WIN: hold ${left} more ${left === 1 ? NAMES.sun.toLowerCase() : NAMES.suns.toLowerCase()} - LOSE: the ${NAMES.fountainShort.toLowerCase()} runs dry`;
+}
+
 /** The banner shown now: a fresh event, else advice about the next sun. */
 export function currentBanner(run) {
   if (run.banner && run.time - run.banner.at < BANNER_SECONDS) return run.banner.text;

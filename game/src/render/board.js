@@ -163,7 +163,7 @@ function windowRect(ap) {
 function drawWindowLabel(ctx, ap, slot, lit) {
   const label = `SUN - ${ap.phase.wallName[0]}`;
   ctx.save();
-  if (ap.wall === 'north') ctx.translate(slot.x + slot.w + 36, slot.y + WALL / 2);
+  if (ap.wall === 'north') ctx.translate(slot.x + slot.w + 36, BOARD_Y - 16);
   else {
     ctx.translate(slot.x + slot.w / 2, slot.y - 34);
     ctx.rotate(ap.wall === 'east' ? Math.PI / 2 : -Math.PI / 2);

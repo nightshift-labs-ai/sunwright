@@ -6,7 +6,7 @@ import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, WAVE_COUNT } from '../config
 import { boonById } from '../draft.js';
 import { chainMultiplier, chainWindow } from '../combat.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
-import { currentBanner } from '../announce.js';
+import { currentBanner, winLoseHeadline } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
@@ -250,9 +250,7 @@ function drawLeftPanel(ctx, run) {
   panel(ctx, LEFT_X, 8, PANEL_W, 150);
   text(ctx, `DAY ${day} - ${phase.name}`, LEFT_X + PANEL_W / 2, 32, 18, INK, 'center', 900);
   text(ctx, `${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, LEFT_X + PANEL_W / 2, 68, 34, GOLD, 'center', 900);
-  drawSunTrack(ctx, LEFT_X + 18, 100, 22, 9, run.stats.wavesCleared, run.waveIndex);
-  const left = WAVE_COUNT - run.stats.wavesCleared;
-  text(ctx, left === 1 ? 'HOLD THE LAST SUN' : `HOLD ${left} MORE ${NAMES.suns}`, LEFT_X + PANEL_W / 2, 140, 16, '#FFF2A8', 'center', 900);
+  drawSunTrack(ctx, LEFT_X + 18, 112, 22, 9, run.stats.wavesCleared, run.waveIndex);
   panel(ctx, LEFT_X, 166, PANEL_W, 196);
   drawSunDial(ctx, run, LEFT_X + PANEL_W / 2, 252);
   panel(ctx, LEFT_X, 370, PANEL_W, 136);
@@ -293,8 +291,7 @@ function drawQuartzGem(ctx, x, y) {
 function drawIncoming(ctx, run, y0) {
   const x0 = RIGHT_X;
   const inWave = run.phase === 'wave';
-  text(ctx, inWave ? 'INCOMING' : `${NAMES.sun} ${run.waveIndex + 1} BRINGS`, x0 + 12, y0 + 22, 16, INK, 'left', 900);
-  if (inWave) text(ctx, `${enemiesRemaining(run)} left`, x0 + PANEL_W - 10, y0 + 22, 16, '#FFB0D8', 'right', 900);
+  text(ctx, inWave ? `INCOMING - ${enemiesRemaining(run)} LEFT` : `${NAMES.sun} ${run.waveIndex + 1} BRINGS`, x0 + 12, y0 + 22, 16, inWave ? '#FFB0D8' : INK, 'left', 900);
   const roster = waveRoster(run.waveIndex, run.diff);
   const left = new Map();
   if (inWave) {
@@ -369,6 +366,25 @@ function drawRightPanel(ctx, run, ui) {
   text(ctx, '1-5 glass, Q/E turn, X sell', x0 + PANEL_W / 2, 702, 12, 'rgba(255,246,223,0.85)', 'center', 800);
 }
 
+
+/** The win and lose rule, inscribed along the north wall under the banner. */
+function drawWinLoseFrieze(ctx, run) {
+  const line = winLoseHeadline(run);
+  const x = BOARD_X - WALL;
+  const w = BOARD_W + WALL * 2;
+  ctx.fillStyle = 'rgba(31,63,153,0.96)';
+  ctx.fillRect(x, 68, w, 38);
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + 1, 69, w - 2, 36);
+  ctx.font = `900 32px ${FONT}`;
+  const squeeze = Math.min(1, (w - 24) / ctx.measureText(line).width);
+  ctx.save();
+  ctx.translate(640, 99);
+  ctx.scale(squeeze, 1);
+  text(ctx, line, 0, 0, 32, '#FFF2A8', 'center', 900);
+  ctx.restore();
+}
 
 /** The big banner over the courtyard: the latest event, or what the next sun asks of you. */
 function drawEventBanner(ctx, run) {
@@ -508,6 +524,7 @@ function drawHotbar(ctx, run, ui) {
 
 export function drawHud(ctx, run, ui) {
   drawEventBanner(ctx, run);
+  drawWinLoseFrieze(ctx, run);
   drawLeftPanel(ctx, run);
   drawRightPanel(ctx, run, ui);
   drawHotbar(ctx, run, ui);

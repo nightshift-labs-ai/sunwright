@@ -3,7 +3,7 @@
 // point the mouse, and read back the numbers the HUD shows.
 import { WAVE_COUNT } from './config.js';
 import { enemiesRemaining } from './sim.js';
-import { currentBanner } from './announce.js';
+import { currentBanner, winLoseHeadline } from './announce.js';
 import { loadHistory } from './save.js';
 
 export function installTestHook(app, api) {
@@ -65,6 +65,7 @@ export function installTestHook(app, api) {
         offer: run.offer.slice(),
         kills: run.stats.kills,
         banner: currentBanner(run),
+        headline: winLoseHeadline(run),
         log: run.log.join(' | '),
         sunsHeld: run.stats.wavesCleared,
         best: app.ui.best,

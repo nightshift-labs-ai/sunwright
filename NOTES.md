@@ -82,6 +82,9 @@
   SCOPE_LINE (counted from config.js; also the first line of the index.html note, which now names the
   moving sun, the 9-sun win, the lose rule and R). Demo scaled 1.2x with all three suns beaming.
 
+- Benchmark 3 item 1: WIN/LOSE frieze along the north wall ("WIN: hold n more suns - LOSE: the
+  fountain runs dry", n from the sim, truth-checked); INCOMING - n LEFT; HOLD line removed.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.
