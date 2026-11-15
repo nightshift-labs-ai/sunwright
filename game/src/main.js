@@ -40,6 +40,7 @@ const app = {
   accumulator: 0,
   lastFrame: 0,
   overlay: '',
+  restartArmedUntil: 0,
   showOptions: false,
   fast: false,
 };
@@ -64,6 +65,7 @@ function startRun(seed = freshSeed(), difficulty = app.settings.difficulty) {
   app.orders = [];
   app.isBest = false;
   app.shrineHurtAt = -9;
+  app.restartArmedUntil = 0;
   app.ui.selected = 'mirror';
   app.ui.ghostRot = 0;
   app.ui.best = loadBest(difficulty).score;
@@ -162,6 +164,12 @@ function handleKeyInPlay(code) {
   if (over) {
     if (code === 'KeyR') restartRun(input.intents, false);
     else if (code === 'KeyS') restartRun(input.intents, true);
+    return;
+  }
+  if (code === 'KeyR') {
+    // In a run R restarts only on a second press within 2 s, so a stray key never ends a run.
+    if (performance.now() < app.restartArmedUntil) startRun(undefined, run.difficultyId);
+    else app.restartArmedUntil = performance.now() + 2000;
     return;
   }
   const digit = code.startsWith('Digit') ? Number(code.slice(5)) : 0;
@@ -312,6 +320,7 @@ function render() {
   if (app.screen === 'play') {
     const run = app.run;
     app.ui.fast = app.fast;
+    app.ui.restartArmed = performance.now() < app.restartArmedUntil;
     const resultsHero = app.overlay === 'results';
     const showHud = run.phase !== 'draft' && !resultsHero;
     drawFrame(ctx, { run, ui: app.ui, fx: app.fx, time: run.time, showHud, resultsHero, shake: app.settings.shake, shrineHurtAgo: run.time - app.shrineHurtAt });

@@ -363,7 +363,6 @@ function drawRightPanel(ctx, run, ui) {
   drawTooltip(ctx, run, ui, 486);
   panel(ctx, x0, 602, PANEL_W, 106);
   drawEventLog(ctx, run, 602);
-  text(ctx, '1-5 glass, Q/E turn, X sell', x0 + PANEL_W / 2, 702, 12, 'rgba(255,246,223,0.85)', 'center', 800);
 }
 
 
@@ -460,6 +459,13 @@ function drawPieceIcon(ctx, type, x, y) {
   ctx.restore();
 }
 
+/** The controls, in one key line over two rows beside the hotbar (R needs a second press). */
+function drawKeyLine(ctx, x, ui) {
+  text(ctx, 'Click sand: place - Q/E turn - X sell', x, HOTBAR.y + 32, 15, INK, 'left', 800);
+  if (ui.restartArmed) text(ctx, 'PRESS R AGAIN TO RESTART', x, HOTBAR.y + 58, 15, '#FF8A8A', 'left', 900);
+  else text(ctx, `R restart - SPACE flare - ESC pause${ui.fast ? ' - x2' : ''}`, x, HOTBAR.y + 58, 15, INK, 'left', 800);
+}
+
 function drawHotbar(ctx, run, ui) {
   PIECE_ORDER.forEach((type, i) => {
     const x = HOTBAR_X + i * (HOTBAR.w + HOTBAR.gap);
@@ -516,9 +522,8 @@ function drawHotbar(ctx, run, ui) {
     ctx.stroke();
     text(ctx, 'ENTER', bx + 95, HOTBAR.y + 30, 15, GOLD, 'center', 900);
     text(ctx, `START ${NAMES.sun}`, bx + 95, HOTBAR.y + 56, 20, INK, 'center', 900);
-  } else if (run.phase === 'wave') {
-    text(ctx, 'Q/E or wheel: turn glass live', fx + 156, HOTBAR.y + 34, 14, INK, 'left', 700);
-    text(ctx, `ESC pause - M mute - F speed${ui.fast ? ' x2' : ''}`, fx + 156, HOTBAR.y + 58, 14, ui.fast ? '#FFF2A8' : 'rgba(255,246,223,0.75)', 'left', 700);
+  } else {
+    drawKeyLine(ctx, fx + 152, ui);
   }
 }
 

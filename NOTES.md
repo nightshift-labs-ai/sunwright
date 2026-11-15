@@ -85,6 +85,9 @@
 - Benchmark 3 item 1: WIN/LOSE frieze along the north wall ("WIN: hold n more suns - LOSE: the
   fountain runs dry", n from the sim, truth-checked); INCOMING - n LEFT; HOLD line removed.
 
+- Benchmark 3 item 2: key line beside the hotbar ("Click sand: place - Q/E turn - X sell" /
+  "R restart - SPACE flare - ESC pause"); R in a run restarts on a second press within 2 s.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.
