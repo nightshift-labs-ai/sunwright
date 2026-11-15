@@ -202,15 +202,25 @@ export function fxFromEvent(fx, ev, run = null) {
   }
 }
 
-/** Sparks rising from every burning beetle. */
+/** Is this beetle searing now (light on it and not shrugged off, or set burning by red light)? */
+export function isSearing(e) {
+  return (e.litPower > 0 && !e.shielded) || e.burn > 0;
+}
+
+/** Every searing beetle keeps 3-5 embers rising off it (more as it heats up) and a thin smoke. */
 function emitBurnSparks(fx, run, dt) {
+  const embers = new Map();
+  for (const p of fx.particles) if (p.owner !== undefined) embers.set(p.owner, (embers.get(p.owner) ?? 0) + 1);
   for (const e of run.enemies) {
-    if (e.litPower <= 0 || e.shielded) continue;
-    if (fxRandom(fx) < dt * (6 + e.litPower * 0.4)) {
-      const x = toScreenX(e.x) + (fxRandom(fx) - 0.5) * 20;
-      const y = toScreenY(e.y) + (fxRandom(fx) - 0.5) * 14;
-      fx.particles.push({ kind: 'spark', x, y, vx: (fxRandom(fx) - 0.5) * 40, vy: -40 - fxRandom(fx) * 60, life: 0.5, max: 0.5, size: 2.5, color: fxRandom(fx) < 0.5 ? '#FFB02E' : '#FFF2A8' });
+    if (!isSearing(e)) continue;
+    const heat = Math.min(1, Math.max(0, 1 - e.hp / e.maxHp));
+    const x = toScreenX(e.x);
+    const y = toScreenY(e.y);
+    if ((embers.get(e.id) ?? 0) < 3 + Math.round(heat * 2)) {
+      const life = 0.6 + fxRandom(fx) * 0.3;
+      fx.particles.push({ kind: 'spark', owner: e.id, x: x + (fxRandom(fx) - 0.5) * 22, y: y + (fxRandom(fx) - 0.5) * 14, vx: (fxRandom(fx) - 0.5) * 30, vy: -35 - fxRandom(fx) * 45, life, max: life, size: 3, color: fxRandom(fx) < 0.5 ? '#FF8A2E' : '#FFE27A' });
     }
+    if (fxRandom(fx) < dt * 3) fx.particles.push({ kind: 'smoke', x, y: y - 6, vx: (fxRandom(fx) - 0.5) * 10, vy: -22, life: 0.8, max: 0.8, size: 6, color: 'rgba(110,90,80,' });
   }
 }
 

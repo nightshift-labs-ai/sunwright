@@ -6,6 +6,9 @@ import { CELL, toScreenX, toScreenY } from './layout.js';
 
 const HEADING_ANGLE = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
 
+/** Each kind's shell radii (x size): where the searing glow is painted. */
+const SHELL_SIZE = { scuttler: [1, 0.72], veerwing: [0.7, 0.38], shellback: [1, 0.8], glassback: [1, 0.78], titan: [1, 0.85] };
+
 /** Each kind's shell (top), underside and head; husks and the results Titan use the same. */
 export const BEETLE_COLORS = {
   scuttler: { top: '#C2307E', under: '#6A1A4A', head: '#5A1446' },
@@ -199,6 +202,15 @@ export function drawEnemy(ctx, e, time) {
     const c = BEETLE_COLORS.scuttler;
     drawShell(ctx, size, size * 0.72, c.top, c.under, c.under);
     drawHead(ctx, size * 0.8, '#FFE14D', c.head);
+  }
+  // Searing: the shell glows orange, then white as the heat (damage taken) rises.
+  if ((e.litPower > 0 && !e.shielded) || e.burn > 0) {
+    const heat = Math.min(1, Math.max(0, 1 - e.hp / e.maxHp));
+    const [rx, ry] = SHELL_SIZE[e.type] ?? SHELL_SIZE.scuttler;
+    ctx.fillStyle = `rgba(255,${Math.round(140 + 110 * heat)},${Math.round(40 + 195 * heat)},${0.3 + 0.4 * heat})`;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size * rx, size * ry, 0, 0, Math.PI * 2);
+    ctx.fill();
   }
   ctx.restore();
   if (e.burn > 0) drawFlames(ctx, x, y, size, time + e.id);

@@ -248,6 +248,10 @@
   Bench5-2's caption). The Titan carcass is ash: charcoal shell, ash plates with glowing ember cracks,
   embers rising through the smoke, drawn at 0.82 (about 235 px wide), whole in the left column.
 
+- Benchmark 6 item 5: a searing beetle (lit and not shrugging, or set burning) gets a shell glow that
+  lerps orange -> white with heat (1 - hp/max), keeps 3-5 embers rising off it (fx, deterministic
+  RNG) and a thin smoke puff. The staged cover tick has no beetle in the light; the title demo shows it.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.
