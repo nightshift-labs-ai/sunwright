@@ -9,6 +9,7 @@ import { routeCells } from '../pathing.js';
 import { drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawShrine } from './board.js';
 import { drawEnemies } from './beetles.js';
 import { drawHud } from './hud.js';
+import { drawResultsHero } from './results.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL, WALL_FRONT } from './layout.js';
 
 function drawCellCursor(ctx, cell, ok) {
@@ -40,18 +41,6 @@ function nextSunTrace(run) {
   return nextCache.value;
 }
 
-function drawSunrise(ctx, time, since) {
-  const k = Math.min(1, since / 1.5);
-  const g = ctx.createLinearGradient(VIEW_W, 0, 0, VIEW_H);
-  g.addColorStop(0, `rgba(255,236,170,${0.55 * k})`);
-  g.addColorStop(0.5, `rgba(255,190,90,${0.25 * k})`);
-  g.addColorStop(1, `rgba(255,150,80,${0.1 * k})`);
-  ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-  ctx.restore();
-}
 
 /**
  * frame: { run, ui, fx, time, showHud, shake, shrineHurtAgo }
@@ -92,7 +81,7 @@ export function drawFrame(ctx, frame) {
   }
   drawFx(ctx, fx);
   ctx.restore();
-  if (phase === 'won') drawSunrise(ctx, time, time - run.endedAt);
+  if (frame.resultsHero) drawResultsHero(ctx, run, time);
   if (frame.showHud) drawHud(ctx, run, ui);
   drawScreenFx(ctx, fx);
 }

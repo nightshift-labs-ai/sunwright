@@ -63,6 +63,13 @@
   lens, sun, magnifier, hourglass, droplet, mirror, twin suns, gem, tag, sun+arrow, prism); HUD badges
   and a 96 px glyph in each draft roundel.
 
+- Results redesign (benchmark 2 items 4, 6, 20; 1 item 2 in part): RESULT_WIN_TITLE = THE TITAN IS
+  ASH across the top on an opaque lapis plaque, subline "Courtyard held - 9/9 suns", 84 px score with
+  NEW BEST, tiles LONGEST SEAR / FOUNTAIN n/10 / TITAN BURNED IN m:ss (sim stat titanSeconds),
+  44 px R - RUN AGAIN; canvas hero (render/results.js): flipped smoking Titan on a scorch, 9-sun
+  track with the skull crossed out, charm badges; sepia dim at noon (sunrise wash removed).
+  tools/thumbs.py writes the judge-scale contact sheet (768 cover + 252 px cells).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

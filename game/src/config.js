@@ -38,7 +38,7 @@ export const NAMES = {
     trueprism: 'True Prism',
   },
 };
-export const RESULT_WIN_TITLE = 'COURTYARD HELD';
+export const RESULT_WIN_TITLE = 'THE TITAN IS ASH';
 export const RESULT_LOSE_TITLE = 'THE SWARM BROKE THROUGH';
 
 export const GAME_NAME = NAMES.game;

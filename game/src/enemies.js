@@ -24,6 +24,7 @@ export function spawnEnemy(run, type, gateIndex) {
     burn: 0,
     slow: 0,
     age: 0,
+    bornAt: run.time,
     wobble: (run.nextEnemyId * 1.7) % 6.28,
   };
   run.enemies.push(enemy);

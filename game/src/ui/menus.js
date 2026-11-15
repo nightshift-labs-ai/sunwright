@@ -18,11 +18,6 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
 }
 
-function boonChip(id) {
-  const b = boonById(id);
-  return `<span class="chip" style="--hue:${b.hue}" title="${escapeHtml(b.text)}">${escapeHtml(b.name)}</span>`;
-}
-
 export function createMenus(intents) {
   document.getElementById('stage').addEventListener('click', (e) => {
     const button = e.target.closest('[data-action]');
@@ -84,26 +79,32 @@ export function renderDraft(menus, run) {
   el('draft-new').textContent = unlocked ? `NEW GLASS: ${PIECES[unlocked].name} [${PIECE_ORDER.indexOf(unlocked) + 1}]` : newFoe ? `NEW: ${ENEMIES[newFoe.type].name}` : '';
 }
 
-/** Results: win or defeat title, score with NEW BEST, stats, boons, seed and the restart keys. */
+function clock(seconds) {
+  const s = Math.max(0, Math.round(seconds));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+/**
+ * Results: THE TITAN IS ASH (or THE SWARM BROKE THROUGH) across the top, then score with NEW BEST,
+ * one-line tiles and the restart keys; the canvas draws the Titan's carcass beside it.
+ */
 export function renderResults(menus, run, isBest) {
   const key = `${run.seed}|${run.phase}|${run.score}`;
   if (key === menus.resultsKey) return;
   menus.resultsKey = key;
   const won = run.phase === 'won';
   el('results-screen').classList.toggle('lost', !won);
-  el('results-title').textContent = won ? RESULT_WIN_TITLE : RESULT_LOSE_TITLE;
+  const title = el('results-title');
+  title.textContent = won ? RESULT_WIN_TITLE : RESULT_LOSE_TITLE;
+  title.style.setProperty('--fit', String(Math.min(1, 1180 / title.offsetWidth)));
   el('results-sub').textContent = won
-    ? `The ${ENEMIES.titan.name} is ash and the courtyard still blazes at noon.`
-    : `The swarm reached the fountain on Day ${run.aperture.day}, ${run.aperture.phase.name.toLowerCase()}.`;
+    ? `Courtyard held - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`
+    : `Fell on Day ${run.aperture.day} ${run.aperture.phase.name.toLowerCase()} - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`;
   el('results-score').innerHTML = `${run.score.toLocaleString('en-US')}${isBest ? '<em>NEW BEST</em>' : ''}`;
-  el('results-stats').innerHTML = [
-    ['BEETLES BURNED', run.stats.kills],
+  const tiles = [
     [`LONGEST ${NAMES.combo}`, `x${run.chain.best}`],
-    [NAMES.suns, `${run.stats.wavesCleared}/${WAVE_COUNT}`],
     [NAMES.fountainShort, `${run.shrineHp}/${run.shrineMax}`],
-  ]
-    .map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`)
-    .join('');
-  el('results-charms').innerHTML = run.boons.length ? run.boons.map(boonChip).join('') : '<span class="none">No charms taken</span>';
-  el('results-seed').textContent = `${run.diff.name} - seed ${run.seed}`;
+    won && run.stats.titanSeconds !== undefined ? ['TITAN BURNED IN', clock(run.stats.titanSeconds)] : ['BEETLES BURNED', run.stats.kills],
+  ];
+  el('results-stats').innerHTML = tiles.map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('');
 }
