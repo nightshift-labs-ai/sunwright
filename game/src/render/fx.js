@@ -289,7 +289,7 @@ function beamTerminal(trace) {
  * The next sun's light through the current glass, drawn as a dashed ghost: red ending in an X
  * labelled MISSES when it lights none of the swarm's path, gold with the path cells it hits otherwise.
  */
-export function drawBeamGhost(ctx, trace, pathCellsLit, time) {
+export function drawBeamGhost(ctx, trace, pathCellsLit, time, wall) {
   const misses = pathCellsLit === 0;
   const color = misses ? '#FF3B30' : '#FFD34D';
   ctx.save();
@@ -324,16 +324,21 @@ export function drawBeamGhost(ctx, trace, pathCellsLit, time) {
       ctx.strokeStyle = color;
       if (pass === 0 && !misses) break;
     }
-    const label = misses ? 'MISSES' : `HITS ${pathCellsLit} PATH CELLS`;
-    ctx.font = '900 32px system-ui, sans-serif';
-    ctx.textAlign = x > 640 ? 'right' : 'left';
-    const tx = x + (x > 640 ? -28 : 28);
-    ctx.lineWidth = 6;
-    ctx.strokeStyle = '#3B1247';
-    ctx.strokeText(label, tx, y + 11);
-    ctx.fillStyle = misses ? '#FF6B5E' : '#FFE27A';
-    ctx.fillText(label, tx, y + 11);
   }
+  // The verdict sits on a plaque just under the draft heading, clear of the roundels.
+  const label = `NEXT ${NAMES.sun} (${wall}): ${misses ? 'MISSES THE PATH' : `HITS ${pathCellsLit} PATH CELLS`}`;
+  ctx.font = '900 30px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  const w = ctx.measureText(label).width + 36;
+  ctx.fillStyle = 'rgba(31,63,153,0.92)';
+  ctx.beginPath();
+  ctx.roundRect(640 - w / 2, 154, w, 44, 12);
+  ctx.fill();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.fillStyle = misses ? '#FF8A80' : '#FFE27A';
+  ctx.fillText(label, 640, 187);
   ctx.restore();
 }
 

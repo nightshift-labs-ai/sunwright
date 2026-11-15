@@ -83,7 +83,7 @@ export function drawFrame(ctx, frame) {
   }
   if (phase === 'draft') {
     const onPath = new Set(routeCells(run.grid, run.flow).filter((i) => run.trace.lit[i] > 0)).size;
-    drawBeamGhost(ctx, run.trace, onPath, time);
+    drawBeamGhost(ctx, run.trace, onPath, time, run.aperture.phase.wallName[0]);
   } else if (frame.titleTraces) {
     for (const trace of frame.titleTraces) drawBeams(ctx, trace, { alpha: 1, flare: 0, time });
   } else if (phase !== 'lost') {
