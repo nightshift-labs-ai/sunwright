@@ -80,6 +80,9 @@ kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 28px sys
 .lost .sheet.results { border-color: #ff8a8a; }
 .results .sub { margin: 0; font-size: 34px; font-weight: 900; color: #3b1247; text-shadow: none; }
 .score { font: 900 76px system-ui, sans-serif; line-height: 1; color: #7a2e14; display: flex; align-items: center; gap: 18px; }
+.rank { display: inline-flex; align-items: center; justify-content: center; width: 112px; height: 112px; border-radius: 50%; font: 900 76px system-ui, sans-serif; background: #2d5bd0; border: 8px solid #f2c14e; color: #ffe27a; -webkit-text-stroke: 2px #3b1247; paint-order: stroke fill; }
+.rank-S { background: #b0307a; color: #fff6df; }
+.rank-C { background: #7a6a58; color: #fff6df; }
 .score em { font: 900 34px system-ui, sans-serif; font-style: normal; color: #3b1247; background: #7dffc4; border-radius: 10px; padding: 4px 14px; }
 .stats { display: flex; gap: 8px; width: 100%; }
 .stats div { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px 6px; background: #2d5bd0; border: 3px solid #f2c14e; border-radius: 12px; overflow: hidden; }

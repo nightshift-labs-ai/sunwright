@@ -5,6 +5,7 @@ import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, NAMES, PIECES, PIECE_ORDER, RE
 import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
+import { rankFor } from '../combat.js';
 import { drawCharmGlyph } from '../render/charms.js';
 
 
@@ -117,7 +118,8 @@ export function showResults(menus, run, record, history) {
   el('results-sub').textContent = won
     ? `Courtyard held - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`
     : `Fell on Day ${run.aperture.day} ${run.aperture.phase.name.toLowerCase()} - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`;
-  el('results-score').innerHTML = `${run.score.toLocaleString('en-US')}${record.isBest ? '<em>NEW BEST</em>' : ''}`;
+  const rank = rankFor(run);
+  el('results-score').innerHTML = `<span class="rank rank-${rank}">${rank}</span>${run.score.toLocaleString('en-US')}${record.isBest ? '<em>NEW BEST</em>' : ''}`;
   const tiles = [
     ['BEETLES BURNED', run.stats.kills],
     [NAMES.suns, `${run.stats.wavesCleared}/${WAVE_COUNT}`],

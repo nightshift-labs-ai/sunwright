@@ -105,6 +105,9 @@
 - Benchmark 4 items 3, 4: unplayed difficulties read "not played yet"; results YOUR BUILD panel
   (charm glyph + name, xN repeats, "P picked from O offers" with the sim's offersSeen, truth-checked).
 
+- Benchmark 4 item 5: rank ring (S/A/B/C, 128 px) beside the score from RANK_THRESHOLDS via
+  combat.rankFor (score, fountain left, Titan burn time), truth-checked. Staged run = A.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

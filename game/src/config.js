@@ -136,6 +136,12 @@ export const FOUNTAIN_MAX = 10;
 
 export const ECONOMY = { waveQuartz: 5, waveQuartzPerWave: 1, rerollCost: 3, oldPieceRefund: 0.5 };
 export const SCORING = { perShrineHp: 50, waveClear: 100, chainWindow: 1, chainMaxMult: 5 };
+/** A won run's rank: the best tier whose score, fountain left and Titan burn time it all meets (else C). */
+export const RANK_THRESHOLDS = [
+  { rank: 'S', score: 40000, fountain: 9, titanSeconds: 25 },
+  { rank: 'A', score: 30000, fountain: 6, titanSeconds: 40 },
+  { rank: 'B', score: 18000, fountain: 3, titanSeconds: 60 },
+];
 export const FLARE_CHARGES = 1;
 
 /** Glass charms (internally boons) offered in the draft. weight: how often it shows; repeat: may be taken again. */

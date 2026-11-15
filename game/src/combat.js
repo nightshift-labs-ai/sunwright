@@ -1,6 +1,6 @@
 // Burning and scoring: beam damage per tick with armour thresholds, the Flare, the CHAIN
 // multiplier for quick successive kills, quartz drops, and beetles biting the Sun Fountain.
-import { BEAM, SPREAD_BURN, SCORING, TINT_EFFECTS } from './config.js';
+import { BEAM, RANK_THRESHOLDS, SPREAD_BURN, SCORING, TINT_EFFECTS } from './config.js';
 import { TINT_BLUE, TINT_GOLD, TINT_RED } from './beams.js';
 import { armourOf, enemyCell, reachedShrine } from './enemies.js';
 
@@ -100,6 +100,14 @@ export function tickChain(run, dt) {
     run.chain.timer -= dt;
     if (run.chain.timer <= 0) run.chain.count = 0;
   }
+}
+
+/** S/A/B for a won run by RANK_THRESHOLDS; every other run is a C. */
+export function rankFor(run) {
+  if (run.phase !== 'won') return 'C';
+  const titan = run.stats.titanSeconds ?? Infinity;
+  const tier = RANK_THRESHOLDS.find((t) => run.score >= t.score && run.shrineHp >= t.fountain && titan <= t.titanSeconds);
+  return tier ? tier.rank : 'C';
 }
 
 /** End-of-wave bonus: points for every Sun Fountain HP left plus a clear bonus that grows each wave. */

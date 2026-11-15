@@ -7,6 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { WAVE_COUNT } from '../game/src/config.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
 import { currentBanner, winLoseHeadline } from '../game/src/announce.js';
+import { rankFor } from '../game/src/combat.js';
 
 const manifest = JSON.parse(readFileSync('tools/shots-manifest.json', 'utf8'));
 const failures = [];
@@ -40,6 +41,7 @@ function hudFacts(run) {
     log: run.log.join(' | '),
     sunsHeld: run.stats.wavesCleared,
     offersSeen: run.stats.offersSeen,
+    rank: rankFor(run),
   };
 }
 
