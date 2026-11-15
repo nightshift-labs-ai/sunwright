@@ -196,5 +196,15 @@ export const SYNERGY = {
   mend: 'sunstone', longchain: 'spreading',
 };
 
+/** FEATS: badges a finished run earns (saved across runs; the title counts them). test(run) on the sim state. */
+export const FEATS = [
+  { id: 'titan', name: 'TITAN ASH', test: (run) => run.phase === 'won' },
+  { id: 'basin', name: 'FULL BASIN', test: (run) => run.phase === 'won' && run.shrineHp >= 8 },
+  { id: 'swift', name: 'SWIFT ASH', test: (run) => run.stats.titanSeconds !== undefined && run.stats.titanSeconds < 30 },
+  { id: 'burned', name: '200 BURNED', test: (run) => run.stats.kills >= 200 },
+  { id: 'sear', name: 'SEAR x40', test: (run) => run.chain.best >= 40 },
+  { id: 'scorched', name: 'SCORCHED WIN', test: (run) => run.phase === 'won' && run.difficultyId === 'scorched' },
+];
+
 /** The game's scope in one line, counted from the tables above (title screen and index.html note). */
 export const SCOPE_LINE = `${PIECE_ORDER.length} glass - ${ENEMY_ORDER.filter((t) => !ENEMIES[t].boss).length} beetles + the Titan - ${WAVE_COUNT} suns - ${BOONS.length} charms - ${DIFFICULTY_ORDER.length} difficulties`;

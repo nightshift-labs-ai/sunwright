@@ -1,5 +1,5 @@
 // Persistence in localStorage: best score and furthest sun per difficulty, the run history shown
-// on the results screen, and settings.
+// on the results screen, the FEATS earned, and settings.
 const KEY = 'sunwright.save.v1';
 
 function readSave() {
@@ -37,8 +37,14 @@ export function recordRun(summary) {
   const isBest = summary.score > old.score;
   data.best[summary.difficultyId] = { score: Math.max(old.score, summary.score), waves: Math.max(old.waves, summary.suns) };
   data.history = [...(data.history ?? []), summary].slice(-HISTORY_KEEP);
+  data.feats = [...new Set([...(data.feats ?? []), ...(summary.feats ?? [])])];
   writeSave(data);
   return { isBest, previousBest: old.score };
+}
+
+/** Every FEAT id any finished run has earned. */
+export function loadFeats() {
+  return readSave().feats ?? [];
 }
 
 /** Finished runs, oldest first. */

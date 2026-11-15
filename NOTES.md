@@ -274,6 +274,12 @@
   line drops its third line (M sound on) and the right urn made room. Playtest clicks all three
   (speed on/off, mute saved on/off, pause then Esc). Cover text items 61 -> 60.
 
+- Benchmark 6 item 10: FEATS (config FEATS, tested on the finished run; runSummary lists them, the save
+  keeps their union): TITAN ASH, FULL BASIN (win at 8/10+), SWIFT ASH (Titan under 30 s), 200 BURNED,
+  SEAR x40, SCORCHED WIN. Results: a FEATS 4/6 row of gold medals replaces the NEXT GOAL line; title:
+  a FEATS n/6 chip beside PLAY. The title is now shot last (after the staged run is saved): FEATS 4/6,
+  NORMAL best 33,090. check-shot-truth replays both from the runs.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.

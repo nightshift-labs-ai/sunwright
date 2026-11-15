@@ -1,7 +1,7 @@
 // The run state and its fixed-step update. Input never touches this state directly: it queues
 // orders, and stepSim applies them at the start of the next 60 Hz tick, then advances the phase
 // machine build -> wave -> draft -> build ... -> won | lost.
-import { BEAM, CHARM_FX, DIFFICULTIES, DT, ECONOMY, FLARE_CHARGES, FOUNTAIN_MAX, PIECES, WAVE_COUNT } from './config.js';
+import { BEAM, CHARM_FX, DIFFICULTIES, FEATS, DT, ECONOMY, FLARE_CHARGES, FOUNTAIN_MAX, PIECES, WAVE_COUNT } from './config.js';
 import { beamModsFor, traceBeams } from './beams.js';
 import { sunApertureFor } from './sun.js';
 import { moveEnemies, shellBlockers, spawnEnemy } from './enemies.js';
@@ -225,7 +225,8 @@ export function stepSim(run, orders) {
 
 /** What the save keeps of a finished run (also shown in the results' RUN HISTORY). */
 export function runSummary(run) {
-  return { difficultyId: run.difficultyId, outcome: run.phase, score: run.score, suns: run.stats.wavesCleared, day: run.aperture.day, phase: run.aperture.phase.name };
+  const feats = FEATS.filter((f) => f.test(run)).map((f) => f.id);
+  return { difficultyId: run.difficultyId, outcome: run.phase, score: run.score, suns: run.stats.wavesCleared, day: run.aperture.day, phase: run.aperture.phase.name, feats };
 }
 
 /** Waves still to spawn plus beetles on the board, for the HUD's remaining bar. */

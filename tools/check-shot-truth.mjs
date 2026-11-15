@@ -4,7 +4,7 @@
 // Also checks each screenshot file: JPEG, 1280x800, at most 256 KiB, and the shots sort the cover first.
 //   node tools/check-shot-truth.mjs
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { ENEMIES, WAVE_COUNT } from '../game/src/config.js';
+import { ENEMIES, FEATS, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
 import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
@@ -106,7 +106,11 @@ for (const shot of manifest.shots) {
   check(JSON.stringify(t.rows.map((r) => ({ tag: r.tag, line: r.line }))) === JSON.stringify(want), `${shot.name} rules table: shown ${JSON.stringify(t.rows)} vs ${JSON.stringify(want)}`);
   for (const r of t.rows) check(r.px >= 28 && r.inside, `${shot.name} rule ${r.tag}: ${r.px}px, inside ${r.inside}`);
   check(t.hint === 'CLICK PLAY OR PRESS ENTER' && t.hintPx >= 34, `${shot.name} start hint: ${t.hint} (${t.hintPx}px)`);
-  console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.tag} ${r.line}`).join(' | ')}; ${t.hint}`);
+  // FEATS on the title: every feat any saved run earned (the earlier runs and the staged one, all replayed).
+  const runs = [...(manifest.history ?? []).map((h) => runSummary(replayTo(h.endTick + 2, h.seed, h.log))), runSummary(replayTo(manifest.shots.find((s) => s.name === '4-results.jpg').state.tick))];
+  const featsWant = `FEATS ${new Set(runs.flatMap((r) => r.feats)).size}/${FEATS.length}`;
+  check(t.feats === featsWant, `${shot.name} ${t.feats} vs ${featsWant}`);
+  console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.tag} ${r.line}`).join(' | ')}; ${t.hint}; ${t.feats}`);
 }
 
 // Draft: each roundel's effect line is its charm's line from config, the pick hint counts the offer,
@@ -212,6 +216,9 @@ for (const shot of manifest.shots) {
       check(strip.label === `LAST ${expected.length} RUNS` && strip.labelPx >= 30, `${shot.name} strip label: ${strip.label} at ${strip.labelPx}px`);
       check(strip.cap === '', `${shot.name} lose title in the strip: ${strip.cap}`);
       if (shot.state.phase === 'won') check(strip.capElsewhere === 0, `${shot.name} lose title shown outside the strip on a win`);
+      const featWant = runSummary(replayTo(shot.state.tick)).feats.map((id) => FEATS.find((f) => f.id === id).name);
+      check(JSON.stringify(strip.feats) === JSON.stringify(featWant) && strip.featsLabel === `FEATS ${featWant.length}/${FEATS.length}`, `${shot.name} FEATS: shown ${strip.featsLabel} ${strip.feats} vs ${featWant}`);
+      console.log(`${shot.name} ${strip.featsLabel}: ${strip.feats.join(', ')}`);
       console.log(`${shot.name} strip: ${strip.label} (${strip.labelPx}px) ${strip.cap} (${strip.capPx}px) | ${strip.chips.map((c) => c.text).join(' | ')}`);
     }
     console.log(`${shot.name} RUN HISTORY: ${expected.map((h) => `${h.outcome} day ${h.day} ${h.phase} ${h.score}`).join(' | ')}; BEST before ${bestBefore}`);

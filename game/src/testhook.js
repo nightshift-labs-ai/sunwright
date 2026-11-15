@@ -96,6 +96,8 @@ function resultsText() {
     capPx: px(cap),
     capElsewhere: elsewhere.length,
     chips: [...strip.querySelectorAll('.chip')].map((n) => ({ text: n.textContent.trim(), won: n.classList.contains('won') })),
+    featsLabel: document.querySelector('#results-feats b')?.textContent.trim() ?? '',
+    feats: [...document.querySelectorAll('#results-feats .feat')].map((n) => n.textContent.trim()),
   };
 }
 

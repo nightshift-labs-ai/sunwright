@@ -1,11 +1,13 @@
 // DOM overlays above the canvas: title (with difficulty picker and best scores), how to play,
 // pause, the draft's stained-glass roundels, and the results screen. Buttons only queue
 // { kind: 'ui', action, arg } intents; main.js decides what they do.
-import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, NAMES, PIECES, PIECE_ORDER, RESULT_LOSE_TITLE, RESULT_WIN_TITLE, SCOPE_LINE, SYNERGY, WAVE_COUNT } from '../config.js';
+import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, FEATS, NAMES, PIECES, PIECE_ORDER, RESULT_LOSE_TITLE, RESULT_WIN_TITLE, SCOPE_LINE, SYNERGY, WAVE_COUNT } from '../config.js';
 import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { rankFor } from '../combat.js';
+import { runSummary } from '../sim.js';
+import { loadFeats } from '../save.js';
 import { draftContext, draftHeal, draftHint, historyChip, titleRules } from '../announce.js';
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
@@ -59,6 +61,7 @@ export function showTitle(menus, bestFor, selected) {
       <b>${DIFFICULTIES[id].name}</b><small>${best.played ? `best ${best.score.toLocaleString('en-US')}` : 'not played yet'}</small></button>`;
   }).join('');
   el('rule-scope').textContent = SCOPE_LINE;
+  el('feats-count').textContent = `FEATS ${loadFeats().length}/${FEATS.length}`;
   // The rules table: icon, gold tag, one line per rule (announce.titleRules, numbers from config).
   el('title-rules').innerHTML = titleRules()
     .map((r) => `<div class="rule rule-${r.icon}"><canvas width="36" height="36" data-icon="${r.icon}"></canvas><b>${escapeHtml(r.tag)}</b><span>${escapeHtml(r.line)}</span></div>`)
@@ -129,12 +132,6 @@ function fitHeading(node, maxPx, room) {
   node.style.setProperty('--fit', String(Math.min(1, Math.max(MIN_SQUEEZE, k))));
 }
 
-/** What to aim for next, from this run's outcome and difficulty. */
-function nextGoal(run) {
-  if (run.phase !== 'won') return `NEXT GOAL: hold ${run.stats.wavesCleared + 1} ${NAMES.suns.toLowerCase()}`;
-  const harder = DIFFICULTY_ORDER[DIFFICULTY_ORDER.indexOf(run.difficultyId) + 1];
-  return harder ? `NEXT GOAL: win on ${DIFFICULTIES[harder].name}` : `NEXT GOAL: beat ${run.score.toLocaleString('en-US')}`;
-}
 
 /**
  * Results: THE TITAN IS ASH (or THE SWARM BROKE THROUGH) across the top, then score with NEW BEST,
@@ -169,7 +166,9 @@ export function showResults(menus, run, record, history) {
     ? `<div class="strip-head"><b>LAST ${history.length} RUN${history.length > 1 ? 'S' : ''}</b></div>` +
       `<div class="chips">${history.map((h) => `<span class="chip ${h.outcome === 'won' ? 'won' : 'fell'}">${historyChip(h)}</span>`).join('')}</div>`
     : '';
-  el('results-next').textContent = nextGoal(run);
+  // FEATS this run earned, as gold medals (config FEATS, tested on the finished run).
+  const earned = runSummary(run).feats;
+  el('results-feats').innerHTML = `<b>FEATS ${earned.length}/${FEATS.length}</b>` + earned.map((id) => `<span class="feat"><i></i>${escapeHtml(FEATS.find((f) => f.id === id).name)}</span>`).join('');
 }
 
 /** R / S on the results screen (and the RUN AGAIN / SAME SEED buttons): queue a fresh run. */
