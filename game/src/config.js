@@ -179,7 +179,7 @@ export const BOONS = [
   { id: 'burning', name: NAMES.charm.burning, text: `Lens focus reaches +${CHARM_FX.burning.lensReach} cells`, line: `Lens reach +${CHARM_FX.burning.lensReach}`, weight: 3, hue: 22 },
   { id: 'flare2', name: NAMES.charm.flare2, text: `+${CHARM_FX.flare2.charges} Flare charge every sun`, line: `+${CHARM_FX.flare2.charges} Flare every sun`, weight: 3, hue: 48 },
   { id: 'magnet', name: NAMES.charm.magnet, text: `Every beetle drops +${CHARM_FX.magnet.quartz} quartz`, line: `+${CHARM_FX.magnet.quartz} quartz a kill`, weight: 3, hue: 280 },
-  { id: 'discount', name: NAMES.charm.discount, text: `Mirrors and splitters cost ${CHARM_FX.discount.cost} less`, line: `Mirror, Splitter -${CHARM_FX.discount.cost}`, weight: 3, hue: 160 },
+  { id: 'discount', name: NAMES.charm.discount, text: `Mirrors and splitters cost ${CHARM_FX.discount.cost} less`, line: `Mirror & Splitter cost ${CHARM_FX.discount.cost} less`, weight: 3, hue: 160 },
   { id: 'sunstone', name: NAMES.charm.sunstone, text: `Fountain heals ${CHARM_FX.sunstone.heal} HP after every sun`, line: `Fountain +${CHARM_FX.sunstone.heal} a sun`, weight: 2, hue: 140 },
   { id: 'mend', name: NAMES.charm.mend, text: `Heal the fountain ${CHARM_FX.mend.heal} HP`, line: `Fountain +${CHARM_FX.mend.heal} now`, weight: 3, hue: 120, repeat: true },
   { id: 'spreading', name: NAMES.charm.spreading, text: 'Burned beetles scorch their neighbours', line: 'Kills burn nearby', weight: 2, hue: 8 },

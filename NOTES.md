@@ -263,6 +263,12 @@
   dial's NEXT line and chip (the pill says it), DRY = RUN LOST (the frieze says it), BEST, and the idle
   tooltip lines. Cover canvas text items (fillText per frame, /tmp count script): 61 before, 61 after.
 
+- Benchmark 6 item 8: draft: the staged offer's Spreading Burn is the rule-changing charm (kills scorch
+  their neighbours); Glass Discount reads `Mirror & Splitter cost 1 less` (effect boxes may wrap to
+  2 lines within their column); the white X at the next beam's end is drawn only when it MISSES; the
+  verdict plaque moved up to y 166 (roundel keys touched it) and the draft collision check now
+  includes that canvas plaque's band.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.

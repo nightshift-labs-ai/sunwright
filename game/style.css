@@ -72,7 +72,7 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
 .roundel .glyph { width: 96px; height: 96px; margin-top: 4px; }
 .roundel b { font: 900 26px system-ui, sans-serif; line-height: 1.05; color: #7a2e14; }
 .roundel .key { position: absolute; top: -34px; width: 68px; height: 68px; border-radius: 50%; background: #f2c14e; border: 4px solid #fff6df; color: #3b1247; font: 900 48px system-ui, sans-serif; display: flex; align-items: center; justify-content: center; }
-.roundel .effect { position: absolute; top: calc(100% + 34px); white-space: nowrap; padding: 4px 16px; font: 800 30px system-ui, sans-serif; line-height: 1.2; letter-spacing: 0; color: #fff6df; background: rgba(31, 63, 153, 0.95); border: 3px solid #f2c14e; border-radius: 10px; }
+.roundel .effect { position: absolute; top: calc(100% + 30px); width: max-content; max-width: 340px; white-space: normal; text-align: center; padding: 4px 16px; font: 800 30px system-ui, sans-serif; line-height: 1.2; letter-spacing: 0; color: #fff6df; background: rgba(31, 63, 153, 0.95); border: 3px solid #f2c14e; border-radius: 10px; }
 .roundel:hover { transform: translateY(-4px) scale(1.03); }
 .draft-foot { position: absolute; bottom: 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .draft-keys { display: flex; gap: 24px; align-items: center; }

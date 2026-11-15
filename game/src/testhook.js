@@ -69,6 +69,8 @@ function draftText() {
     if (a.r.left < 12 || a.r.top < 0 || a.r.right > 1268 || a.r.bottom > 800) bad.push(`${a.text} / screen edge`);
     for (const b of boxes.slice(i + 1)) if (a.r.left < b.r.right && b.r.left < a.r.right && a.r.top < b.r.bottom && b.r.top < a.r.bottom) bad.push(`${a.text} / ${b.text}`);
   });
+  // The canvas verdict plaque (fx.drawBeamGhost, y 166-210, at most x 330-950) is text too.
+  for (const a of boxes) if (a.r.top < 210 && a.r.bottom > 166 && a.r.left < 950 && a.r.right > 330) bad.push(`${a.text} / NEXT SUN verdict plaque`);
   // Each roundel owns a 400 px column; its effect line keeps a 12 px gutter inside it.
   for (const n of screen.querySelectorAll('.effect')) if (n.getBoundingClientRect().width > 388) bad.push(`${n.textContent.trim()} / wider than its column`);
   const all = (sel) => [...screen.querySelectorAll(sel)].map((n) => n.textContent.trim());

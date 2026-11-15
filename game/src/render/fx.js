@@ -398,7 +398,8 @@ export function drawBeamGhost(ctx, trace, pathCellsLit, time, wall) {
     }
   }
   ctx.setLineDash([]);
-  const end = beamTerminal(trace);
+  // The red X marks where the next beam dies short of the path; a beam that hits gets no mark.
+  const end = misses ? beamTerminal(trace) : null;
   if (end) {
     const x = toScreenX(end.x);
     const y = toScreenY(end.y);
@@ -423,13 +424,13 @@ export function drawBeamGhost(ctx, trace, pathCellsLit, time, wall) {
   const w = ctx.measureText(label).width + 36;
   ctx.fillStyle = 'rgba(31,63,153,0.92)';
   ctx.beginPath();
-  ctx.roundRect(640 - w / 2, 200, w, 44, 12);
+  ctx.roundRect(640 - w / 2, 166, w, 44, 12);
   ctx.fill();
   ctx.strokeStyle = color;
   ctx.lineWidth = 3;
   ctx.stroke();
   ctx.fillStyle = misses ? '#FF8A80' : '#FFE27A';
-  ctx.fillText(label, 640, 233);
+  ctx.fillText(label, 640, 199);
   ctx.restore();
 }
 
