@@ -265,8 +265,11 @@ function drawStarburst(ctx, x, y, r, alpha) {
   ctx.stroke();
 }
 
-/** Glow, halo and core widths and alphas of a beam. */
-const BEAM_PASSES = [[26, 0.32], [11, 0.75], [5, 0.95]];
+/**
+ * A beam's passes: [width per unit of power, cap px, alpha]: a soft halo (<= 12 px, 35%), the tinted
+ * core (<= 6 px: orange sunlight, red or blue prism light) and a 2 px white centre line.
+ */
+const BEAM_PASSES = [[7, 12, 0.35], [3.5, 6, 0.95], [2, 2, 0.95]];
 /** Glow / halo / core colours per tint: sunlight, red (1), blue (2), gold (4). */
 const TINT_COLORS = {
   0: ['rgba(255,197,49,', 'rgba(255,128,24,', 'rgba(255,251,230,'],
@@ -293,14 +296,14 @@ export function drawBeams(ctx, trace, opts) {
   g.setTransform(ctx.getTransform());
   g.lineCap = 'round';
   for (let pass = 0; pass < 3; pass++) {
-    const [width, a] = BEAM_PASSES[pass];
+    const [width, cap, a] = BEAM_PASSES[pass];
     for (const leg of trace.legs) {
       const w = Math.min(1.7, Math.max(0.5, Math.sqrt(leg.power / 10))) * surge;
       const colors = leg.focused && pass < 2 ? FOCUS_COLORS : TINT_COLORS[leg.tint] ?? TINT_COLORS[0];
       g.strokeStyle = `${colors[pass]}${a})`;
-      g.lineWidth = width * w;
+      g.lineWidth = Math.min(cap, width * w);
       // Colour-blind option: prism light also differs by pattern (red long dashes, blue dots).
-      g.setLineDash(opts.patterns && pass === 2 ? TINT_DASHES[leg.tint] ?? [] : []);
+      g.setLineDash(opts.patterns && pass >= 1 ? TINT_DASHES[leg.tint] ?? [] : []);
       g.beginPath();
       g.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));
       g.lineTo(toScreenX(leg.x1), toScreenY(leg.y1));

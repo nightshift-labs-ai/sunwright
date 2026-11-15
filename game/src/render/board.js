@@ -482,7 +482,8 @@ function easeTurn(piece, time) {
 }
 
 /** Draw one piece standing in cell (c, r). alpha < 1 for the placement ghost. */
-export function drawPiece(ctx, piece, c, r, shadow, time, alpha = 1) {
+/** One piece on its plinth; glow = the light is on it (the pane itself glows warm, no cell box). */
+export function drawPiece(ctx, piece, c, r, shadow, time, alpha = 1, glow = false) {
   const px = BOARD_X + c * CELL;
   const py = BOARD_Y + r * CELL;
   const age = piece.placedAt === undefined ? 9 : time - piece.placedAt;
@@ -510,6 +511,10 @@ export function drawPiece(ctx, piece, c, r, shadow, time, alpha = 1) {
     return;
   }
   ctx.translate(cx, cy);
+  if (glow) {
+    ctx.shadowColor = 'rgba(255,196,48,1)';
+    ctx.shadowBlur = 22;
+  }
   const angle = easeTurn(piece, time);
   if (piece.type === 'mirror' || piece.type === 'splitter') {
     // Rot 0 = "/" (bottom-left to top-right); each step turns 90 degrees.
@@ -594,21 +599,12 @@ export function drawPieces(ctx, grid, shadow, time, lit = null, next = null) {
       const i = r * grid.cols + c;
       const p = grid.pieces[i];
       if (!p) continue;
-      drawPiece(ctx, p, c, r, shadow, time);
-      if (!lit || p.type === 'pillar') continue;
+      const litNow = !!lit && lit[i] > 0 && p.type !== 'pillar';
+      drawPiece(ctx, p, c, r, shadow, time, 1, litNow);
+      if (!lit || p.type === 'pillar' || litNow) continue;
       const x = BOARD_X + c * CELL;
       const y = BOARD_Y + r * CELL;
-      if (lit[i] > 0) {
-        ctx.save();
-        ctx.globalCompositeOperation = 'lighter';
-        ctx.strokeStyle = 'rgba(255,240,190,0.55)';
-        ctx.lineWidth = 8;
-        ctx.strokeRect(x + 5, y + 5, CELL - 10, CELL - 10);
-        ctx.restore();
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 2.5;
-        ctx.strokeRect(x + 5, y + 5, CELL - 10, CELL - 10);
-      } else if (next && next.lit[i] > 0) {
+      if (next && next.lit[i] > 0) {
         ctx.setLineDash([7, 5]);
         ctx.strokeStyle = PALETTE.gold;
         ctx.lineWidth = 3;

@@ -252,6 +252,11 @@
   lerps orange -> white with heat (1 - hp/max), keeps 3-5 embers rising off it (fx, deterministic
   RNG) and a thin smoke puff. The staged cover tick has no beetle in the light; the title demo shows it.
 
+- Benchmark 6 item 6: clean beams: three passes, a soft halo (<= 12 px, 35% alpha), a tinted core
+  (<= 6 px: orange sunlight, red/blue prism light) and a 2 px white centre, all capped whatever the
+  power (was a 26 px glow + 11 px edge that turned the prism loop lilac). Lit glass no longer gets a
+  white cell box: the pane itself glows gold (shadow blur on the sprite only, not the plinth).
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.
