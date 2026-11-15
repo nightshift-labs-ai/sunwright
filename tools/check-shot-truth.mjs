@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { ENEMIES, RESULT_LOSE_TITLE, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
-import { bannerSun, currentBanner, draftContext, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
+import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
 import { bannerLayout } from '../game/src/render/banner.js';
 import { FLOATER_REACH, beamHitAnchor, createFx, fxFromEvent, updateFx } from '../game/src/render/fx.js';
 import { DT } from '../game/src/config.js';
@@ -118,6 +118,7 @@ for (const shot of manifest.shots) {
   check(JSON.stringify(d.effects) === JSON.stringify(run.offer.map((id) => boonById(id).line)), `${shot.name} roundel effects: shown ${JSON.stringify(d.effects)} vs offer ${run.offer.join(',')}`);
   check(d.hint === draftHint(run), `${shot.name} pick hint: shown ${d.hint} vs ${draftHint(run)}`);
   check(d.context === draftContext(run) && d.contextPx >= 34, `${shot.name} draft context: shown ${d.context} (${d.contextPx}px) vs ${draftContext(run)}`);
+  check(d.heal === draftHeal(run), `${shot.name} heal chip: shown '${d.heal}' vs '${draftHeal(run)}'`);
   check(d.overlaps.length === 0, `${shot.name} draft text collides: ${d.overlaps.join(' | ')}`);
   console.log(`${shot.name}: ${d.context}; roundels ${d.effects.join(' / ')}; ${d.hint}; ${d.overlaps.length} collisions`);
 }
@@ -174,6 +175,25 @@ for (const shot of manifest.shots) {
   if (lit.length < 0.7 * glass.length || stray.length) console.log(`NOTE ${shot.name}: solved plan not met (${stray.length} stray panes)`);
   check(shot.state.shrineHp < shot.state.shrineMax, `${shot.name} fountain is full: no lose threat on the cover`);
   console.log(`${shot.name}: ${lit.length}/${glass.length} glass lit, ${glass.length - lit.length - stray.length} on the next sun's ghost, ${stray.length} stray, fountain ${shot.state.shrineHp}/${shot.state.shrineMax}`);
+}
+
+// One run: the in-game shots, in tick order, agree with each other. Score, beetles burned and suns
+// held only grow; the charms owned on a later shot start with the earlier shot's picks; the fountain
+// on a later shot is at most the earlier one plus the heals shown (the draft's Sunstone chip).
+{
+  const play = manifest.shots.filter((s) => s.state.screen === 'play').sort((a, b) => a.state.tick - b.state.tick);
+  for (let i = 1; i < play.length; i++) {
+    const a = play[i - 1].state;
+    const b = play[i].state;
+    const pair = `${play[i - 1].name} -> ${play[i].name}`;
+    check(b.score >= a.score && b.kills >= a.kills && b.sunsHeld >= a.sunsHeld, `${pair}: score/burned/suns go down`);
+    check(b.boons.slice(0, a.boons.length).join() === a.boons.join(), `${pair}: charms ${a.boons} are not the start of ${b.boons}`);
+    if (play[i].draftText) {
+      const heal = Number((play[i].draftText.heal.match(/^\+(\d+)/) ?? [0, 0])[1]);
+      check(b.shrineHp <= a.shrineHp + heal, `${pair}: fountain ${a.shrineHp} -> ${b.shrineHp} with ${heal} shown healed`);
+    }
+    console.log(`${pair}: score ${a.score} -> ${b.score}, burned ${a.kills} -> ${b.kills}, fountain ${a.shrineHp} -> ${b.shrineHp}${play[i].draftText?.heal ? ` (${play[i].draftText.heal})` : ''}`);
+  }
 }
 
 // RUN HISTORY and BEST: the earlier real runs and the main run, replayed, must be what the save shows.

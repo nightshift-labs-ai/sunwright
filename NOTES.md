@@ -234,6 +234,11 @@
   the demo courtyard is whole on the right (scale 0.649) with HOW TO PLAY / OPTIONS under it.
   check-shot-truth compares the rows and sizes.
 
+- Benchmark 6 item 2: the 3 in-game shots read as one run. Draft context counts the run's burned total
+  (81, results 229; was the sun's 28); a +1 SUNSTONE chip names the heal after the sun (stats.sunHeal),
+  so cover 7/10 -> draft 8/10 adds up. check-shot-truth: in tick order score, burned and suns only
+  grow, charms extend the earlier picks, fountain <= earlier + shown heal.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.

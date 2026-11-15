@@ -88,9 +88,14 @@ export function bannerSun(run) {
   return run.waveIndex;
 }
 
-/** The draft's context line under its heading: the sun just held, what burned in it, the fountain. */
+/** The draft's context line under its heading: suns held, beetles burned so far (the run's total), the fountain. */
 export function draftContext(run) {
-  return `${NAMES.sun} ${run.stats.wavesCleared} HELD - ${run.stats.sunKills} burned - ${NAMES.fountainShort} ${run.shrineHp}/${run.shrineMax}`;
+  return `${NAMES.sun} ${run.stats.wavesCleared} HELD - ${run.stats.kills} burned - ${NAMES.fountainShort} ${run.shrineHp}/${run.shrineMax}`;
+}
+
+/** The chip beside it when Sunstone mended the fountain after this sun (else ''). */
+export function draftHeal(run) {
+  return run.stats.sunHeal > 0 ? `+${run.stats.sunHeal} ${NAMES.charm.sunstone.toUpperCase()}` : '';
 }
 
 /** How to take a charm, under the draft roundels. */

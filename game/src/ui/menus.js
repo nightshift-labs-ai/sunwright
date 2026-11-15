@@ -6,7 +6,7 @@ import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { rankFor } from '../combat.js';
-import { draftContext, draftHint, historyChip, titleRules } from '../announce.js';
+import { draftContext, draftHeal, draftHint, historyChip, titleRules } from '../announce.js';
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
 import { drawRuleIcon } from '../render/ruleicons.js';
@@ -74,7 +74,8 @@ export function showDraft(menus, run) {
   const ap = sunApertureFor(run.seed, run.waveIndex);
   el('draft-banner').textContent = `${NAMES.sun} MOVES ${ap.phase.wallName} - PICK 1`;
   fitHeading(el('draft-banner'), 112, 1160);
-  el('draft-context').textContent = draftContext(run);
+  const heal = draftHeal(run);
+  el('draft-context').innerHTML = `<span class="ctx">${escapeHtml(draftContext(run))}</span>${heal ? `<span class="healchip">${escapeHtml(heal)}</span>` : ''}`;
   el('draft-roundels').innerHTML = run.offer
     .map((id, i) => {
       const b = boonById(id);

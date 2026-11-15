@@ -72,8 +72,9 @@ function draftText() {
   // Each roundel owns a 400 px column; its effect line keeps a 12 px gutter inside it.
   for (const n of screen.querySelectorAll('.effect')) if (n.getBoundingClientRect().width > 388) bad.push(`${n.textContent.trim()} / wider than its column`);
   const all = (sel) => [...screen.querySelectorAll(sel)].map((n) => n.textContent.trim());
-  const context = document.getElementById('draft-context');
-  return { effects: all('.effect'), hint: all('.draft-hint')[0], reroll: all('#draft-reroll')[0], context: context.textContent.trim(), contextPx: parseFloat(getComputedStyle(context).fontSize), overlaps: bad };
+  const context = document.querySelector('#draft-context .ctx');
+  const heal = document.querySelector('#draft-context .healchip');
+  return { effects: all('.effect'), hint: all('.draft-hint')[0], reroll: all('#draft-reroll')[0], context: context.textContent.trim(), heal: heal ? heal.textContent.trim() : '', contextPx: parseFloat(getComputedStyle(context).fontSize), overlaps: bad };
 }
 
 /** The results LAST 3 RUNS strip as shown: label, small lose title, chips, their type sizes, and any
