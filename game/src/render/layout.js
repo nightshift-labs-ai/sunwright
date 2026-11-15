@@ -30,4 +30,4 @@ export function cellAtPixel(px, py) {
 }
 
 /** HUD anchors that effects fly towards (the quartz counter) or burst from (the Sun Fountain pips). */
-export const QUARTZ_ANCHOR = { x: 1100, y: 138 };
+export const QUARTZ_ANCHOR = { x: 1100, y: 182 };

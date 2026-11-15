@@ -227,36 +227,31 @@ function drawFountainPips(ctx, run, y) {
       ctx.stroke();
     }
   }
-  text(ctx, 'EMPTY = RUN LOST', LEFT_X + PANEL_W / 2, y + 100, 20, '#FFB0B0', 'center', 900);
+  ctx.save();
+  ctx.translate(LEFT_X + PANEL_W / 2, y + 100);
+  ctx.font = `900 20px ${FONT}`;
+  const squeeze = Math.min(1, (PANEL_W - 20) / ctx.measureText('EMPTY = RUN LOST').width);
+  ctx.scale(squeeze, 1);
+  text(ctx, 'EMPTY = RUN LOST', 0, 0, 20, '#FFB0B0', 'center', 900);
+  ctx.restore();
 }
 
-function drawSearMeter(ctx, run, y) {
-  const mult = chainMultiplier(run.chain.count);
-  const active = run.chain.count >= 2;
-  text(ctx, NAMES.combo, LEFT_X + 10, y, 17, INK, 'left', 900);
-  const pop = Math.max(0, 1 - (run.time - run.feedback.searAt) / 0.25);
-  text(ctx, active ? `x${mult}` : 'x1', LEFT_X + PANEL_W - 10, y + 6, active ? 32 + pop * 14 : 22, active ? '#FFF2A8' : 'rgba(255,246,223,0.6)', 'right', 900);
-  ctx.fillStyle = 'rgba(30,20,60,0.5)';
-  ctx.fillRect(LEFT_X + 10, y + 16, PANEL_W - 20, 7);
-  if (run.chain.timer > 0) {
-    ctx.fillStyle = '#FFD34D';
-    ctx.fillRect(LEFT_X + 10, y + 16, (PANEL_W - 20) * (run.chain.timer / chainWindow(run)), 7);
-  }
-  text(ctx, `longest x${run.chain.best}`, LEFT_X + 10, y + 42, 14, 'rgba(255,246,223,0.85)', 'left', 700);
-}
 
 function drawLeftPanel(ctx, run) {
+  panel(ctx, LEFT_X, 8, PANEL_W, 196);
+  drawSunDial(ctx, run, LEFT_X + PANEL_W / 2, 94);
+  panel(ctx, LEFT_X, 212, PANEL_W, 136);
+  drawFountainPips(ctx, run, 236);
+}
+
+/** The wide bar across the top: day, phase and sun count, then the 9-sun track. */
+function drawSunBar(ctx, run) {
   const { day, phase } = run.aperture;
-  panel(ctx, LEFT_X, 8, PANEL_W, 150);
-  text(ctx, `DAY ${day} - ${phase.name}`, LEFT_X + PANEL_W / 2, 32, 18, INK, 'center', 900);
-  text(ctx, `${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, LEFT_X + PANEL_W / 2, 68, 34, GOLD, 'center', 900);
-  drawSunTrack(ctx, LEFT_X + 18, 112, 22, 9, run.stats.wavesCleared, run.waveIndex);
-  panel(ctx, LEFT_X, 166, PANEL_W, 196);
-  drawSunDial(ctx, run, LEFT_X + PANEL_W / 2, 252);
-  panel(ctx, LEFT_X, 370, PANEL_W, 136);
-  drawFountainPips(ctx, run, 394);
-  panel(ctx, LEFT_X, 514, PANEL_W, 70);
-  drawSearMeter(ctx, run, 538);
+  const x = BOARD_X - WALL + 4;
+  const w = BOARD_W + WALL * 2 - 8;
+  panel(ctx, x, 4, w, 58);
+  text(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, x + 16, 44, 28, INK, 'left', 900);
+  drawSunTrack(ctx, x + w - 26 - 8 * 44, 33, 44, 13, run.stats.wavesCleared, run.waveIndex);
 }
 
 const ICON_ENEMIES = Object.fromEntries(Object.keys(ENEMIES).map((type) => [type, { id: 3, type, def: ENEMIES[type], heading: 0, hp: 1, maxHp: 1, litPower: 0, age: 0, x: 0, y: 0 }]));
@@ -337,32 +332,33 @@ function drawTooltip(ctx, run, ui, y0) {
   text(ctx, keys, RIGHT_X + 12, y0 + 96, 14, '#FFF2A8', 'left', 900);
 }
 
-function drawEventLog(ctx, run, y0) {
-  text(ctx, 'LOG', RIGHT_X + 12, y0 + 18, 13, 'rgba(255,246,223,0.75)', 'left', 900);
-  run.log
-    .slice()
-    .reverse()
-    .forEach((line, k) => text(ctx, line, RIGHT_X + 12, y0 + 40 + k * 20, 13, k === 0 ? INK : 'rgba(255,246,223,0.8)', 'left', 800));
-}
 
 function drawRightPanel(ctx, run, ui) {
   const x0 = RIGHT_X;
-  panel(ctx, x0, 8, PANEL_W, 150);
+  panel(ctx, x0, 8, PANEL_W, 128);
   text(ctx, 'SCORE', x0 + 12, 30, 15, INK, 'left', 900);
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 34, '#FFF2A8', 'right', 900);
   text(ctx, `BEST ${ui.best.toLocaleString('en-US')}`, x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
-  text(ctx, NAMES.currency, x0 + 12, 120, 15, INK, 'left', 900);
+  drawComboLine(ctx, run, x0, 120);
+  panel(ctx, x0, 142, PANEL_W, 62);
+  text(ctx, NAMES.currency, x0 + 12, 170, 15, INK, 'left', 900);
   drawQuartzGem(ctx, QUARTZ_ANCHOR.x, QUARTZ_ANCHOR.y);
   const pulse = Math.max(0, 1 - (run.time - run.feedback.quartzAt) / 0.3);
-  text(ctx, String(run.quartz), x0 + PANEL_W - 10, 146, 32 + pulse * 8, pulse > 0 ? '#FFFFFF' : '#BDF4FF', 'right', 900);
-  panel(ctx, x0, 166, PANEL_W, 222);
-  drawIncoming(ctx, run, 166);
-  panel(ctx, x0, 396, PANEL_W, 82);
-  drawCharmRow(ctx, run, 396);
-  panel(ctx, x0, 486, PANEL_W, 108);
-  drawTooltip(ctx, run, ui, 486);
-  panel(ctx, x0, 602, PANEL_W, 106);
-  drawEventLog(ctx, run, 602);
+  text(ctx, String(run.quartz), x0 + PANEL_W - 10, 190, 32 + pulse * 8, pulse > 0 ? '#FFFFFF' : '#BDF4FF', 'right', 900);
+  panel(ctx, x0, 212, PANEL_W, 222);
+  drawIncoming(ctx, run, 212);
+  panel(ctx, x0, 442, PANEL_W, 82);
+  drawCharmRow(ctx, run, 442);
+  panel(ctx, x0, 532, PANEL_W, 108);
+  drawTooltip(ctx, run, ui, 532);
+}
+
+/** SEAR combo under the score: the live multiplier (popping on each step) and the run's longest. */
+function drawComboLine(ctx, run, x0, y) {
+  const mult = chainMultiplier(run.chain.count);
+  const active = run.chain.count >= 2;
+  const pop = Math.max(0, 1 - (run.time - run.feedback.searAt) / 0.25);
+  text(ctx, `${NAMES.combo} x${active ? mult : 1}`, x0 + PANEL_W - 10, y + 8, active ? 26 + pop * 8 : 20, active ? '#FFF2A8' : 'rgba(255,246,223,0.7)', 'right', 900);
 }
 
 
@@ -389,22 +385,21 @@ function drawWinLoseFrieze(ctx, run) {
 function drawEventBanner(ctx, run) {
   const message = currentBanner(run);
   if (!message) return;
-  const x = BOARD_X - WALL + 4;
-  const w = BOARD_W + WALL * 2 - 8;
-  ctx.fillStyle = 'rgba(31,63,153,0.94)';
+  const w = Math.round(VIEW_W * 0.6);
+  const x = 640 - w / 2;
+  ctx.fillStyle = 'rgba(31,63,153,0.9)';
   ctx.beginPath();
-  ctx.roundRect(x, 2, w, 64, 12);
+  ctx.roundRect(x, BOARD_Y + 6, w, 62, 12);
   ctx.fill();
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 3;
   ctx.stroke();
-  ctx.font = `900 62px ${FONT}`;
-  const width = ctx.measureText(message).width;
-  const squeeze = Math.min(1, (w - 30) / width);
+  ctx.font = `900 61px ${FONT}`;
+  const squeeze = Math.min(1, (w - 28) / ctx.measureText(message).width);
   ctx.save();
-  ctx.translate(640, 57);
+  ctx.translate(640, BOARD_Y + 59);
   ctx.scale(squeeze, 1);
-  text(ctx, message, 0, 0, 62, '#FFE27A', 'center', 900);
+  text(ctx, message, 0, 0, 61, '#FFE27A', 'center', 900);
   ctx.restore();
 }
 
@@ -528,8 +523,9 @@ function drawHotbar(ctx, run, ui) {
 }
 
 export function drawHud(ctx, run, ui) {
-  drawEventBanner(ctx, run);
+  drawSunBar(ctx, run);
   drawWinLoseFrieze(ctx, run);
+  drawEventBanner(ctx, run);
   drawLeftPanel(ctx, run);
   drawRightPanel(ctx, run, ui);
   drawHotbar(ctx, run, ui);

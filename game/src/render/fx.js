@@ -4,6 +4,7 @@
 import { NAMES, WAVE_COUNT } from '../config.js';
 import { beamModsFor, traceBeams } from '../beams.js';
 import { sunApertureFor } from '../sun.js';
+import { currentBanner } from '../announce.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
 import { boardLabelBoxes } from './board.js';
 
@@ -278,6 +279,8 @@ export function ghostLabelBox(trace, label) {
 /** Labels on the board that floaters must keep clear of: floor words and the NEXT SUN tag. */
 export function boardTextBoxes(run) {
   const boxes = boardLabelBoxes(run);
+  // The event banner plaque over the top of the courtyard (see hud.drawEventBanner).
+  if (currentBanner(run)) boxes.push({ text: 'BANNER', x0: 640 - VIEW_W * 0.3, x1: 640 + VIEW_W * 0.3, y0: BOARD_Y + 6, y1: BOARD_Y + 68 });
   if ((run.phase === 'wave' || run.phase === 'build') && run.waveIndex + 1 < WAVE_COUNT) {
     const ap = sunApertureFor(run.seed, run.waveIndex + 1);
     const trace = traceBeams(run.grid, ap, beamModsFor(run.boons));

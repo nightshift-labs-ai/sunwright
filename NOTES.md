@@ -113,6 +113,10 @@
   courtyard; else dropped. stageplan.mjs runs the same deterministic fx in Node to pick the cover;
   the test hook measures real boxes and check-shot-truth asserts zero overlaps.
 
+- Benchmark 4 item 9: calmer cover - LOG panel and SEAR panel gone (SEAR xN is a combo line under
+  SCORE), banner plaque 60% wide at cap 44 inside the north wall (floaters avoid it), wide top bar
+  with DAY - PHASE - SUN n/9 and the 9-sun track; left panel = sun dial + fountain.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.
