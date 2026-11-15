@@ -62,11 +62,11 @@ export const BOARD = {
 };
 
 export const PIECES = {
-  mirror: { name: NAMES.piece.mirror, cost: 3, blurb: 'Bounces light 90 degrees (-10% power)', short: 'turns light 90 degrees' },
-  splitter: { name: NAMES.piece.splitter, cost: 5, blurb: 'Halves the beam: half passes, half bounces', short: 'halves the beam' },
-  lens: { name: NAMES.piece.lens, cost: 7, blurb: 'x2.5 power for 3 cells, then the beam ends', short: 'focuses x2.5 for 3 cells' },
-  pillar: { name: NAMES.piece.pillar, cost: 1, blurb: 'Blocks beetles and light', short: 'blocks beetles and light' },
-  prism: { name: NAMES.piece.prism, cost: 8, blurb: 'Fans light: red burns, blue slows, gold pierces armour', short: 'splits burn, slow, pierce', unlockWave: 3 },
+  mirror: { name: NAMES.piece.mirror, cost: 3, blurb: 'Bounces light 90 degrees (-10% power)', short: 'turns light 90 degrees', verb: 'turns light' },
+  splitter: { name: NAMES.piece.splitter, cost: 5, blurb: 'Halves the beam: half passes, half bounces', short: 'halves the beam', verb: 'halves light' },
+  lens: { name: NAMES.piece.lens, cost: 7, blurb: 'x2.5 power for 3 cells, then the beam ends', short: 'focuses x2.5 for 3 cells', verb: 'focuses x2.5' },
+  pillar: { name: NAMES.piece.pillar, cost: 1, blurb: 'Blocks beetles and light', short: 'blocks beetles', verb: 'blocks beetles' },
+  prism: { name: NAMES.piece.prism, cost: 8, blurb: 'Fans light: red burns, blue slows, gold pierces armour', short: 'splits burn, slow, pierce', verb: 'fans 3 colours', unlockWave: 3 },
 };
 export const PIECE_ORDER = ['mirror', 'splitter', 'lens', 'pillar', 'prism'];
 
@@ -92,6 +92,14 @@ export const ENEMIES = {
   glassback: { name: NAMES.enemy.glassback, hp: 40, speed: 0.95, armour: 0, flies: false, harm: 2, quartz: 2, score: 50, size: 0.45, blocksLight: true },
   titan: { name: NAMES.enemy.titan, hp: 1100, speed: 0.36, armour: 30, flies: false, harm: 5, quartz: 0, score: 1500, size: 0.85, boss: true },
 };
+/** A beetle kind's rule in one word, from its stats (INCOMING tags): boss, deflects, armoured, fast. */
+export function enemyRuleTag(def) {
+  if (def.boss) return 'boss';
+  if (def.blocksLight) return 'deflects';
+  if (def.armour > 0) return 'armoured';
+  if (def.speed >= 1.3) return 'fast';
+  return '';
+}
 /** The Hornback Titan's carapace opens (armour 0) for `open` seconds out of every `cycle`. */
 export const TITAN_CARAPACE = { cycle: 6, open: 2.5 };
 

@@ -2,8 +2,9 @@
 // the event banner, the 9-sun track with HOLD n MORE SUNS, the sun dial (NOW / NEXT), fountain
 // droplets with the lose rule, SEAR, score with BEST, quartz, INCOMING (with the Titan's row),
 // glass charms, the hovered piece's tooltip and keys, the event log, and the hotbar.
-import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, WAVE_COUNT } from '../config.js';
+import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, WAVE_COUNT, enemyRuleTag } from '../config.js';
 import { boonById } from '../draft.js';
+import { beamModsFor } from '../beams.js';
 import { chainMultiplier, chainWindow } from '../combat.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
 import { winLoseHeadline } from '../announce.js';
@@ -19,6 +20,8 @@ const INK = '#FFF6DF';
 const GOLD = '#F2C14E';
 const FONT = 'system-ui, "Segoe UI", sans-serif';
 const PANEL_W = 212;
+/** The left panel: sun dial, then the FOUNTAIN pips (the next sun and the lose rule are said once, elsewhere). */
+const LEFT_PANEL_H = 250;
 const LEFT_X = 6;
 const RIGHT_X = VIEW_W - PANEL_W - 6;
 
@@ -190,21 +193,6 @@ function drawSunDial(ctx, run, cx, cy) {
     }
     text(ctx, wall[0].toUpperCase(), gx, gy + (wall === 'north' ? -22 : 30), 15, INK, 'center', 900);
   }
-  const nextLine = nextAp ? [`NEXT: ${nextAp.phase.name} (${nextAp.phase.wallName[0]})`, `NEXT: ${nextAp.phase.wallName}`] : 'FINAL SUN';
-  fitLine(ctx, nextLine, cx, cy + 54, PANEL_W - 16, 20, GOLD, 'center');
-  // The real trigger: the sun moves when this sun ends (never a timer).
-  if (nextAp) {
-    const chip = run.phase === 'build' ? 'after the coming sun' : 'after this sun';
-    ctx.font = `900 15px ${FONT}`;
-    const w = ctx.measureText(chip).width + 20;
-    ctx.fillStyle = '#FFB02E';
-    ctx.beginPath();
-    ctx.roundRect(cx - w / 2, cy + 62, w, 22, 11);
-    ctx.fill();
-    ctx.fillStyle = '#3B1247';
-    ctx.textAlign = 'center';
-    ctx.fillText(chip, cx, cy + 78);
-  }
 }
 
 /** One water droplet pip: pointed top, round bottom. */
@@ -244,20 +232,19 @@ function drawFountainPips(ctx, run, y) {
       ctx.stroke();
     }
   }
-  fitLine(ctx, ['EMPTY = RUN LOST', 'DRY = RUN LOST'], LEFT_X + PANEL_W / 2, y + 100, PANEL_W - 20, 20, '#FFB0B0', 'center');
 }
 
 
 function drawLeftPanel(ctx, run) {
-  panel(ctx, LEFT_X, 8, PANEL_W, 332);
+  panel(ctx, LEFT_X, 8, PANEL_W, LEFT_PANEL_H);
   drawSunDial(ctx, run, LEFT_X + PANEL_W / 2, 94);
   ctx.strokeStyle = 'rgba(242,193,78,0.6)';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(LEFT_X + 12, 194);
-  ctx.lineTo(LEFT_X + PANEL_W - 12, 194);
+  ctx.moveTo(LEFT_X + 12, 140);
+  ctx.lineTo(LEFT_X + PANEL_W - 12, 140);
   ctx.stroke();
-  drawFountainPips(ctx, run, 222);
+  drawFountainPips(ctx, run, 166);
 }
 
 /** The wide bar across the top: day, phase and sun count, then the 9-sun track. */
@@ -316,12 +303,17 @@ function drawIncoming(ctx, run, y0) {
     drawEnemyIcon(ctx, row.type, x0 + 26, y, 0.62);
     text(ctx, ENEMIES[row.type].name, x0 + 48, y + 6, 15, INK, 'left', 800);
     text(ctx, inWave ? `${left.get(row.type) ?? 0}` : `x${row.count}`, x0 + PANEL_W - 10, y + 7, 20, '#FFE14D', 'right', 900);
-    if (row.isNew && !inWave) text(ctx, 'NEW', x0 + 48, y + 21, 15, '#FF8AD0', 'left', 900);
-    y += row.isNew && !inWave ? 40 : 32;
+    // The kind's rule in one word (from its stats), and NEW before its first sun.
+    const rule = enemyRuleTag(ENEMIES[row.type]);
+    const isNew = row.isNew && !inWave;
+    if (rule) text(ctx, rule, x0 + 48, y + 27, 20, '#9FE8FF', 'left', 900);
+    if (isNew) text(ctx, 'NEW', rule ? x0 + PANEL_W - 10 : x0 + 48, y + 27, 15, '#FF8AD0', rule ? 'right' : 'left', 900);
+    y += rule || isNew ? 44 : 32;
   }
   const titanLeft = run.waveIndex === WAVE_COUNT - 1 && inWave ? left.get('titan') ?? 0 : 1;
   drawTitanSkull(ctx, x0 + 22, y, 9, titanLeft === 0, '#FF6B5E');
-  fitLine(ctx, [`${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, `${NAMES.sun} ${WAVE_COUNT}: THE TITAN`], x0 + 38, y + 5, PANEL_W - 46, 15, '#FFB0B0');
+  fitLine(ctx, [`${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, `${NAMES.sun} ${WAVE_COUNT}: THE TITAN`, `${NAMES.sun} ${WAVE_COUNT}: TITAN`], x0 + 38, y + 5, PANEL_W - 104, 15, '#FFB0B0');
+  text(ctx, enemyRuleTag(ENEMIES.titan), x0 + PANEL_W - 10, y + 7, 20, '#FF8A8A', 'right', 900);
   const preview = nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name);
   if (preview) {
     // Shorter wordings of the same preview: drop SUN, then keep only the first change.
@@ -354,8 +346,26 @@ function drawCharmRow(ctx, run, y0) {
 }
 
 /** What the mouse is over: the piece (drawn as a ghost), its cost and job, and its keys. */
+/** The GLASS legend: each piece's icon and what it does, one verb each (the lens with this run's focus). */
+function drawGlassLegend(ctx, run, y0) {
+  PIECE_ORDER.forEach((type, k) => {
+    const y = y0 + 20 + k * 20;
+    ctx.save();
+    ctx.translate(RIGHT_X + 26, y - 6);
+    ctx.scale(0.5, 0.5);
+    drawPieceIcon(ctx, type, 0, 0);
+    ctx.restore();
+    const verb = type === 'lens' ? `focuses x${beamModsFor(run.boons).lensMult}` : PIECES[type].verb;
+    text(ctx, verb, RIGHT_X + 52, y, 15, pieceUnlocked(run, type) ? INK : 'rgba(255,246,223,0.5)', 'left', 800);
+  });
+}
+
 function drawTooltip(ctx, run, ui, y0) {
   const hover = ui.hoverPiece;
+  if (!hover && !ui.ghost && !(ui.hintBad && ui.hint)) {
+    drawGlassLegend(ctx, run, y0);
+    return;
+  }
   const type = hover?.type ?? ui.selected;
   ctx.globalAlpha = 0.85;
   drawPieceIcon(ctx, type, RIGHT_X + 30, y0 + 40);
@@ -377,8 +387,6 @@ function drawRightPanel(ctx, run, ui) {
   panel(ctx, x0, 8, PANEL_W, 128);
   text(ctx, 'SCORE', x0 + 12, 30, 15, INK, 'left', 900);
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 32, '#FFF2A8', 'right', 900);
-  // No "BEST 0": a difficulty never finished says so (its first run sets the best).
-  text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
   drawComboLine(ctx, run, x0, 120);
   panel(ctx, x0, 142, PANEL_W, 62);
   text(ctx, NAMES.currency, x0 + 12, 170, 15, INK, 'left', 900);
@@ -615,7 +623,7 @@ function drawHotbar(ctx, run, ui) {
 export function hudTextBoxes() {
   const top = BOARD_X - WALL;
   return [
-    { text: 'left panel', x0: LEFT_X, y0: 8, x1: LEFT_X + PANEL_W, y1: 340 },
+    { text: 'left panel', x0: LEFT_X, y0: 8, x1: LEFT_X + PANEL_W, y1: 8 + LEFT_PANEL_H },
     { text: 'sun bar', x0: top + 4, y0: 4, x1: top + BOARD_W + WALL * 2 - 4, y1: 62 },
     { text: 'frieze', x0: top, y0: 68, x1: top + BOARD_W + WALL * 2, y1: 106 },
     { text: 'right panels', x0: RIGHT_X, y0: 8, x1: RIGHT_X + PANEL_W, y1: 640 },

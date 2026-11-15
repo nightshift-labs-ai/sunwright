@@ -257,6 +257,12 @@
   power (was a 26 px glow + 11 px edge that turned the prism loop lilac). Lit glass no longer gets a
   white cell box: the pane itself glows gold (shadow blur on the sprite only, not the plinth).
 
+- Benchmark 6 item 7: INCOMING rows carry the kind's rule at 20 px (config.enemyRuleTag, from stats:
+  fast / armoured / deflects / boss); with nothing hovered the tooltip panel is a GLASS legend, one
+  verb per piece (config PIECES[].verb; the lens shows this run's focus). Offsets, same commit: the
+  dial's NEXT line and chip (the pill says it), DRY = RUN LOST (the frieze says it), BEST, and the idle
+  tooltip lines. Cover canvas text items (fillText per frame, /tmp count script): 61 before, 61 after.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.
