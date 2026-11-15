@@ -43,6 +43,7 @@ export function renderOptions(settings) {
   for (const name of ['volume', 'music', 'sfx']) el(`opt-${name}`).value = settings[name];
   el('opt-shake').checked = settings.shake;
   el('opt-muted').checked = settings.muted;
+  el('opt-patterns').checked = !!settings.patterns;
 }
 
 /** Difficulty buttons with each difficulty's best score. */

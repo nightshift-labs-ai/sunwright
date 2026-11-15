@@ -219,6 +219,7 @@ const TINT_COLORS = {
   2: ['rgba(89,184,255,', 'rgba(120,200,255,', 'rgba(225,245,255,'],
   4: ['rgba(255,170,20,', 'rgba(255,200,40,', 'rgba(255,246,190,'],
 };
+const TINT_DASHES = { 1: [16, 7], 2: [3, 7] };
 const FOCUS_COLORS = ['rgba(255,120,40,', 'rgba(255,160,60,', 'rgba(255,251,230,'];
 
 /**
@@ -243,6 +244,8 @@ export function drawBeams(ctx, trace, opts) {
       const colors = leg.focused && pass < 2 ? FOCUS_COLORS : TINT_COLORS[leg.tint] ?? TINT_COLORS[0];
       g.strokeStyle = `${colors[pass]}${a})`;
       g.lineWidth = width * w;
+      // Colour-blind option: prism light also differs by pattern (red long dashes, blue dots).
+      g.setLineDash(opts.patterns && pass === 2 ? TINT_DASHES[leg.tint] ?? [] : []);
       g.beginPath();
       g.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));
       g.lineTo(toScreenX(leg.x1), toScreenY(leg.y1));

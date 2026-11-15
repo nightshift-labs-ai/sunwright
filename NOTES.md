@@ -151,6 +151,8 @@
 - Benchmark 3 item 5 (part): HUD panels at 80% opacity; sun dial + FOUNTAIN merged into one left
   panel; dial shows only NEXT: EVENING (W) with an amber "after this sun" chip (the real trigger).
 
+- M3: Options > Beam patterns (colour-blind): red prism light in long dashes, blue in dots (off by default).
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).
@@ -164,7 +166,7 @@
   floaters and a floater-on-beam truth failure, Glassback not deflecting - reverted.
 - Benchmark 3 item 5 rest: board >= 58% of the cover (now ~52% incl. walls: needs a layout change),
   <= 3 type sizes in the HUD.
-- M3 leftovers: colour-blind beam patterns option, illustrated How to play.
+- M3 leftover: illustrated How to play panels.
 
 ## Known bugs
 - Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.
