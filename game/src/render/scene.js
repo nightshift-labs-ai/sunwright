@@ -28,8 +28,8 @@ function drawCellCursor(ctx, cell, ok) {
   }
 }
 
-/** Where the title's demo courtyard sits: right of the menu card, between the rules and the key band. */
-const TITLE_DEMO = { x: 942, y: 554, scale: 0.565 };
+/** Where the title's demo courtyard sits: right of the menu card under the rules, bleeding under the key band. */
+const TITLE_DEMO = { x: 960, y: 596, scale: 0.68, bottom: 736 };
 
 const nextCache = { run: null, version: -1, value: null };
 
@@ -58,6 +58,10 @@ export function drawFrame(ctx, frame) {
   if (frame.titleTraces) {
     // Title: the courtyard sits to the right of the menu card, every sun window ablaze.
     drawSandSurround(ctx);
+    // Cut off at the key band's top edge: nothing (no SWARM tag) is left hidden under the band.
+    ctx.beginPath();
+    ctx.rect(0, 0, VIEW_W, TITLE_DEMO.bottom);
+    ctx.clip();
     ctx.translate(TITLE_DEMO.x, TITLE_DEMO.y);
     ctx.scale(TITLE_DEMO.scale, TITLE_DEMO.scale);
     ctx.translate(-VIEW_W / 2, -390);

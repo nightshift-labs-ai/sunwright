@@ -221,6 +221,10 @@
   the cover's fx in Node and compares every floater, its spawn distance and its anchor. Cover now has
   +30 and +90 SEAR x3.
 
+- Title demo back to a bigger courtyard (scale 0.68, was 0.565 after the relayout): E, N and W beams
+  all visible, right of the card; it is cut off at the key band's top edge, so no board tag is hidden
+  under a box (Bench4-10).
+
 - HUD: a difficulty with no finished run shows NO BEST YET under SCORE instead of BEST 0 (Bench4-3).
 
 ## Next
