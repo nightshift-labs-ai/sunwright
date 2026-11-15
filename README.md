@@ -14,6 +14,7 @@ evening from the west, so glass that burned the swarm at noon can miss it in the
 - Between suns pick 1 of 3 glass charms; quick kills build a SEAR multiplier; 3 difficulties.
 
 ## Controls
+- Title: **Enter** starts the selected difficulty, **Up / Down** pick it
 - **1-5** pick glass, **click** sand to place, **Q / E** or the wheel to turn (also during a sun)
 - **X** sells the glass under the mouse, **Enter** starts the sun, **Space** fires the Flare
 - **R** twice restarts a run, **Esc** pauses, **M** mutes, **F** fast-forwards
