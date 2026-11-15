@@ -271,8 +271,9 @@ function drawSunBar(ctx, run) {
   const x = BOARD_X - WALL + 4;
   const w = BOARD_W + WALL * 2 - 8;
   panel(ctx, x, 4, w, 58);
-  text(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, x + 16, 44, 32, INK, 'left', 900);
-  drawSunTrack(ctx, x + w - 26 - 8 * 40, 33, 40, 13, run.stats.wavesCleared, run.waveIndex);
+  const trackX = x + w - 26 - 8 * 40;
+  fitLine(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, x + 16, 44, trackX - x - 46, 32, INK);
+  drawSunTrack(ctx, trackX, 33, 40, 13, run.stats.wavesCleared, run.waveIndex);
 }
 
 const ICON_ENEMIES = Object.fromEntries(Object.keys(ENEMIES).map((type) => [type, { id: 3, type, def: ENEMIES[type], heading: 0, hp: 1, maxHp: 1, litPower: 0, age: 0, x: 0, y: 0 }]));
@@ -321,7 +322,7 @@ function drawIncoming(ctx, run, y0) {
     text(ctx, ENEMIES[row.type].name, x0 + 48, y + 6, 15, INK, 'left', 800);
     text(ctx, inWave ? `${left.get(row.type) ?? 0}` : `x${row.count}`, x0 + PANEL_W - 10, y + 7, 20, '#FFE14D', 'right', 900);
     if (row.isNew && !inWave) text(ctx, 'NEW', x0 + 48, y + 21, 15, '#FF8AD0', 'left', 900);
-    y += 32;
+    y += row.isNew && !inWave ? 40 : 32;
   }
   const titanLeft = run.waveIndex === WAVE_COUNT - 1 && inWave ? left.get('titan') ?? 0 : 1;
   drawTitanSkull(ctx, x0 + 22, y, 9, titanLeft === 0, '#FF6B5E');
@@ -363,7 +364,9 @@ function drawTooltip(ctx, run, ui, y0) {
   const keys = hover
     ? `${hover.type === 'pillar' ? '' : 'Q/E turn - '}X sell +${liftRefund(run, hover)}`
     : `${PIECE_ORDER.indexOf(type) + 1} select - click place`;
-  text(ctx, keys, RIGHT_X + 12, y0 + 96, 15, '#FFF2A8', 'left', 900);
+  // A placement the rules refuse says why (e.g. "Would seal off the fountain").
+  if (ui.hintBad && ui.hint) fitLine(ctx, ui.hint, RIGHT_X + 12, y0 + 96, PANEL_W - 20, 15, '#FF8A8A');
+  else text(ctx, keys, RIGHT_X + 12, y0 + 96, 15, '#FFF2A8', 'left', 900);
 }
 
 
@@ -416,9 +419,12 @@ function drawWinLoseFrieze(ctx, run) {
 }
 
 /** The big banner over the courtyard: the latest event, or what the next sun asks of you. */
-function drawEventBanner(ctx, run) {
+function drawEventBanner(ctx, run, ui) {
   const message = currentBanner(run);
   if (!message) return;
+  // Fade out of the way while the mouse works the top rows it covers.
+  ctx.save();
+  if (ui.hoverCell && ui.hoverCell.r <= 1) ctx.globalAlpha = 0.45;
   const w = Math.round(VIEW_W * 0.6);
   const x = 640 - w / 2;
   ctx.fillStyle = 'rgba(31,63,153,0.9)';
@@ -434,6 +440,7 @@ function drawEventBanner(ctx, run) {
   ctx.translate(640, BOARD_Y + 59);
   ctx.scale(squeeze, 1);
   text(ctx, message, 0, 0, 61, '#FFE27A', 'center', 900);
+  ctx.restore();
   ctx.restore();
 }
 
@@ -565,7 +572,7 @@ function drawHotbar(ctx, run, ui) {
 export function drawHud(ctx, run, ui) {
   drawSunBar(ctx, run);
   drawWinLoseFrieze(ctx, run);
-  drawEventBanner(ctx, run);
+  drawEventBanner(ctx, run, ui);
   drawLeftPanel(ctx, run);
   drawRightPanel(ctx, run, ui);
   drawHotbar(ctx, run, ui);
