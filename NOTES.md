@@ -132,6 +132,9 @@
   waves.nextSunPreview (first-ever kinds, then biggest rises), truth-checked. README carries the three
   live make.fun badges (kit repo_readme check).
 
+- Benchmark 3 item 7: identity colours + 2 px dark outlines - silver mirror in a lapis frame, cyan
+  splitter, aqua lens, terracotta pillar, rainbow prism; the hotbar icons match.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

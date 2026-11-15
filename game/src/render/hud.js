@@ -420,23 +420,30 @@ function drawEventBanner(ctx, run) {
   ctx.restore();
 }
 
+/** The hotbar's piece icons, in the same identity colours as the board's glass. */
 function drawPieceIcon(ctx, type, x, y) {
   ctx.save();
   ctx.translate(x, y);
-  ctx.fillStyle = '#EBC68C';
-  ctx.fillRect(-16, -8, 32, 20);
-  ctx.fillStyle = '#B47E48';
-  ctx.fillRect(-16, 12, 32, 6);
+  ctx.strokeStyle = '#2A1608';
+  ctx.lineWidth = 2;
+  if (type !== 'pillar') {
+    ctx.fillStyle = '#EBC68C';
+    ctx.fillRect(-16, 4, 32, 12);
+    ctx.fillStyle = '#B47E48';
+    ctx.fillRect(-16, 16, 32, 5);
+  }
   if (type === 'mirror' || type === 'splitter') {
     ctx.rotate(-Math.PI / 4);
-    ctx.fillStyle = type === 'mirror' ? '#DDEBFA' : 'rgba(120,230,240,0.85)';
-    ctx.fillRect(-17, -4, 34, 8);
-    ctx.strokeStyle = type === 'mirror' ? GOLD : '#E8FFFF';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(-17, -4, 34, 8);
+    ctx.fillStyle = type === 'mirror' ? '#2D5BD0' : '#16C9E0';
+    ctx.fillRect(-19, -6, 38, 12);
+    if (type === 'mirror') {
+      ctx.fillStyle = '#E6F1FF';
+      ctx.fillRect(-15, -3, 30, 6);
+    }
+    ctx.strokeRect(-19, -6, 38, 12);
   } else if (type === 'prism') {
     const faces = ['#FF4D3D', '#59B8FF', '#FFC531'];
-    const tri = [[0, -18], [14, 8], [-14, 8]];
+    const tri = [[0, -18], [15, 9], [-15, 9]];
     for (let k = 0; k < 3; k++) {
       ctx.fillStyle = faces[k];
       ctx.beginPath();
@@ -446,8 +453,6 @@ function drawPieceIcon(ctx, type, x, y) {
       ctx.closePath();
       ctx.fill();
     }
-    ctx.strokeStyle = GOLD;
-    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(...tri[0]);
     ctx.lineTo(...tri[1]);
@@ -455,18 +460,19 @@ function drawPieceIcon(ctx, type, x, y) {
     ctx.closePath();
     ctx.stroke();
   } else if (type === 'lens') {
-    ctx.fillStyle = '#77D7E8';
+    ctx.fillStyle = '#3FE0C5';
     ctx.beginPath();
-    ctx.ellipse(0, -2, 6, 15, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, -4, 8, 17, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = GOLD;
-    ctx.lineWidth = 2;
     ctx.stroke();
   } else {
-    ctx.fillStyle = '#E2B57A';
-    ctx.fillRect(-12, -22, 24, 34);
+    ctx.fillStyle = '#D9713F';
+    ctx.fillRect(-12, -22, 24, 40);
+    ctx.fillStyle = '#9A4424';
+    ctx.fillRect(-12, 8, 24, 10);
     ctx.fillStyle = '#2D5BD0';
-    ctx.fillRect(-12, -18, 24, 5);
+    ctx.fillRect(-12, -16, 24, 5);
+    ctx.strokeRect(-12, -22, 24, 40);
   }
   ctx.restore();
 }

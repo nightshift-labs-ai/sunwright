@@ -360,7 +360,12 @@ export function drawPiece(ctx, piece, c, r, shadow, time, alpha = 1) {
   const h = (tall ? 30 : 12) * squash;
   const inset = tall ? 9 : 7;
   if (alpha === 1) drawBlockShadow(ctx, px + inset, py + inset, CELL - inset * 2, CELL - inset * 2, h + (tall ? 0 : 10), shadow);
-  drawBlock(ctx, px + inset, py + inset + 4, CELL - inset * 2, CELL - inset * 2, h, tall ? '#E2B57A' : PALETTE.plinthTop, tall ? '#A86F3C' : PALETTE.plinthFront);
+  drawBlock(ctx, px + inset, py + inset + 4, CELL - inset * 2, CELL - inset * 2, h, tall ? '#D9713F' : PALETTE.plinthTop, tall ? '#9A4424' : PALETTE.plinthFront);
+  if (tall) {
+    ctx.strokeStyle = '#2A1608';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px + inset, py + inset + 4 - h, CELL - inset * 2, CELL - inset * 2 + h);
+  }
   const cx = px + CELL / 2;
   const cy = py + CELL / 2 - h + 4;
   if (tall) {
@@ -377,27 +382,28 @@ export function drawPiece(ctx, piece, c, r, shadow, time, alpha = 1) {
     // Rot 0 = "/" (bottom-left to top-right); each step turns 90 degrees.
     ctx.rotate(-Math.PI / 4 + angle);
     if (piece.type === 'mirror') {
-      const grad = ctx.createLinearGradient(0, -6, 0, 6);
+      // A silver pane in a lapis frame.
+      ctx.fillStyle = PALETTE.lapis;
+      ctx.fillRect(-30, -8, 60, 16);
+      const grad = ctx.createLinearGradient(0, -5, 0, 5);
       grad.addColorStop(0, '#FFFFFF');
-      grad.addColorStop(0.5, '#BFD9F2');
-      grad.addColorStop(1, '#7E9CC4');
+      grad.addColorStop(0.5, '#D7E6F5');
+      grad.addColorStop(1, '#9DB4D2');
       ctx.fillStyle = grad;
-      ctx.fillRect(-27, -5, 54, 10);
-      ctx.strokeStyle = PALETTE.gold;
-      ctx.lineWidth = 3;
-      ctx.strokeRect(-27, -5, 54, 10);
+      ctx.fillRect(-26, -4, 52, 8);
     } else {
-      ctx.fillStyle = 'rgba(120,230,240,0.55)';
-      ctx.fillRect(-27, -5, 54, 10);
+      // A saturated cyan half-silvered pane with gold clips.
+      ctx.fillStyle = '#16C9E0';
+      ctx.fillRect(-28, -6, 56, 12);
       ctx.fillStyle = '#E8FFFF';
-      ctx.fillRect(-25, -1, 50, 2);
-      ctx.strokeStyle = '#7FE0F0';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(-27, -5, 54, 10);
+      ctx.fillRect(-24, -1, 48, 2);
       ctx.fillStyle = PALETTE.gold;
-      ctx.fillRect(-30, -6, 5, 12);
-      ctx.fillRect(25, -6, 5, 12);
+      ctx.fillRect(-31, -7, 5, 14);
+      ctx.fillRect(26, -7, 5, 14);
     }
+    ctx.strokeStyle = '#2A1608';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-30, -8, 60, 16);
   } else if (piece.type === 'prism') {
     // A triangular prism pointing the way its gold beam leaves; rainbow faces.
     ctx.rotate(angle);
@@ -419,8 +425,8 @@ export function drawPiece(ctx, piece, c, r, shadow, time, alpha = 1) {
     ctx.lineTo(-6, 2);
     ctx.closePath();
     ctx.fill();
-    ctx.strokeStyle = PALETTE.gold;
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#2A1608';
+    ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(...tri[0]);
     ctx.lineTo(...tri[1]);
@@ -431,15 +437,15 @@ export function drawPiece(ctx, piece, c, r, shadow, time, alpha = 1) {
     // The lens disc stands across its axis: rot 0 passes east-west light.
     ctx.rotate(angle);
     const grad = ctx.createRadialGradient(-3, -4, 2, 0, 0, 22);
-    grad.addColorStop(0, '#F4FFFF');
-    grad.addColorStop(0.6, '#77D7E8');
-    grad.addColorStop(1, '#2C8FB0');
+    grad.addColorStop(0, '#F0FFFB');
+    grad.addColorStop(0.5, '#3FE0C5');
+    grad.addColorStop(1, '#13A08C');
     ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 8, 23, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, 10, 24, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = PALETTE.gold;
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#2A1608';
+    ctx.lineWidth = 2;
     ctx.stroke();
   }
   ctx.restore();
