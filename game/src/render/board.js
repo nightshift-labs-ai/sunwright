@@ -249,6 +249,33 @@ export function drawBoardTags(ctx, run) {
   }
 }
 
+/** A warm wedge of light fanning from the lit window across the sand. */
+function drawGodRays(ctx, ap, slot, time) {
+  const cx = slot.x + slot.w / 2;
+  const cy = ap.wall === 'north' ? BOARD_Y : slot.y + slot.h / 2;
+  const dir = ap.wall === 'north' ? [0, 1] : ap.wall === 'east' ? [-1, 0] : [1, 0];
+  const len = ap.wall === 'north' ? BOARD_H * 0.8 : BOARD_W * 0.55;
+  const spread = 0.42 + Math.sin(time * 0.8) * 0.02;
+  const ex = cx + dir[0] * len;
+  const ey = cy + dir[1] * len;
+  const px = -dir[1] * len * spread;
+  const py = dir[0] * len * spread;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const grad = ctx.createLinearGradient(cx, cy, ex, ey);
+  grad.addColorStop(0, 'rgba(255,214,120,0.30)');
+  grad.addColorStop(1, 'rgba(255,214,120,0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(cx - dir[1] * 12, cy + dir[0] * 12);
+  ctx.lineTo(ex + px, ey + py);
+  ctx.lineTo(ex - px, ey - py);
+  ctx.lineTo(cx + dir[1] * 12, cy - dir[0] * 12);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
 /** Floor, walls, the day's three sun windows (lit / next / shuttered), labels and the burrows. */
 export function drawCourtyard(ctx, run, time, allLit = false) {
   floorCanvas ??= buildFloorTexture();
@@ -262,7 +289,8 @@ export function drawCourtyard(ctx, run, time, allLit = false) {
     const slot = windowRect(ap);
     const lit = allLit || ap.wall === now.wall;
     const next = run.waveIndex + 1 === dayStart + k;
-    ctx.fillStyle = lit ? '#FFF4C8' : '#4A3A6A';
+    if (lit && !allLit) drawGodRays(ctx, ap, slot, time);
+    ctx.fillStyle = lit ? '#FFF4C8' : PALETTE.lapis;
     ctx.beginPath();
     if (ap.wall === 'north') {
       // An arched window through the wall's front face.
@@ -276,8 +304,27 @@ export function drawCourtyard(ctx, run, time, allLit = false) {
     if (lit) {
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
-      ctx.fillStyle = `rgba(255,197,49,${0.35 + Math.sin(time * 3) * 0.08})`;
-      ctx.fill();
+      const sx = slot.x + slot.w / 2;
+      const sy = slot.y + slot.h / 2;
+      const disk = ctx.createRadialGradient(sx, sy, 2, sx, sy, 34);
+      disk.addColorStop(0, 'rgba(255,255,235,0.95)');
+      disk.addColorStop(0.45, `rgba(255,214,90,${0.6 + Math.sin(time * 3) * 0.1})`);
+      disk.addColorStop(1, 'rgba(255,170,40,0)');
+      ctx.fillStyle = disk;
+      ctx.fillRect(sx - 34, sy - 34, 68, 68);
+      ctx.restore();
+    } else {
+      // Shuttered: gold slats across a lapis arch.
+      ctx.save();
+      ctx.clip();
+      ctx.strokeStyle = PALETTE.gold;
+      ctx.lineWidth = 2;
+      for (let k = 6; k < slot.h; k += 7) {
+        ctx.beginPath();
+        ctx.moveTo(slot.x, slot.y + k);
+        ctx.lineTo(slot.x + slot.w, slot.y + k);
+        ctx.stroke();
+      }
       ctx.restore();
     }
     ctx.strokeStyle = next ? '#FFFFFF' : PALETTE.gold;
