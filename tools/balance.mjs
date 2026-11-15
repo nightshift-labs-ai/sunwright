@@ -2,31 +2,14 @@
 // print how far they get at each difficulty. playRun also records every order with the tick it
 // was applied on, so tools/shots.mjs can replay the exact run in the browser.
 //   node tools/balance.mjs [runsPerDifficulty=8] [bot=greedy|careful]
-import { DIFFICULTY_ORDER, DX, DY, PIECE_ORDER, WAVE_COUNT } from '../game/src/config.js';
+import { DIFFICULTY_ORDER, PIECE_ORDER, WAVE_COUNT } from '../game/src/config.js';
 import { createRun, pieceCost, pieceUnlocked, stepSim } from '../game/src/sim.js';
 import { placementCheck, setPiece } from '../game/src/grid.js';
-import { buildFlowField, flowDirectionAt } from '../game/src/pathing.js';
+import { buildFlowField, routeCells } from '../game/src/pathing.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 
 /** Boons the careful bot prefers, best first. */
 const BOON_TASTE = ['highsun', 'silvered', 'burning', 'spreading', 'sunstone', 'flare2', 'magnet', 'discount', 'longchain', 'mend'];
-
-/** Cells walkers step through from each burrow to the shrine (counted once per burrow). */
-function routeCells(grid, flow) {
-  const cells = [];
-  for (const g of grid.gates) {
-    let c = g.c;
-    let r = g.r;
-    for (let guard = 0; guard < 200; guard++) {
-      cells.push(r * grid.cols + c);
-      const d = flowDirectionAt(flow, c, r);
-      if (d < 0) break;
-      c += DX[d];
-      r += DY[d];
-    }
-  }
-  return cells;
-}
 
 /**
  * How much burning a layout does: beam power summed over the walking route cells, plus light

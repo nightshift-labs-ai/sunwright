@@ -141,6 +141,70 @@ export function drawBeams(ctx, trace, opts) {
   ctx.restore();
 }
 
+/** Where the first ray of a trace ends (follow legs end to start from the opening). */
+function beamTerminal(trace) {
+  if (!trace.legs.length) return null;
+  let leg = trace.legs[0];
+  for (let guard = 0; guard < trace.legs.length; guard++) {
+    const next = trace.legs.find((l) => l.x0 === leg.x1 && l.y0 === leg.y1 && l !== leg);
+    if (!next) break;
+    leg = next;
+  }
+  return { x: leg.x1, y: leg.y1 };
+}
+
+/**
+ * The next sun's light through the current glass, drawn as a dashed ghost: red ending in an X
+ * labelled MISSES when it lights none of the swarm's path, gold with the path cells it hits otherwise.
+ */
+export function drawBeamGhost(ctx, trace, pathCellsLit, time) {
+  const misses = pathCellsLit === 0;
+  const color = misses ? '#FF3B30' : '#FFD34D';
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.setLineDash([16, 12]);
+  ctx.lineDashOffset = -time * 40;
+  for (const [width, stroke] of [[12, 'rgba(255,250,235,0.9)'], [6, color]]) {
+    ctx.lineWidth = width;
+    ctx.strokeStyle = stroke;
+    for (const leg of trace.legs) {
+      ctx.beginPath();
+      ctx.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));
+      ctx.lineTo(toScreenX(leg.x1), toScreenY(leg.y1));
+      ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+  const end = beamTerminal(trace);
+  if (end) {
+    const x = toScreenX(end.x);
+    const y = toScreenY(end.y);
+    ctx.lineWidth = 9;
+    ctx.strokeStyle = '#FFFFFF';
+    for (const pass of [0, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(x - 18, y - 18);
+      ctx.lineTo(x + 18, y + 18);
+      ctx.moveTo(x + 18, y - 18);
+      ctx.lineTo(x - 18, y + 18);
+      ctx.stroke();
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = color;
+      if (pass === 0 && !misses) break;
+    }
+    const label = misses ? 'MISSES' : `HITS ${pathCellsLit} PATH CELLS`;
+    ctx.font = '900 32px system-ui, sans-serif';
+    ctx.textAlign = x > 640 ? 'right' : 'left';
+    const tx = x + (x > 640 ? -28 : 28);
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#3B1247';
+    ctx.strokeText(label, tx, y + 11);
+    ctx.fillStyle = misses ? '#FF6B5E' : '#FFE27A';
+    ctx.fillText(label, tx, y + 11);
+  }
+  ctx.restore();
+}
+
 /** Particles and floating text, drawn above the board. */
 export function drawFx(ctx, fx) {
   for (const p of fx.particles) {

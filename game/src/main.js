@@ -302,7 +302,8 @@ function render() {
   if (app.screen === 'play') {
     const run = app.run;
     app.ui.fast = app.fast;
-    drawFrame(ctx, { run, ui: app.ui, fx: app.fx, time: run.time, showHud: true, shake: app.settings.shake, shrineHurtAgo: run.time - app.shrineHurtAt });
+    const showHud = run.phase !== 'draft' && app.overlay !== 'results';
+    drawFrame(ctx, { run, ui: app.ui, fx: app.fx, time: run.time, showHud, shake: app.settings.shake, shrineHurtAgo: run.time - app.shrineHurtAt });
     setBeamHum(litLength(run.trace), run.phase === 'wave' && !app.paused);
     updateMusic(run.waveIndex, run.phase === 'wave' && !app.paused);
     if (run.phase === 'wave' && !app.paused) playSizzle(run.enemies.reduce((n, e) => n + (e.litPower > 0 && !e.shielded ? 1 : 0), 0));

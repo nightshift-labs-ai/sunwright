@@ -2,7 +2,8 @@
 // The draft dims the board so the new opening's beam (through the current layout) stands out;
 // a win floods the courtyard with sunrise, a defeat drains the light.
 import { shadowVectorFor } from '../sun.js';
-import { drawBeams, drawFx, drawScreenFx, shakeOffset } from './fx.js';
+import { drawBeamGhost, drawBeams, drawFx, drawScreenFx, shakeOffset } from './fx.js';
+import { routeCells } from '../pathing.js';
 import { drawCourtyard, drawPiece, drawPieces, drawShrine } from './board.js';
 import { drawEnemies } from './beetles.js';
 import { drawHud } from './hud.js';
@@ -62,7 +63,10 @@ export function drawFrame(ctx, frame) {
     ctx.fillStyle = 'rgba(70,40,15,0.35)';
     ctx.fillRect(BOARD_X - WALL, BOARD_Y - WALL_FRONT - WALL, BOARD_W + WALL * 2, BOARD_H + WALL_FRONT + WALL * 2);
   }
-  if (phase !== 'lost') {
+  if (phase === 'draft') {
+    const onPath = new Set(routeCells(run.grid, run.flow).filter((i) => run.trace.lit[i] > 0)).size;
+    drawBeamGhost(ctx, run.trace, onPath, time);
+  } else if (phase !== 'lost') {
     const alpha = phase === 'wave' || phase === 'won' ? 1 : phase === 'build' ? 0.8 : 0.95;
     drawBeams(ctx, ui.ghostTrace ?? run.trace, { alpha, flare: run.flareLeft > 0 ? 1 : 0, time });
   }

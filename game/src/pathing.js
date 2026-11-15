@@ -35,6 +35,23 @@ export function flowDirectionAt(flow, c, r) {
   return flow.next[r * flow.cols + c];
 }
 
+/** Every cell walkers step through from each burrow to the fountain (repeats kept per burrow). */
+export function routeCells(grid, flow) {
+  const cells = [];
+  for (const g of grid.gates) {
+    let c = g.c;
+    let r = g.r;
+    for (let guard = 0; guard < grid.cols * grid.rows; guard++) {
+      cells.push(r * grid.cols + c);
+      const d = flowDirectionAt(flow, c, r);
+      if (d < 0) break;
+      c += DX[d];
+      r += DY[d];
+    }
+  }
+  return cells;
+}
+
 /** Steps from a cell to the shrine along the flow field. */
 export function routeLength(flow, c, r) {
   return flow.dist[r * flow.cols + c];

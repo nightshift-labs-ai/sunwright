@@ -35,6 +35,11 @@
 - M4 (part): no dark frames - sepia rgba(70,40,15,0.35) dims, orange-edged white-core beams,
   parchment roundel centres; measure-shots gates mean luminance >= 0.45, no 64x64 block < 0.15.
 
+- Draft redesign (benchmark 1 item 9 + item 1 sizes): huge condensed "SUN MOVES WEST - PICK 1"
+  heading, three 236 px roundels with 48 px keys and 34 px names (effect text on hover), "X - reroll"
+  + "NEW: GLASSBACK" footer, HUD hidden; the next sun's beam drawn as a dashed ghost ending in an X
+  labelled MISSES (or HITS n PATH CELLS, honestly computed from pathing.routeCells).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

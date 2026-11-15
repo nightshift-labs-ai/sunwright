@@ -57,35 +57,28 @@ export function renderTitle(bestFor, selected) {
   }).join('');
 }
 
-/** The draft: banner for the coming sun, three roundels, reroll, next-wave preview, owned boons. */
+/** The draft: a huge "SUN MOVES WEST - PICK 1", three roundels (effect on hover), reroll, NEW chip. */
 export function renderDraft(menus, run) {
   const key = `${run.waveIndex}|${run.offer.join(',')}|${run.quartz}`;
   if (key === menus.draftKey) return;
   menus.draftKey = key;
   const ap = sunApertureFor(run.seed, run.waveIndex);
   el('draft-banner').textContent = `${NAMES.sun} MOVES ${ap.phase.wallName} - PICK 1`;
-  const unlocked = PIECE_ORDER.find((type) => PIECES[type].unlockWave === run.waveIndex);
-  el('draft-sub').textContent = unlocked
-    ? `NEW GLASS: ${PIECES[unlocked].name.toUpperCase()} (key ${PIECE_ORDER.indexOf(unlocked) + 1}) - ${PIECES[unlocked].blurb}`
-    : `${NAMES.sun} ${run.waveIndex} held. Pick a glass charm for Day ${ap.day} ${ap.phase.name}, ${NAMES.sun.toLowerCase()} ${run.waveIndex + 1}/${WAVE_COUNT}.`;
   el('draft-roundels').innerHTML = run.offer
     .map((id, i) => {
       const b = boonById(id);
       return `<button class="roundel ${b.weight <= 2 ? 'rare' : ''}" style="--hue:${b.hue}" data-action="pick" data-arg="${i}">
-        <span class="key">${i + 1}</span><span class="glass"></span>
+        <span class="glass"></span><span class="key">${i + 1}</span>
         <b>${escapeHtml(b.name)}</b><span class="effect">${escapeHtml(b.text)}</span></button>`;
     })
     .join('');
   const cost = rerollCost(run);
   const reroll = el('draft-reroll');
-  reroll.textContent = `X - reroll (${cost} quartz)`;
+  reroll.textContent = `X - reroll (${cost} ${NAMES.currency.toLowerCase()})`;
   reroll.disabled = run.quartz < cost;
-  el('draft-next').innerHTML =
-    `<span class="label">NEXT ${NAMES.sun}</span>` +
-    waveRoster(run.waveIndex, run.diff)
-      .map((r) => `<span class="foe">${escapeHtml(ENEMIES[r.type].name)} x${r.count}${r.isNew ? ' <em>NEW</em>' : ''}</span>`)
-      .join('');
-  el('draft-owned').innerHTML = run.boons.length ? run.boons.map(boonChip).join('') : '<span class="none">No charms yet</span>';
+  const unlocked = PIECE_ORDER.find((type) => PIECES[type].unlockWave === run.waveIndex);
+  const newFoe = waveRoster(run.waveIndex, run.diff).find((r) => r.isNew);
+  el('draft-new').textContent = unlocked ? `NEW GLASS: ${PIECES[unlocked].name} [${PIECE_ORDER.indexOf(unlocked) + 1}]` : newFoe ? `NEW: ${ENEMIES[newFoe.type].name}` : '';
 }
 
 /** Results: win or defeat title, score with NEW BEST, stats, boons, seed and the restart keys. */
