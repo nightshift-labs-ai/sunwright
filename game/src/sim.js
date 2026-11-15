@@ -43,6 +43,7 @@ export function createRun(seed, difficultyId = 'normal') {
     flareCharges: 0,
     flareLeft: 0,
     chain: { count: 0, timer: 0, best: 0 },
+    feedback: { searAt: -9, biteAt: -9, biteHarm: 0, quartzAt: -9 },
     stats: { kills: 0, leaked: 0, wavesCleared: 0 },
     events: [],
     endedAt: 0,

@@ -155,9 +155,20 @@ function drawFountainPips(ctx, run, y) {
   for (let k = 0; k < run.shrineMax; k++) {
     const x = 24 + (k % 6) * 27;
     const yy = y + 24 + Math.floor(k / 6) * 28;
-    ctx.fillStyle = k < run.shrineHp ? '#3FD6C8' : 'rgba(40,20,50,0.55)';
+    const crack = k >= run.shrineHp && k < run.shrineHp + run.feedback.biteHarm && run.time - run.feedback.biteAt < 0.8;
+    ctx.fillStyle = crack ? '#FF5C5C' : k < run.shrineHp ? '#3FD6C8' : 'rgba(40,20,50,0.55)';
     droplet(ctx, x, yy, 8);
     ctx.fill();
+    if (crack) {
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x - 5, yy - 6);
+      ctx.lineTo(x + 1, yy);
+      ctx.lineTo(x - 2, yy + 3);
+      ctx.lineTo(x + 5, yy + 9);
+      ctx.stroke();
+    }
     ctx.strokeStyle = k < run.shrineHp ? '#B8FFE0' : 'rgba(255,255,255,0.2)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
@@ -168,7 +179,8 @@ function drawChainMeter(ctx, run, y) {
   const mult = chainMultiplier(run.chain.count);
   const active = run.chain.count >= 2;
   text(ctx, NAMES.combo, 16, y, 15, INK);
-  text(ctx, active ? `x${mult}` : 'x1', PANEL_W - 8, y + 4, active ? 30 : 20, active ? '#FFF2A8' : 'rgba(255,246,223,0.6)', 'right', 900);
+  const pop = Math.max(0, 1 - (run.time - run.feedback.searAt) / 0.25);
+  text(ctx, active ? `x${mult}` : 'x1', PANEL_W - 8, y + 4, active ? 30 + pop * 14 : 20, active ? '#FFF2A8' : 'rgba(255,246,223,0.6)', 'right', 900);
   ctx.fillStyle = 'rgba(30,20,60,0.5)';
   ctx.fillRect(16, y + 14, PANEL_W - 24, 6);
   if (run.chain.timer > 0) {
@@ -218,7 +230,8 @@ function drawRightPanel(ctx, run) {
   ctx.strokeStyle = '#FFFFFF';
   ctx.lineWidth = 2;
   ctx.stroke();
-  text(ctx, String(run.quartz), x0 + PANEL_W - 12, 210, 40, '#BDF4FF', 'right', 900);
+  const pulse = Math.max(0, 1 - (run.time - run.feedback.quartzAt) / 0.3);
+  text(ctx, String(run.quartz), x0 + PANEL_W - 12, 210, 40 + pulse * 8, pulse > 0 ? '#FFFFFF' : '#BDF4FF', 'right', 900);
 
   panel(ctx, x0, 240, PANEL_W, 236);
   const inWave = run.phase === 'wave';

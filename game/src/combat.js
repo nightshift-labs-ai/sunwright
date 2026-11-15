@@ -50,6 +50,8 @@ function registerKill(run, e) {
   const quartz = e.def.quartz + (run.boons.includes('magnet') ? 1 : 0);
   run.score += points;
   run.quartz += quartz;
+  run.feedback.quartzAt = run.time;
+  if (chain.count >= 2) run.feedback.searAt = run.time;
   run.stats.kills++;
   run.events.push({ t: run.time, type: 'kill', x: e.x, y: e.y, enemy: e.type, points, chain: chain.count, mult, quartz, boss: !!e.def.boss });
   if (run.boons.includes('spreading') && (e.litPower > 0 || e.burn > 0)) {
@@ -70,6 +72,8 @@ export function resolveFallenAndBiters(run) {
       registerKill(run, e);
     } else if (reachedShrine(run, e)) {
       run.shrineHp = Math.max(0, run.shrineHp - e.def.harm);
+      run.feedback.biteAt = run.time;
+      run.feedback.biteHarm = e.def.harm;
       run.stats.leaked++;
       run.events.push({ t: run.time, type: 'bite', x: e.x, y: e.y, harm: e.def.harm, enemy: e.type });
     } else {
