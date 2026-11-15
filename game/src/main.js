@@ -326,6 +326,7 @@ function render() {
   if (app.screen === 'play') {
     const run = app.run;
     app.ui.fast = app.fast;
+    app.ui.muted = app.settings.muted;
     app.ui.restartArmed = performance.now() < app.restartArmedUntil;
     const resultsHero = app.overlay === 'results';
     const showHud = run.phase !== 'draft' && !resultsHero;

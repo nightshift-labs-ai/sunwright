@@ -502,10 +502,45 @@ function drawPieceIcon(ctx, type, x, y) {
 }
 
 /** The controls, in one key line over two rows beside the hotbar (R needs a second press). */
+/** A small speaker: box and cone, then two sound waves (or an X when muted). Centred on y. */
+function drawSpeaker(ctx, x, y, muted, color) {
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x, y - 3);
+  ctx.lineTo(x + 4, y - 3);
+  ctx.lineTo(x + 9, y - 8);
+  ctx.lineTo(x + 9, y + 8);
+  ctx.lineTo(x + 4, y + 3);
+  ctx.lineTo(x, y + 3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  if (muted) {
+    ctx.moveTo(x + 12, y - 4);
+    ctx.lineTo(x + 19, y + 4);
+    ctx.moveTo(x + 19, y - 4);
+    ctx.lineTo(x + 12, y + 4);
+  } else {
+    for (const r of [4, 8]) {
+      ctx.moveTo(x + 10 + r * Math.cos(-0.9), y + r * Math.sin(-0.9));
+      ctx.arc(x + 10, y, r, -0.9, 0.9);
+    }
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+/** Three short key lines beside the hotbar during a sun; the last one says whether sound is on. */
 function drawKeyLine(ctx, x, ui) {
-  text(ctx, 'Click sand: place - Q/E turn - X sell', x, HOTBAR.y + 32, 15, INK, 'left', 800);
-  if (ui.restartArmed) text(ctx, 'PRESS R AGAIN TO RESTART', x, HOTBAR.y + 58, 15, '#FF8A8A', 'left', 900);
-  else text(ctx, `R restart - SPACE flare - ESC pause${ui.fast ? ' - x2' : ''}`, x, HOTBAR.y + 58, 15, INK, 'left', 800);
+  text(ctx, 'Click sand: place - Q/E turn - X sell', x, HOTBAR.y + 22, 15, INK, 'left', 800);
+  if (ui.restartArmed) text(ctx, 'PRESS R AGAIN TO RESTART', x, HOTBAR.y + 44, 15, '#FF8A8A', 'left', 900);
+  else text(ctx, `R restart - SPACE flare - ESC pause${ui.fast ? ' - x2' : ''}`, x, HOTBAR.y + 44, 15, INK, 'left', 800);
+  drawSpeaker(ctx, x + 1, HOTBAR.y + 61, ui.muted, ui.muted ? '#FF8A8A' : INK);
+  text(ctx, ui.muted ? 'M sound off' : 'M sound on', x + 26, HOTBAR.y + 66, 15, ui.muted ? '#FF8A8A' : INK, 'left', 800);
 }
 
 function drawHotbar(ctx, run, ui) {

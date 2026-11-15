@@ -232,3 +232,8 @@ export function updateMusic(intensity, fighting) {
     music.step++;
   }
 }
+
+/** For the playtest: whether the mix is muted and the master gain right now (null before audio starts). */
+export function audioProbe() {
+  return { muted: levels.muted, gain: master ? master.gain.value : null };
+}

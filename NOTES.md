@@ -172,6 +172,10 @@
   keycaps as one band along the bottom (26 px, no squeeze). Playtest asserts ENTER -> SCORCHED run
   and ArrowUp -> Normal.
 
+- Benchmark 5 item 4: title key band has M MUTE; during a sun the HUD key line gets a third line with a
+  drawn speaker and `M sound on` (red X + `M sound off` when muted). M toggles the real master gain and
+  saves settings.muted; the playtest reads the gain (audio.audioProbe) and the save both ways.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

@@ -7,6 +7,7 @@ import { enemiesRemaining } from './sim.js';
 import { rankFor } from './combat.js';
 import { currentBanner, winLoseHeadline } from './announce.js';
 import { loadHistory } from './save.js';
+import { audioProbe } from './audio.js';
 import { boardTextBoxes, boxTouchesBeam } from './render/fx.js';
 import { boardLabelBoxes } from './render/board.js';
 
@@ -132,6 +133,9 @@ export function installTestHook(app, api) {
     },
     resultsText() {
       return resultsText();
+    },
+    audio() {
+      return audioProbe();
     },
     floaterCount() {
       return app.fx.texts.length;

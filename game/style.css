@@ -29,9 +29,9 @@ button.big:hover { background: #cf3f93; }
 .diff b { font-size: 34px; }
 .diff small { font-weight: 800; font-size: 30px; }
 .diff.on { background: #f2c14e; color: #3b1247; border-color: #fff6df; }
-.keycaps { position: absolute; left: 24px; right: 24px; bottom: 12px; display: flex; justify-content: center; gap: 22px; padding: 4px 0; font: 900 26px system-ui, sans-serif; color: #fff6df; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 16px; }
+.keycaps { position: absolute; left: 24px; right: 24px; bottom: 12px; display: flex; justify-content: center; gap: 8px; padding: 4px 0; font: 900 26px system-ui, sans-serif; color: #fff6df; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 16px; }
 .keycaps span { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 24px system-ui, sans-serif; text-align: center; color: #3b1247; background: #fff6df; border: 2px solid #f2c14e; border-bottom-width: 5px; border-radius: 8px; }
+kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px system-ui, sans-serif; text-align: center; color: #3b1247; background: #fff6df; border: 2px solid #f2c14e; border-bottom-width: 5px; border-radius: 8px; }
 .row { display: flex; gap: 12px; }
 .row button { font-size: 30px; padding: 2px 18px; }
 .options label { display: grid; grid-template-columns: 220px 200px; justify-items: start; align-items: center; gap: 16px; font-weight: 800; font-size: 20px; }

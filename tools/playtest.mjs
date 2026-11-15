@@ -60,6 +60,17 @@ await frame();
 s = await state();
 expect(s.screen === 'play' && s.phase === 'build' && s.difficulty === 'GENTLE', 'Play starts a Gentle run in the build phase');
 
+// M mutes the real mix and the setting is saved; M again brings the sound back.
+const savedMuted = () => page.evaluate(() => JSON.parse(localStorage.getItem('sunwright.save.v1')).settings.muted);
+await page.keyboard.press('KeyM');
+await page.waitForTimeout(400);
+let audio = await page.evaluate(() => window.__test.audio());
+expect((await savedMuted()) === true && audio.muted && (audio.gain === null || audio.gain < 0.05), `M mutes the audio and saves it (gain ${audio.gain})`);
+await page.keyboard.press('KeyM');
+await page.waitForTimeout(400);
+audio = await page.evaluate(() => window.__test.audio());
+expect((await savedMuted()) === false && !audio.muted && (audio.gain === null || audio.gain > 0.3), `M again turns the sound back on (gain ${audio.gain})`);
+
 const quartzBefore = s.quartz;
 await page.keyboard.press('Digit1');
 const at = cellCentre(4, 4);
