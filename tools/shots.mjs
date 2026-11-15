@@ -46,7 +46,7 @@ async function capture(name, state) {
   await page.evaluate(() => window.__test.squeezes());
   await page.waitForTimeout(150);
   await page.screenshot({ path: `screenshots/${name}`, type: 'jpeg', quality: QUALITY });
-  manifest.shots.push({ name, tick: state.tick ?? null, state, squeeze: await page.evaluate(() => window.__test.squeezes()) });
+  manifest.shots.push({ name, tick: state.tick ?? null, state, squeeze: await page.evaluate(() => window.__test.squeezes()), propOverlaps: await page.evaluate(() => window.__test.propOverlaps()) });
   console.log(`${name}: ${state.phase ?? state.screen} day ${state.day ?? '-'} wave ${state.wave ?? '-'} score ${state.score ?? '-'}`);
 }
 for (const h of history) {
@@ -70,6 +70,7 @@ manifest.shots.at(-1).textOverlaps = await page.evaluate(() => window.__test.tex
 manifest.shots.at(-1).floaters = await page.evaluate(() => window.__test.floaterCount());
 manifest.shots.at(-1).tagOverlaps = await page.evaluate(() => window.__test.tagOverlaps());
 manifest.shots.at(-1).starbursts = await page.evaluate(() => window.__test.starbursts());
+manifest.shots.at(-1).floaterList = await page.evaluate(() => window.__test.floaters());
 await capture('3-draft.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, draftTick]));
 manifest.shots.at(-1).draftText = await page.evaluate(() => window.__test.draftText());
 await capture('4-results.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, endTick + 150]));

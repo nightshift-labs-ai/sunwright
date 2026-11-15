@@ -145,11 +145,38 @@ function drawUrn(g, x, y) {
   g.fill();
 }
 
-/** Life outside the walls: palms and urns on the sand, a Moorish noon courtyard. */
-function drawCourtyardDecor(g) {
-  drawPalm(g, 92, 470);
-  drawUrn(g, 150, 640);
-  drawPalm(g, 1178, 700);
+/**
+ * Life outside the walls: a palm and urns on the sand, placed in the gaps the play HUD leaves, so no
+ * prop touches text. Only the play screen shows them (draft and results put text there).
+ */
+const PROPS = [
+  { kind: 'palm', x: 92, y: 470 },
+  { kind: 'urn', x: 150, y: 640 },
+  { kind: 'urn', x: 1234, y: 684 },
+];
+
+/** Each prop's bounding box, shadow and fronds included. */
+export function propBoxes() {
+  return PROPS.map((p) => (p.kind === 'palm' ? { text: 'palm', x0: p.x - 50, x1: p.x + 50, y0: p.y - 48, y1: p.y + 44 } : { text: 'urn', x0: p.x - 24, x1: p.x + 36, y0: p.y - 32, y1: p.y + 38 }));
+}
+
+let propCanvas = null;
+let propsShown = false;
+
+/** The props layer, drawn after the walls on the play screen only. */
+export function drawProps(ctx) {
+  if (!propCanvas) {
+    propCanvas = makeCanvas(VIEW_W, VIEW_H);
+    const g = propCanvas.getContext('2d');
+    for (const p of PROPS) (p.kind === 'palm' ? drawPalm : drawUrn)(g, p.x, p.y);
+  }
+  ctx.drawImage(propCanvas, 0, 0);
+  propsShown = true;
+}
+
+/** Whether the last frame drew the props (for the screenshot checks). */
+export function propsVisible() {
+  return propsShown;
 }
 
 /** The static frame: warm surround, lapis side walls, the north wall's oblique front, the low south wall. */
@@ -168,7 +195,6 @@ function buildWallTexture() {
     for (let x = 0; x <= VIEW_W; x += 20) g.lineTo(x, y + Math.sin(x * 0.02 + y) * 4);
     g.stroke();
   }
-  drawCourtyardDecor(g);
   const left = BOARD_X - WALL;
   const right = BOARD_X + BOARD_W + WALL;
   const top = BOARD_Y - WALL_FRONT - WALL;
@@ -333,6 +359,7 @@ function drawGodRays(ctx, ap, slot, time) {
 
 /** Floor, walls, the day's three sun windows (lit / next / shuttered), labels and the burrows. */
 export function drawCourtyard(ctx, run, time, allLit = false) {
+  propsShown = false;
   floorCanvas ??= buildFloorTexture();
   wallCanvas ??= buildWallTexture();
   ctx.drawImage(wallCanvas, 0, 0);

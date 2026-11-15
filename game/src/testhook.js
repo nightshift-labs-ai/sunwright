@@ -10,7 +10,23 @@ import { loadHistory } from './save.js';
 import { audioProbe } from './audio.js';
 import { squeezeReport } from './render/fit.js';
 import { bannerLayout } from './render/banner.js';
+import { propBoxes, propsVisible } from './render/board.js';
+import { hudTextBoxes } from './render/hud.js';
 import { boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
+
+/** Props (palms, urns) drawn this frame whose box touches HUD text or a visible overlay's text. */
+function propOverlaps(app) {
+  if (!propsVisible()) return [];
+  const texts = app.screen === 'play' ? hudTextBoxes() : [];
+  for (const n of document.querySelectorAll('#stage .overlay:not(.hidden) *')) {
+    if (n.childElementCount || !n.textContent.trim()) continue;
+    const r = n.getBoundingClientRect();
+    texts.push({ text: n.textContent.trim().slice(0, 30), x0: r.left, y0: r.top, x1: r.right, y1: r.bottom });
+  }
+  const bad = [];
+  for (const p of propBoxes()) for (const t of texts) if (p.x0 < t.x1 && t.x0 < p.x1 && p.y0 < t.y1 && t.y0 < p.y1) bad.push(`${p.text} / ${t.text}`);
+  return bad;
+}
 
 /** The banner pill's wall and box as drawn (render/banner.js), or null. */
 function bannerBox(run) {
@@ -116,6 +132,9 @@ export function installTestHook(app, api) {
     textOverlaps() {
       return floaterOverlaps(app);
     },
+    propOverlaps() {
+      return propOverlaps(app);
+    },
     tagOverlaps() {
       return app.run ? boardTagOverlaps(app.run) : [];
     },
@@ -134,6 +153,10 @@ export function installTestHook(app, api) {
     },
     starbursts() {
       return drawnStarbursts();
+    },
+    /** Floating numbers now: text, kind, spawn point and the beam hit (or bite) it belongs to. */
+    floaters() {
+      return app.fx.texts.filter((t) => t.kind).map((t) => ({ text: t.text, kind: t.kind, sx: Math.round(t.sx), sy: Math.round(t.sy), ax: Math.round(t.ax), ay: Math.round(t.ay) }));
     },
     floaterCount() {
       return app.fx.texts.length;

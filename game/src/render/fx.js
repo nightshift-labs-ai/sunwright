@@ -124,15 +124,40 @@ export function boxTouchesBeam(box, legs) {
   });
 }
 
-const FLOATER_SPOTS = [[0, 0], [0, -30], [40, -20], [-40, -20], [0, 34], [70, 0], [-70, 0], [0, -64], [90, 30], [-90, 30], [0, 70], [110, -40], [-110, -40], [0, -100], [0, 100]];
+const FLOATER_SPOTS = [[0, 0], [0, -30], [40, -20], [-40, -20], [0, 34], [56, -48], [-56, -48], [70, 0], [-70, 0], [0, -64], [60, 40], [-60, 40], [30, 60], [-30, 60], [86, 0], [-86, 0]];
+/** A floating number spawns no further than 1.5 cells from the beam hit it scores. */
+export const FLOATER_REACH = 1.5 * CELL;
 
-/** Place a floating number at the first spot near the kill that keeps clear of other floaters,
- *  the floor labels and the beam cores, inside the courtyard; drop it if there is none. */
+/**
+ * Where a kill's number belongs: the kill point when the light was on the beetle as it died, else
+ * the nearest lit cell within 1.5 cells (a burn finishing it beside the beam), else nowhere.
+ */
+export function beamHitAnchor(ev, run) {
+  const x = toScreenX(ev.x);
+  const y = toScreenY(ev.y);
+  if (ev.lit || !run) return { x, y };
+  let best = null;
+  const { cols } = run.grid;
+  for (let i = 0; i < run.trace.lit.length; i++) {
+    if (run.trace.lit[i] <= 0) continue;
+    const cx = toScreenX((i % cols) + 0.5);
+    const cy = toScreenY(Math.floor(i / cols) + 0.5);
+    const d = Math.hypot(cx - x, cy - y);
+    if (d <= FLOATER_REACH && (!best || d < best.d)) best = { x: cx, y: cy, d };
+  }
+  return best && { x: best.x, y: best.y };
+}
+
+/** Place a floating number at the first spot within 1.5 cells of its anchor that keeps clear of other
+ *  floaters, the floor labels and the beam cores, inside the courtyard; drop it if there is none. */
 function placeFloater(fx, t, run) {
   const labels = run ? boardTextBoxes(run) : [];
   const legs = run?.trace?.legs ?? [];
   for (const [dx, dy] of FLOATER_SPOTS) {
     const cand = { ...t, x: t.x + dx, y: t.y + dy };
+    if (Math.hypot(cand.x - t.ax, cand.y - t.ay) > FLOATER_REACH) continue;
+    cand.sx = cand.x;
+    cand.sy = cand.y;
     const box = floaterBox(cand);
     const path = floaterBox(cand, true);
     if (path.x0 < BOARD_X + 4 || path.x1 > BOARD_X + BOARD_W - 4 || path.y0 < BOARD_Y + 4 || box.y1 > BOARD_Y + BOARD_H - 4) continue;
@@ -155,11 +180,12 @@ export function fxFromEvent(fx, ev, run = null) {
       fx.particles.push({ kind: 'quartz', x: x + k * 6, y, sx: x + k * 6, sy: y, vx: 0, vy: 0, life: 0.75 + k * 0.08, max: 0.75 + k * 0.08, size: 6, color: '#7FE8FF' });
     }
     const label = ev.mult > 1 ? `+${ev.points}  ${NAMES.combo} x${ev.mult}` : `+${ev.points}`;
-    placeFloater(fx, { x, y: y - 18, text: label, life: FLOATER_LIFE, max: FLOATER_LIFE, color: ev.mult >= 4 ? '#FFFFFF' : '#F2C14E', size: 28 + (Math.min(ev.mult, 5) - 1) * 4 }, run);
+    const hit = beamHitAnchor(ev, run);
+    if (hit) placeFloater(fx, { x: hit.x, y: hit.y - 18, ax: hit.x, ay: hit.y, kind: 'kill', text: label, life: FLOATER_LIFE, max: FLOATER_LIFE, color: ev.mult >= 4 ? '#FFFFFF' : '#F2C14E', size: 28 + (Math.min(ev.mult, 5) - 1) * 4 }, run);
   } else if (ev.type === 'bite') {
     fx.shake = Math.min(14, fx.shake + 6 + ev.harm * 2);
     fx.hurt = 1;
-    placeFloater(fx, { x: toScreenX(ev.x), y: toScreenY(ev.y) - 30, text: `-${ev.harm} ${NAMES.fountainShort}`, life: FLOATER_LIFE, max: FLOATER_LIFE, color: '#FF5C5C', size: 32 }, run);
+    placeFloater(fx, { x: toScreenX(ev.x), y: toScreenY(ev.y) - 30, ax: toScreenX(ev.x), ay: toScreenY(ev.y), kind: 'bite', text: `-${ev.harm} ${NAMES.fountainShort}`, life: FLOATER_LIFE, max: FLOATER_LIFE, color: '#FF5C5C', size: 32 }, run);
     burst(fx, toScreenX(ev.x), toScreenY(ev.y), 12, 'spark', '#FF5C5C', 120, 0.5, 3);
   } else if (ev.type === 'placed' || ev.type === 'lifted') {
     burst(fx, toScreenX(ev.c + 0.5), toScreenY(ev.r + 0.85), 12, 'smoke', 'rgba(232,196,140,', 50, 0.6, 7);

@@ -9,7 +9,9 @@ import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
 import { bannerSun, currentBanner, draftContext, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
 import { bannerLayout } from '../game/src/render/banner.js';
-import { BOARD_W } from '../game/src/render/layout.js';
+import { FLOATER_REACH, beamHitAnchor, createFx, fxFromEvent, updateFx } from '../game/src/render/fx.js';
+import { DT } from '../game/src/config.js';
+import { BOARD_W, BOARD_X, BOARD_Y, CELL } from '../game/src/render/layout.js';
 import { rankFor } from '../game/src/combat.js';
 import { MAX_STARBURSTS, beamModsFor, bigStarbursts, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
@@ -93,6 +95,9 @@ for (const shot of manifest.shots) {
   if (shot.squeeze.squeezed.length) console.log(`${shot.name} squeezed (>= 92%): ${shot.squeeze.squeezed.join(' | ')}`);
 }
 
+// Props: no palm or urn box touches text on any shot.
+for (const shot of manifest.shots) if (shot.propOverlaps) check(shot.propOverlaps.length === 0, `${shot.name} prop touches text: ${shot.propOverlaps.join(' | ')}`);
+
 // Title: the rule lines are announce.titleRules() (suns from config), each at least 34 px and unclipped.
 for (const shot of manifest.shots) {
   if (!shot.titleText) continue;
@@ -116,6 +121,36 @@ for (const shot of manifest.shots) {
   check(d.context === draftContext(run) && d.contextPx >= 34, `${shot.name} draft context: shown ${d.context} (${d.contextPx}px) vs ${draftContext(run)}`);
   check(d.overlaps.length === 0, `${shot.name} draft text collides: ${d.overlaps.join(' | ')}`);
   console.log(`${shot.name}: ${d.context}; roundels ${d.effects.join(' / ')}; ${d.hint}; ${d.overlaps.length} collisions`);
+}
+
+// Floating numbers: replay the cover's effects in Node (the same fx code, tick by tick) and check that
+// every number on screen spawned within 1.5 cells of its anchor, and that a kill's anchor was a live
+// beam hit: the beetle was lit as it died, or the nearest lit cell within 1.5 cells of it.
+for (const shot of manifest.shots) {
+  if (!shot.floaterList) continue;
+  const run = createRun(manifest.seed, manifest.difficulty);
+  const fx = createFx();
+  let k = 0;
+  while (run.tick < shot.state.tick) {
+    const orders = k < manifest.log.length && manifest.log[k].tick === run.tick ? manifest.log[k++].orders : [];
+    stepSim(run, orders);
+    for (const ev of run.events) {
+      const before = fx.texts.length;
+      fxFromEvent(fx, ev, run);
+      const t = fx.texts.length > before ? fx.texts.at(-1) : null;
+      if (t && ev.type === 'kill') {
+        const hit = beamHitAnchor(ev, run);
+        const lit = ev.lit || (hit && run.trace.lit[Math.floor((hit.y - BOARD_Y) / CELL) * run.grid.cols + Math.floor((hit.x - BOARD_X) / CELL)] > 0);
+        if (Math.abs(run.tick - shot.state.tick) < 90) check(lit && hit.x === t.ax && hit.y === t.ay, `${shot.name} ${t.text} not anchored on a live beam hit`);
+      }
+    }
+    updateFx(fx, run, DT);
+    run.events.length = 0;
+  }
+  const want = fx.texts.filter((t) => t.kind).map((t) => ({ text: t.text, kind: t.kind, sx: Math.round(t.sx), sy: Math.round(t.sy), ax: Math.round(t.ax), ay: Math.round(t.ay) }));
+  check(JSON.stringify(shot.floaterList) === JSON.stringify(want), `${shot.name} floaters: shown ${JSON.stringify(shot.floaterList)} vs replay ${JSON.stringify(want)}`);
+  for (const t of shot.floaterList) check(Math.hypot(t.sx - t.ax, t.sy - t.ay) <= FLOATER_REACH + 0.5, `${shot.name} ${t.text} spawned ${Math.round(Math.hypot(t.sx - t.ax, t.sy - t.ay))} px from its hit`);
+  console.log(`${shot.name}: floaters ${shot.floaterList.map((t) => `${t.text} (${Math.round(Math.hypot(t.sx - t.ax, t.sy - t.ay))} px from its ${t.kind === 'kill' ? 'beam hit' : 'bite'})`).join(' | ')}`);
 }
 
 // Starbursts: at most 6 big ones, each where the light hits a beetle or a prism splits (replayed).

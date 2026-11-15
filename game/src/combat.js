@@ -65,7 +65,7 @@ function registerKill(run, e) {
   run.stats.kills++;
   run.stats.sunKills++;
   if (e.def.boss) run.stats.titanSeconds = run.time - e.bornAt;
-  run.events.push({ t: run.time, type: 'kill', x: e.x, y: e.y, enemy: e.type, points, chain: chain.count, mult, quartz, boss: !!e.def.boss });
+  run.events.push({ t: run.time, type: 'kill', x: e.x, y: e.y, enemy: e.type, points, chain: chain.count, mult, quartz, boss: !!e.def.boss, lit: e.litPower > 0 });
   if (run.boons.includes('spreading') && (e.litPower > 0 || e.burn > 0)) {
     for (const other of run.enemies) {
       if (other !== e && other.hp > 0 && Math.hypot(other.x - e.x, other.y - e.y) < SPREAD_BURN.radius) {

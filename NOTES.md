@@ -213,6 +213,14 @@
   takes cover ticks the checks pass (no floater conflict, no covered tag) and rewards an active SEAR:
   cover tick 4694, SEAR x3, 17 beetles, 1 floater.
 
+- Benchmark 5 item 11: props (palm, two urns) left the static wall texture for their own layer, drawn on
+  the play screen only, placed in the gaps the HUD leaves (right palm -> urn below the tooltip panel);
+  the test hook checks every prop box against hud.hudTextBoxes() and visible overlay text, per shot.
+  Kill events carry `lit`; a kill's number anchors on the beam hit (lit beetle, else the nearest lit
+  cell within 1.5 cells, else no number) and spawns within 1.5 cells of it. check-shot-truth replays
+  the cover's fx in Node and compares every floater, its spawn distance and its anchor. Cover now has
+  +30 and +90 SEAR x3.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

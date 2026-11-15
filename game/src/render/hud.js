@@ -610,6 +610,18 @@ function drawHotbar(ctx, run, ui) {
   }
 }
 
+/** The play HUD's panels and text rows (props and other decoration must keep clear of these). */
+export function hudTextBoxes() {
+  const top = BOARD_X - WALL;
+  return [
+    { text: 'left panel', x0: LEFT_X, y0: 8, x1: LEFT_X + PANEL_W, y1: 340 },
+    { text: 'sun bar', x0: top + 4, y0: 4, x1: top + BOARD_W + WALL * 2 - 4, y1: 62 },
+    { text: 'frieze', x0: top, y0: 68, x1: top + BOARD_W + WALL * 2, y1: 106 },
+    { text: 'right panels', x0: RIGHT_X, y0: 8, x1: RIGHT_X + PANEL_W, y1: 640 },
+    { text: 'hotbar and keys', x0: HOTBAR_X, y0: HOTBAR.y, x1: 1200, y1: HOTBAR.y + HOTBAR.h },
+  ];
+}
+
 export function drawHud(ctx, run, ui) {
   drawSunBar(ctx, run);
   drawWinLoseFrieze(ctx, run);
