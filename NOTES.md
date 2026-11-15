@@ -40,6 +40,9 @@
   + "NEW: GLASSBACK" footer, HUD hidden; the next sun's beam drawn as a dashed ghost ending in an X
   labelled MISSES (or HITS n PATH CELLS, honestly computed from pathing.routeCells).
 
+- FOUNTAIN_MAX = 10 for every difficulty (Gentle/Scorched differ by enemy HP, count and quartz);
+  Sunstone now heals 1 after every sun. Greedy 8 seeds: gentle 2/8 (6.4), normal 1/8 (5.4), scorched 0/8 (3.0).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

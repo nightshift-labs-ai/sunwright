@@ -126,11 +126,13 @@ export const WAVES = [
 ];
 
 export const DIFFICULTIES = {
-  gentle: { name: NAMES.difficulty.gentle, hpMul: 0.65, countMul: 0.8, startQuartz: 18, shrineHp: 14 },
-  normal: { name: NAMES.difficulty.normal, hpMul: 1, countMul: 1, startQuartz: 14, shrineHp: 10 },
-  scorched: { name: NAMES.difficulty.scorched, hpMul: 1.35, countMul: 1.2, startQuartz: 12, shrineHp: 8 },
+  gentle: { name: NAMES.difficulty.gentle, hpMul: 0.6, countMul: 0.8, startQuartz: 20 },
+  normal: { name: NAMES.difficulty.normal, hpMul: 1, countMul: 1, startQuartz: 14 },
+  scorched: { name: NAMES.difficulty.scorched, hpMul: 1.45, countMul: 1.2, startQuartz: 11 },
 };
 export const DIFFICULTY_ORDER = ['gentle', 'normal', 'scorched'];
+/** The Sun Fountain always holds 10 HP; the run is lost when it runs dry. */
+export const FOUNTAIN_MAX = 10;
 
 export const ECONOMY = { waveQuartz: 5, waveQuartzPerWave: 1, rerollCost: 3, oldPieceRefund: 0.5 };
 export const SCORING = { perShrineHp: 50, waveClear: 100, chainWindow: 1, chainMaxMult: 5 };
@@ -143,7 +145,7 @@ export const BOONS = [
   { id: 'flare2', name: NAMES.charm.flare2, text: '+1 Flare charge every sun', weight: 3, hue: 48 },
   { id: 'magnet', name: NAMES.charm.magnet, text: 'Every beetle drops +1 quartz', weight: 3, hue: 280 },
   { id: 'discount', name: NAMES.charm.discount, text: 'Mirrors and splitters cost 1 less', weight: 3, hue: 160 },
-  { id: 'sunstone', name: NAMES.charm.sunstone, text: 'Fountain +2 max HP and heal 2', weight: 2, hue: 140 },
+  { id: 'sunstone', name: NAMES.charm.sunstone, text: 'Fountain heals 1 HP after every sun', weight: 2, hue: 140 },
   { id: 'mend', name: NAMES.charm.mend, text: 'Heal the fountain 4 HP', weight: 3, hue: 120, repeat: true },
   { id: 'spreading', name: NAMES.charm.spreading, text: 'Burned beetles scorch their neighbours', weight: 2, hue: 8 },
   { id: 'highsun', name: NAMES.charm.highsun, text: 'Every beam +20% power', weight: 2, hue: 52 },

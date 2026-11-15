@@ -1,7 +1,7 @@
 // The run state and its fixed-step update. Input never touches this state directly: it queues
 // orders, and stepSim applies them at the start of the next 60 Hz tick, then advances the phase
 // machine build -> wave -> draft -> build ... -> won | lost.
-import { BEAM, DIFFICULTIES, DT, ECONOMY, FLARE_CHARGES, PIECES, WAVE_COUNT } from './config.js';
+import { BEAM, DIFFICULTIES, DT, ECONOMY, FLARE_CHARGES, FOUNTAIN_MAX, PIECES, WAVE_COUNT } from './config.js';
 import { createRng } from './rng.js';
 import { createGrid, pieceAt, placementCheck, setPiece } from './grid.js';
 import { buildFlowField } from './pathing.js';
@@ -30,8 +30,8 @@ export function createRun(seed, difficultyId = 'normal') {
     aperture: null,
     quartz: diff.startQuartz,
     score: 0,
-    shrineHp: diff.shrineHp,
-    shrineMax: diff.shrineHp,
+    shrineHp: FOUNTAIN_MAX,
+    shrineMax: FOUNTAIN_MAX,
     boons: [],
     offer: [],
     rerolls: 0,
@@ -161,6 +161,7 @@ function startWave(run) {
 }
 
 function finishWave(run) {
+  if (run.boons.includes('sunstone')) run.shrineHp = Math.min(run.shrineMax, run.shrineHp + 1);
   const bonus = waveClearBonus(run);
   run.score += bonus;
   run.quartz += ECONOMY.waveQuartz + ECONOMY.waveQuartzPerWave * run.waveIndex;

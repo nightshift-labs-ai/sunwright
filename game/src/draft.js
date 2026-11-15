@@ -35,10 +35,7 @@ export function rerollOffer(run) {
 
 export function applyBoon(run, id) {
   run.boons.push(id);
-  if (id === 'sunstone') {
-    run.shrineMax += 2;
-    run.shrineHp = Math.min(run.shrineMax, run.shrineHp + 2);
-  } else if (id === 'mend') {
+  if (id === 'mend') {
     run.shrineHp = Math.min(run.shrineMax, run.shrineHp + 4);
   }
 }
