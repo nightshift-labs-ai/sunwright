@@ -28,7 +28,7 @@ export const NAMES = {
     burning: 'Burning Glass',
     flare2: 'Second Flare',
     magnet: 'Quartz Pull',
-    discount: "Glasswright's Discount",
+    discount: 'Glass Discount',
     sunstone: 'Sunstone',
     mend: 'Mend the Fountain',
     spreading: 'Spreading Burn',
@@ -36,6 +36,11 @@ export const NAMES = {
     longchain: 'Long Sear',
     grinder: 'Lens Grinder',
     trueprism: 'True Prism',
+  },
+  /** Charm names for tight rows (results YOUR BUILD): `Mend x2`. */
+  charmShort: {
+    silvered: 'Silvered', burning: 'Burning', flare2: '2nd Flare', magnet: 'Quartz Pull', discount: 'Discount', sunstone: 'Sunstone',
+    mend: 'Mend', spreading: 'Spreading', highsun: 'High Sun', longchain: 'Long Sear', grinder: 'Grinder', trueprism: 'True Prism',
   },
 };
 export const RESULT_WIN_TITLE = 'THE TITAN IS ASH';
@@ -57,11 +62,11 @@ export const BOARD = {
 };
 
 export const PIECES = {
-  mirror: { name: NAMES.piece.mirror, cost: 3, blurb: 'Bounces light 90 degrees (-10% power)', short: 'bounces light 90 degrees' },
+  mirror: { name: NAMES.piece.mirror, cost: 3, blurb: 'Bounces light 90 degrees (-10% power)', short: 'turns light 90 degrees' },
   splitter: { name: NAMES.piece.splitter, cost: 5, blurb: 'Halves the beam: half passes, half bounces', short: 'halves the beam' },
   lens: { name: NAMES.piece.lens, cost: 7, blurb: 'x2.5 power for 3 cells, then the beam ends', short: 'focuses x2.5 for 3 cells' },
   pillar: { name: NAMES.piece.pillar, cost: 1, blurb: 'Blocks beetles and light', short: 'blocks beetles and light' },
-  prism: { name: NAMES.piece.prism, cost: 8, blurb: 'Fans light: red burns, blue slows, gold pierces armour', short: 'red burn, blue slow, gold pierce', unlockWave: 3 },
+  prism: { name: NAMES.piece.prism, cost: 8, blurb: 'Fans light: red burns, blue slows, gold pierces armour', short: 'splits burn, slow, pierce', unlockWave: 3 },
 };
 export const PIECE_ORDER = ['mirror', 'splitter', 'lens', 'pillar', 'prism'];
 

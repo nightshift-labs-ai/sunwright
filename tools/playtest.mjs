@@ -156,6 +156,9 @@ await page.keyboard.press('KeyR');
 await frame();
 await advance(1);
 expect((await state()).quartz === before && (await state()).tick <= 2, 'a second R press restarts the run');
+// Every line drawn during the whole playtest fits its box at >= 92% width (render/fit.js).
+const squeeze = await page.evaluate(() => window.__test.squeezes());
+expect(squeeze.tooTight.length === 0, `no line squeezed under 92%${squeeze.tooTight.length ? `: ${squeeze.tooTight.join(' | ')}` : ''}`);
 expect(errors.length === 0, `no console errors${errors.length ? `: ${errors.slice(0, 3).join(' | ')}` : ''}`);
 await browser.close();
 console.log(failures.length ? `${failures.length} FAILED` : 'ALL PASSED');

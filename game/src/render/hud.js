@@ -11,6 +11,7 @@ import { sunApertureFor } from '../sun.js';
 import { nextSunPreview, waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
 import { drawCharmBadge } from './charms.js';
+import { fitSized } from './fit.js';
 import { BOARD_W, BOARD_X, BOARD_Y, CELL, QUARTZ_ANCHOR, VIEW_W, WALL } from './layout.js';
 
 const INK = '#FFF6DF';
@@ -188,9 +189,8 @@ function drawSunDial(ctx, run, cx, cy) {
     }
     text(ctx, wall[0].toUpperCase(), gx, gy + (wall === 'north' ? -22 : 30), 15, INK, 'center', 900);
   }
-  const nextLine = nextAp ? `NEXT: ${nextAp.phase.name} (${nextAp.phase.wallName[0]})` : 'FINAL SUN';
-  ctx.font = `900 20px ${FONT}`;
-  fitLine(ctx, nextLine, cx - Math.min(PANEL_W - 16, ctx.measureText(nextLine).width) / 2, cy + 54, PANEL_W - 16, 20, GOLD);
+  const nextLine = nextAp ? [`NEXT: ${nextAp.phase.name} (${nextAp.phase.wallName[0]})`, `NEXT: ${nextAp.phase.wallName}`] : 'FINAL SUN';
+  fitLine(ctx, nextLine, cx, cy + 54, PANEL_W - 16, 20, GOLD, 'center');
   // The real trigger: the sun moves when this sun ends (never a timer).
   if (nextAp) {
     const chip = run.phase === 'build' ? 'after the coming sun' : 'after this sun';
@@ -243,13 +243,7 @@ function drawFountainPips(ctx, run, y) {
       ctx.stroke();
     }
   }
-  ctx.save();
-  ctx.translate(LEFT_X + PANEL_W / 2, y + 100);
-  ctx.font = `900 20px ${FONT}`;
-  const squeeze = Math.min(1, (PANEL_W - 20) / ctx.measureText('EMPTY = RUN LOST').width);
-  ctx.scale(squeeze, 1);
-  text(ctx, 'EMPTY = RUN LOST', 0, 0, 20, '#FFB0B0', 'center', 900);
-  ctx.restore();
+  fitLine(ctx, ['EMPTY = RUN LOST', 'DRY = RUN LOST'], LEFT_X + PANEL_W / 2, y + 100, PANEL_W - 20, 20, '#FFB0B0', 'center');
 }
 
 
@@ -271,9 +265,9 @@ function drawSunBar(ctx, run) {
   const x = BOARD_X - WALL + 4;
   const w = BOARD_W + WALL * 2 - 8;
   panel(ctx, x, 4, w, 58);
-  const trackX = x + w - 26 - 8 * 40;
+  const trackX = x + w - 26 - 8 * 36;
   fitLine(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, x + 16, 44, trackX - x - 46, 32, INK);
-  drawSunTrack(ctx, trackX, 33, 40, 13, run.stats.wavesCleared, run.waveIndex);
+  drawSunTrack(ctx, trackX, 33, 36, 13, run.stats.wavesCleared, run.waveIndex);
 }
 
 const ICON_ENEMIES = Object.fromEntries(Object.keys(ENEMIES).map((type) => [type, { id: 3, type, def: ENEMIES[type], heading: 0, hp: 1, maxHp: 1, litPower: 0, age: 0, x: 0, y: 0 }]));
@@ -326,20 +320,27 @@ function drawIncoming(ctx, run, y0) {
   }
   const titanLeft = run.waveIndex === WAVE_COUNT - 1 && inWave ? left.get('titan') ?? 0 : 1;
   drawTitanSkull(ctx, x0 + 22, y, 9, titanLeft === 0, '#FF6B5E');
-  fitLine(ctx, `${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, x0 + 38, y + 5, PANEL_W - 46, 15, '#FFB0B0');
+  fitLine(ctx, [`${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, `${NAMES.sun} ${WAVE_COUNT}: THE TITAN`], x0 + 38, y + 5, PANEL_W - 46, 15, '#FFB0B0');
   const preview = nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name);
-  if (preview) fitLine(ctx, preview, x0 + 12, y + 32, PANEL_W - 20, 15, '#FFE27A');
+  if (preview) {
+    // Shorter wordings of the same preview: drop SUN, then keep only the first change.
+    const parts = preview.replace(`NEXT ${NAMES.sun}: `, '').split(', ');
+    fitLine(ctx, [preview, `NEXT: ${parts.join(', ')}`, `NEXT: ${parts[0]}`, parts[0]], x0 + 12, y + 32, PANEL_W - 20, 15, '#FFE27A');
+  }
 }
 
-/** One HUD line squeezed horizontally to fit maxW. */
-function fitLine(ctx, str, x, y, maxW, size, color) {
-  ctx.font = `900 ${size}px ${FONT}`;
-  const squeeze = Math.min(1, maxW / ctx.measureText(str).width);
+/**
+ * One HUD line in maxW: the first wording that fits at >= 92% width (render/fit.js), squeezed that
+ * little. size may be a list (largest first): each wording tries every size before the next wording.
+ */
+function fitLine(ctx, options, x, y, maxW, sizes, color, align = 'left') {
+  const { str, squeeze, size } = fitSized(ctx, options, maxW, [sizes].flat(), (px) => `900 ${px}px ${FONT}`);
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(squeeze, 1);
-  text(ctx, str, 0, 0, size, color, 'left', 900);
+  text(ctx, str, 0, 0, size, color, align, 900);
   ctx.restore();
+  return str;
 }
 
 /** Owned glass charms as small medallions. */
@@ -364,7 +365,7 @@ function drawTooltip(ctx, run, ui, y0) {
   const keys = hover
     ? `${hover.type === 'pillar' ? '' : 'Q/E turn - '}X sell +${liftRefund(run, hover)}`
     : `${PIECE_ORDER.indexOf(type) + 1} select - click place`;
-  // A placement the rules refuse says why (e.g. "Would seal off the fountain").
+  // A placement the rules refuse says why (e.g. "Would seal the fountain").
   if (ui.hintBad && ui.hint) fitLine(ctx, ui.hint, RIGHT_X + 12, y0 + 96, PANEL_W - 20, 15, '#FF8A8A');
   else text(ctx, keys, RIGHT_X + 12, y0 + 96, 15, '#FFF2A8', 'left', 900);
 }
@@ -409,13 +410,7 @@ function drawWinLoseFrieze(ctx, run) {
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 2;
   ctx.strokeRect(x + 1, 69, w - 2, 36);
-  ctx.font = `900 32px ${FONT}`;
-  const squeeze = Math.min(1, (w - 24) / ctx.measureText(line).width);
-  ctx.save();
-  ctx.translate(640, 99);
-  ctx.scale(squeeze, 1);
-  text(ctx, line, 0, 0, 32, '#FFF2A8', 'center', 900);
-  ctx.restore();
+  fitLine(ctx, line, 640, 99, w - 24, 32, '#FFF2A8', 'center');
 }
 
 /** The big banner over the courtyard: the latest event, or what the next sun asks of you. */
@@ -434,13 +429,7 @@ function drawEventBanner(ctx, run, ui) {
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 3;
   ctx.stroke();
-  ctx.font = `900 61px ${FONT}`;
-  const squeeze = Math.min(1, (w - 28) / ctx.measureText(message).width);
-  ctx.save();
-  ctx.translate(640, BOARD_Y + 59);
-  ctx.scale(squeeze, 1);
-  text(ctx, message, 0, 0, 61, '#FFE27A', 'center', 900);
-  ctx.restore();
+  fitLine(ctx, message, 640, BOARD_Y + 59, w - 28, [61, 54, 48, 42, 36], '#FFE27A', 'center');
   ctx.restore();
 }
 

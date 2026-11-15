@@ -186,6 +186,16 @@
   (new run.stats.sunKills, reset at each sun start; outcomes unchanged). Verdict plaque moved to y 200.
   check-shot-truth compares the line with the replayed sim and checks its size.
 
+- Benchmark 5 item 7: one family (system-ui) everywhere; the Georgia roundel names and sheet headings
+  are gone. render/fit.js holds the type rule: squeeze to no less than 92%, else a shorter wording or
+  a smaller size; anything tighter is recorded and fails check-shot-truth (per shot) and the playtest
+  (every frame it drew). Shortened: tiles BURNED / BEST SEAR, YOUR BUILD short charm names (`Mend x2`,
+  NAMES.charmShort), DRY = RUN LOST, NEXT: WEST, SUN 9: THE TITAN, NEXT: NEW GLASSBACK, frieze
+  `WIN: 5 more suns - LOSE: the fountain runs dry`, Mirror tooltip `turns light 90 degrees`, prism
+  `splits burn, slow, pierce`, refusals `Would seal the fountain` / `That is the fountain`;
+  Glasswright's Discount renamed Glass Discount. Draft heading and results title drop font size
+  (84 / 104 px) instead of squeezing; the event banner tries 61-36 px; sun track spacing 36 px.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

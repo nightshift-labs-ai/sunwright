@@ -43,9 +43,10 @@ await page.waitForFunction(() => window.__test, null, { timeout: 15000 });
 await page.waitForTimeout(200);
 const manifest = { seed: SEED, difficulty: DIFF, bot: BOT, shots: [], history: history.map((h) => ({ seed: h.seed, log: h.log, endTick: h.endTick })) };
 async function capture(name, state) {
+  await page.evaluate(() => window.__test.squeezes());
   await page.waitForTimeout(150);
   await page.screenshot({ path: `screenshots/${name}`, type: 'jpeg', quality: QUALITY });
-  manifest.shots.push({ name, tick: state.tick ?? null, state });
+  manifest.shots.push({ name, tick: state.tick ?? null, state, squeeze: await page.evaluate(() => window.__test.squeezes()) });
   console.log(`${name}: ${state.phase ?? state.screen} day ${state.day ?? '-'} wave ${state.wave ?? '-'} score ${state.score ?? '-'}`);
 }
 for (const h of history) {

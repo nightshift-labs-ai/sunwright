@@ -74,6 +74,13 @@ for (const shot of manifest.shots) if (shot.textOverlaps) check(shot.textOverlap
 for (const shot of manifest.shots) if (shot.floaters !== undefined) console.log(`${shot.name}: ${shot.floaters} floating numbers, ${shot.textOverlaps.length} overlaps`);
 for (const shot of manifest.shots) if (shot.textOutside) check(shot.textOutside.length === 0, `${shot.name} text outside its plaque: ${shot.textOutside.join(' | ')}`);
 
+// Type: no line on any shot squeezed under 92% of its width (render/fit.js records the ones that were).
+for (const shot of manifest.shots) {
+  if (!shot.squeeze) continue;
+  check(shot.squeeze.tooTight.length === 0, `${shot.name} squeezed under 92%: ${shot.squeeze.tooTight.join(' | ')}`);
+  if (shot.squeeze.squeezed.length) console.log(`${shot.name} squeezed (>= 92%): ${shot.squeeze.squeezed.join(' | ')}`);
+}
+
 // Title: the rule lines are announce.titleRules() (suns from config), each at least 34 px and unclipped.
 for (const shot of manifest.shots) {
   if (!shot.titleText) continue;

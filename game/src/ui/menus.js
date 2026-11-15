@@ -9,6 +9,7 @@ import { rankFor } from '../combat.js';
 import { draftContext, draftHint, historyChip, titleRules } from '../announce.js';
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
+import { MIN_SQUEEZE, fitScale } from '../render/fit.js';
 
 
 const SCREENS = ['title', 'howto', 'options', 'pause', 'draft', 'results'];
@@ -69,6 +70,7 @@ export function showDraft(menus, run) {
   menus.draftKey = key;
   const ap = sunApertureFor(run.seed, run.waveIndex);
   el('draft-banner').textContent = `${NAMES.sun} MOVES ${ap.phase.wallName} - PICK 1`;
+  fitHeading(el('draft-banner'), 112, 1160);
   el('draft-context').textContent = draftContext(run);
   el('draft-roundels').innerHTML = run.offer
     .map((id, i) => {
@@ -101,13 +103,26 @@ function synergyTag(run, id) {
   return partner && run.boons.includes(partner) ? `<span class="synergy">+ pairs with ${escapeHtml(boonById(partner).name)}</span>` : '';
 }
 
-/** Shrink each stat label horizontally until it fits its tile on one line (needs the overlay shown). */
+/** Fit each stat label to its tile on one line, never squeezed under 92% (needs the overlay shown). */
 function fitLabels(root) {
   for (const label of root.querySelectorAll('.stats small')) {
     label.style.setProperty('--fit', '1');
-    const room = label.parentElement.clientWidth - 12;
-    if (label.scrollWidth > room) label.style.setProperty('--fit', String(room / label.scrollWidth));
+    label.style.setProperty('--fit', String(fitScale(label.textContent, label.scrollWidth, label.parentElement.clientWidth - 12)));
   }
+}
+
+const measure = document.createElement('canvas').getContext('2d');
+
+/**
+ * A one-line heading in `room` px: its natural size up to maxPx, squeezed to no less than 92%;
+ * a longer line gets a smaller font instead (render/fit.js rule).
+ */
+function fitHeading(node, maxPx, room) {
+  measure.font = `900 ${maxPx}px system-ui, sans-serif`;
+  const k = room / measure.measureText(node.textContent).width;
+  const px = k >= MIN_SQUEEZE ? maxPx : Math.floor((maxPx * k) / MIN_SQUEEZE);
+  node.style.fontSize = `${px}px`;
+  node.style.setProperty('--fit', String(Math.min(1, Math.max(MIN_SQUEEZE, k))));
 }
 
 /** What to aim for next, from this run's outcome and difficulty. */
@@ -129,17 +144,17 @@ export function showResults(menus, run, record, history) {
   el('results-screen').classList.toggle('lost', !won);
   const title = el('results-title');
   title.textContent = won ? RESULT_WIN_TITLE : RESULT_LOSE_TITLE;
-  requestAnimationFrame(() => title.style.setProperty('--fit', String(Math.min(1, 1180 / title.offsetWidth))));
+  fitHeading(title, 104, 1180);
   el('results-sub').textContent = won
     ? `Courtyard held - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`
     : `Fell on Day ${run.aperture.day} ${run.aperture.phase.name.toLowerCase()} - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`;
   const rank = rankFor(run);
   el('results-score').innerHTML = `<span class="rank rank-${rank}">${rank}</span>${run.score.toLocaleString('en-US')}${record.isBest ? '<em>NEW BEST</em>' : ''}`;
   const tiles = [
-    ['BEETLES BURNED', run.stats.kills],
+    ['BURNED', run.stats.kills],
     [NAMES.suns, `${run.stats.wavesCleared}/${WAVE_COUNT}`],
     [NAMES.fountainShort, `${run.shrineHp}/${run.shrineMax}`],
-    [`LONGEST ${NAMES.combo}`, `x${run.chain.best}`],
+    [`BEST ${NAMES.combo}`, `x${run.chain.best}`],
   ];
   el('results-stats').innerHTML = tiles.map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('');
   requestAnimationFrame(() => fitLabels(el('results-stats')));

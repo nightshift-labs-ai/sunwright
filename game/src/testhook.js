@@ -8,6 +8,7 @@ import { rankFor } from './combat.js';
 import { currentBanner, winLoseHeadline } from './announce.js';
 import { loadHistory } from './save.js';
 import { audioProbe } from './audio.js';
+import { squeezeReport } from './render/fit.js';
 import { boardTextBoxes, boxTouchesBeam } from './render/fx.js';
 import { boardLabelBoxes } from './render/board.js';
 
@@ -137,6 +138,10 @@ export function installTestHook(app, api) {
     },
     audio() {
       return audioProbe();
+    },
+    /** Lines squeezed since the last call: { tooTight, squeezed } (render/fit.js); clears the record. */
+    squeezes() {
+      return squeezeReport();
     },
     floaterCount() {
       return app.fx.texts.length;

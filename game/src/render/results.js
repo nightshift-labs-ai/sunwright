@@ -1,9 +1,10 @@
 // The results hero art, drawn on the canvas beside the results plaque: the Hornback Titan flipped
 // on its back and smoking on a scorched patch (or the drained fountain on a defeat), the 9-sun
 // track with the skull crossed out, and the glass charms taken.
-import { WAVE_COUNT } from '../config.js';
+import { NAMES, WAVE_COUNT } from '../config.js';
 import { boonById } from '../draft.js';
 import { drawCharmBadge } from './charms.js';
+import { fitOption } from './fit.js';
 import { drawSunTrack } from './hud.js';
 import { VIEW_H, VIEW_W } from './layout.js';
 
@@ -114,10 +115,9 @@ function caption(ctx, str, x, y, size, color) {
   ctx.fillText(str, x, y);
 }
 
-/** Draw text no wider than maxW, squeezing it horizontally when it would not fit. */
-export function fitText(ctx, str, x, y, maxW) {
-  const width = ctx.measureText(str).width;
-  const squeeze = Math.min(1, maxW / width);
+/** Draw the first wording that fits maxW at >= 92% width (render/fit.js), squeezed that little. */
+export function fitText(ctx, options, x, y, maxW) {
+  const { str, squeeze } = fitOption(ctx, options, maxW);
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(squeeze, 1);
@@ -141,7 +141,8 @@ function drawYourBuild(ctx, run) {
     ctx.font = '800 20px system-ui, sans-serif';
     ctx.fillStyle = '#FFF6DF';
     ctx.textAlign = 'left';
-    fitText(ctx, n > 1 ? `${boon.name} x${n}` : boon.name, x + 36, y + 7, 120);
+    const times = n > 1 ? ` x${n}` : '';
+    fitText(ctx, [`${boon.name}${times}`, `${NAMES.charmShort[id]}${times}`], x + 36, y + 7, 120);
   });
   ctx.font = '800 22px system-ui, sans-serif';
   ctx.fillStyle = '#FFE27A';
