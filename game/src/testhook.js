@@ -9,7 +9,7 @@ import { currentBanner, winLoseHeadline } from './announce.js';
 import { loadHistory } from './save.js';
 import { audioProbe } from './audio.js';
 import { squeezeReport } from './render/fit.js';
-import { boardTextBoxes, boxTouchesBeam } from './render/fx.js';
+import { boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
 import { boardLabelBoxes } from './render/board.js';
 
 /** Board tags (SWARM, FOUNTAIN) that a beam core or a beetle covers right now. */
@@ -142,6 +142,9 @@ export function installTestHook(app, api) {
     /** Lines squeezed since the last call: { tooTight, squeezed } (render/fit.js); clears the record. */
     squeezes() {
       return squeezeReport();
+    },
+    starbursts() {
+      return drawnStarbursts();
     },
     floaterCount() {
       return app.fx.texts.length;

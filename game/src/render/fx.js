@@ -1,8 +1,8 @@
-// Light and juice: additive sunbeams with starbursts at bounces, sparks on burning beetles,
+// Light and juice: additive sunbeams with starbursts where light hits beetles, sparks on burning beetles,
 // smoke and flipped husks on kills, quartz that fly to the HUD counter, floating CHAIN text,
 // screen shake, the Flare flash and the red hurt vignette. Effects advance with sim time.
 import { NAMES, WAVE_COUNT } from '../config.js';
-import { beamModsFor, traceBeams } from '../beams.js';
+import { beamModsFor, bigStarbursts, traceBeams } from '../beams.js';
 import { sunApertureFor } from '../sun.js';
 import { currentBanner } from '../announce.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
@@ -273,8 +273,25 @@ export function drawBeams(ctx, trace, opts) {
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   const twinkle = 0.85 + Math.sin((opts.time ?? 0) * 7) * 0.15;
-  for (const b of trace.bursts) drawStarburst(ctx, toScreenX(b.x), toScreenY(b.y), 22 * Math.min(1.25, Math.max(0.7, Math.sqrt(b.power / 10))) * twinkle, 0.55 * alpha);
+  // Big starbursts only where light hits a beetle or a prism splits (at most 6); bounces just glint.
+  const big = bigStarbursts(trace, opts.enemies ?? []);
+  const glints = new Set();
+  for (const b of trace.bursts) {
+    const key = `${b.x},${b.y}`;
+    if (b.kind === 'prism' || b.kind === 'shell' || glints.has(key)) continue;
+    glints.add(key);
+    drawStarburst(ctx, toScreenX(b.x), toScreenY(b.y), 9 * twinkle, 0.35 * alpha);
+  }
+  for (const b of big) drawStarburst(ctx, toScreenX(b.x), toScreenY(b.y), 26 * Math.min(1.25, Math.max(0.75, Math.sqrt(b.power / 10))) * twinkle, 0.6 * alpha);
+  lastStarbursts = big;
   ctx.restore();
+}
+
+let lastStarbursts = [];
+
+/** The big starbursts of the last beam frame (for the screenshot checks). */
+export function drawnStarbursts() {
+  return lastStarbursts.map((b) => ({ x: +b.x.toFixed(2), y: +b.y.toFixed(2), kind: b.kind }));
 }
 
 let beamCanvas = null;

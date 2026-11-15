@@ -48,7 +48,8 @@ export function beamModsFor(boons) {
 /**
  * Trace all light from one opening. blockers: optional Set of cell indices holding a Glassback.
  * Returns { lit: Float32Array power per cell, tints: Uint8Array flags per cell,
- *   legs: [{x0,y0,x1,y1,power,tint,focused}], bursts: [{x,y,power}] } in cell units.
+ *   legs: [{x0,y0,x1,y1,power,tint,focused}], bursts: [{x,y,power,kind}] } in cell units
+ *   (kind: mirror, splitter, lens, prism, or shell where a Glassback soaks the beam).
  */
 export function traceBeams(grid, aperture, mods, blockers = null) {
   const lit = new Float32Array(grid.cols * grid.rows);
@@ -96,26 +97,26 @@ export function traceBeams(grid, aperture, mods, blockers = null) {
       tints[i] |= tint;
       if (blockers && blockers.has(i) && tint !== TINT_GOLD) {
         endLeg(cx, cy); // a Glassback's mirror shell soaks the beam
-        bursts.push({ x: cx, y: cy, power: power * 0.5 });
+        bursts.push({ x: cx, y: cy, power: power * 0.5, kind: 'shell' });
         break;
       }
       if (piece) {
         endLeg(cx, cy);
         if (piece.type === 'mirror') {
-          bursts.push({ x: cx, y: cy, power });
+          bursts.push({ x: cx, y: cy, power, kind: 'mirror' });
           dir = reflectDirection(piece.rot, dir);
           power *= 1 - mods.bounceLoss;
         } else if (piece.type === 'splitter') {
-          bursts.push({ x: cx, y: cy, power });
+          bursts.push({ x: cx, y: cy, power, kind: 'splitter' });
           const turned = reflectDirection(piece.rot, dir);
           power *= 0.5;
           rays.push({ c: c + DX[turned], r: r + DY[turned], dir: turned, power, focus, tint, x: cx, y: cy });
         } else if (piece.type === 'lens') {
-          bursts.push({ x: cx, y: cy, power: power * 0.6 });
+          bursts.push({ x: cx, y: cy, power: power * 0.6, kind: 'lens' });
           power *= mods.lensMult;
           focus = mods.lensReach + 1;
         } else if (piece.type === 'prism') {
-          bursts.push({ x: cx, y: cy, power });
+          bursts.push({ x: cx, y: cy, power, kind: 'prism' });
           const fan = prismFan(piece.rot, dir);
           power *= mods.prismShare;
           for (const branch of fan.slice(1)) rays.push({ c: c + DX[branch.dir], r: r + DY[branch.dir], dir: branch.dir, power, focus: 0, tint: branch.tint, x: cx, y: cy });
@@ -139,4 +140,27 @@ export function litLength(trace) {
   let n = 0;
   for (const p of trace.lit) if (p > 0) n++;
   return n;
+}
+
+/** How many big starbursts a frame may show. */
+export const MAX_STARBURSTS = 6;
+
+/**
+ * The big starbursts worth drawing: prism splits and Glassback shells first, then the beetles the
+ * light hits hardest, at most MAX_STARBURSTS. Plain bounces get none (render/fx.js gives them a glint).
+ */
+export function bigStarbursts(trace, enemies) {
+  // One per spot: a prism crossed by several rays still splits light in one place.
+  const out = [];
+  for (const b of trace.bursts) {
+    if (b.kind !== 'prism' && b.kind !== 'shell') continue;
+    const same = out.find((o) => o.x === b.x && o.y === b.y);
+    if (same) same.power = Math.max(same.power, b.power);
+    else out.push({ x: b.x, y: b.y, power: b.power, kind: b.kind });
+  }
+  const hits = enemies
+    .filter((e) => e.hp > 0 && e.litPower > 0 && !out.some((b) => Math.hypot(b.x - e.x, b.y - e.y) < 0.6))
+    .sort((a, b) => b.litPower - a.litPower || a.id - b.id)
+    .map((e) => ({ x: e.x, y: e.y, power: e.litPower, kind: 'hit' }));
+  return [...out, ...hits].slice(0, MAX_STARBURSTS);
 }

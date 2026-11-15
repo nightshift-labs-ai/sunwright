@@ -200,6 +200,11 @@
   (lilac wings), Shellback bronze (metallic sweep, gold ribs), Glassback cyan (teal ring), Titan plum.
   The INCOMING icons are the same sprites; floor husks and the results Titan use the same palette.
 
+- Benchmark 5 item 9: big starbursts only where light hits a beetle or a prism splits (beams.
+  bigStarbursts: prism/Glassback-shell spots once each, then lit beetles by power, at most 6); mirror,
+  splitter and lens joints get a small glint. Trace bursts carry a kind. check-shot-truth replays the
+  cover and compares the drawn bursts. Cover: 2 big bursts, 0 blown 32 px blocks (was 5).
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

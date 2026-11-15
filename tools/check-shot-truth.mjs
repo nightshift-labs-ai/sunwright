@@ -9,7 +9,7 @@ import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
 import { currentBanner, draftContext, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
 import { rankFor } from '../game/src/combat.js';
-import { beamModsFor, traceBeams } from '../game/src/beams.js';
+import { MAX_STARBURSTS, beamModsFor, bigStarbursts, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
 import { boonById } from '../game/src/draft.js';
 
@@ -104,6 +104,16 @@ for (const shot of manifest.shots) {
   check(d.context === draftContext(run) && d.contextPx >= 34, `${shot.name} draft context: shown ${d.context} (${d.contextPx}px) vs ${draftContext(run)}`);
   check(d.overlaps.length === 0, `${shot.name} draft text collides: ${d.overlaps.join(' | ')}`);
   console.log(`${shot.name}: ${d.context}; roundels ${d.effects.join(' / ')}; ${d.hint}; ${d.overlaps.length} collisions`);
+}
+
+// Starbursts: at most 6 big ones, each where the light hits a beetle or a prism splits (replayed).
+for (const shot of manifest.shots) {
+  if (!shot.starbursts) continue;
+  const run = replayTo(shot.state.tick);
+  const want = bigStarbursts(run.trace, run.enemies).map((b) => ({ x: +b.x.toFixed(2), y: +b.y.toFixed(2), kind: b.kind }));
+  check(shot.starbursts.length <= MAX_STARBURSTS, `${shot.name}: ${shot.starbursts.length} big starbursts`);
+  check(JSON.stringify(shot.starbursts) === JSON.stringify(want), `${shot.name} starbursts: drawn ${JSON.stringify(shot.starbursts)} vs sim ${JSON.stringify(want)}`);
+  console.log(`${shot.name}: ${shot.starbursts.length} big starbursts (${shot.starbursts.map((b) => b.kind).join(', ')})`);
 }
 
 // Solved plan on the cover: >= 70% of the glass is lit, and every unlit piece is on the next sun's ghost.
