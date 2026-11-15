@@ -146,6 +146,8 @@
 - Draft roundels: synergy tags (config SYNERGY), magenta rare rims, unit-safe text; draft verdict
   plaque under the heading.
 
+- Benchmark 2 item 22: potted palms and a lapis urn on the sand outside the walls (static surround).
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).
@@ -155,7 +157,6 @@
   showing nextSunPreview). Best winning seed 2090 gave 19 beetles / 4 types but weak beams, fading
   floaters and a floater-on-beam truth failure, Glassback not deflecting - reverted.
 - Benchmark 3 item 5 (hierarchy budget: board >= 58% of the cover, merge left panels) - lowest.
-- Benchmark 2 item 22 (potted palms / urns / awning outside the courtyard) - low.
 - M3 leftovers: colour-blind beam patterns option, illustrated How to play.
 
 ## Known bugs
