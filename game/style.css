@@ -67,9 +67,6 @@ kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 28px sys
 #draft-reroll { font-size: 34px; padding: 8px 26px; }
 .newchip { font: 900 34px system-ui, sans-serif; color: #fff6df; background: #b0307a; border: 3px solid #f2c14e; border-radius: 12px; padding: 8px 22px; }
 .newchip:empty { display: none; }
-.owned { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; max-width: 900px; }
-.chip { padding: 5px 12px; border-radius: 16px; font-weight: 800; font-size: 15px; background: hsl(var(--hue) 70% 40%); border: 2px solid #f2c14e; }
-.none { opacity: 0.7; font-weight: 700; }
 
 /* Results: a full-width title plaque, the hero art on the canvas at the left, an opaque plaque at the right,
    all inside a 24 px margin. */

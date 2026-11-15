@@ -14,7 +14,7 @@ const { chromium } = require('playwright');
 const SEED = Number(process.argv[2] ?? 1000);
 const DIFF = process.argv[3] ?? 'normal';
 const BOT = process.argv[4] ?? 'greedy';
-const QUALITY = Number(process.argv[5] ?? 80);
+const QUALITY = Number(process.argv[5] ?? 74);
 const URL = 'http://127.0.0.1:8796/index.html?test=1';
 
 /** Two earlier real runs that fell (Day 2 evening, Day 3 noon): they fill the RUN HISTORY and BEST. */

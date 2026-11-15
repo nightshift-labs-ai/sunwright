@@ -83,9 +83,3 @@ export function placementCheck(grid, c, r) {
 export function setPiece(grid, c, r, piece) {
   grid.pieces[cellIndex(grid, c, r)] = piece;
 }
-
-export function countPieces(grid) {
-  let n = 0;
-  for (const p of grid.pieces) if (p) n++;
-  return n;
-}

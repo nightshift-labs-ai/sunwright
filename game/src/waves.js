@@ -38,7 +38,3 @@ export function nextSunPreview(waveIndex, diff, nameOf) {
     .map((c) => (c.isNew ? `NEW ${nameOf(c.type)}` : `+${c.more} ${nameOf(c.type)}`));
   return changes.length ? `NEXT SUN: ${changes.join(', ')}` : '';
 }
-
-export function waveSize(waveIndex, diff) {
-  return buildWaveSchedule(waveIndex, diff).length;
-}

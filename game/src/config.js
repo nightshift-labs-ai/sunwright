@@ -41,7 +41,6 @@ export const NAMES = {
 export const RESULT_WIN_TITLE = 'THE TITAN IS ASH';
 export const RESULT_LOSE_TITLE = 'THE SWARM BROKE THROUGH';
 
-export const GAME_NAME = NAMES.game;
 export const SIM_HZ = 60;
 export const DT = 1 / SIM_HZ;
 

@@ -143,6 +143,9 @@
 - Benchmark 2 item 14: lit window gets a god-ray wedge + sun disk; inactive windows are shuttered
   lapis arches; kills leave a scorch + flipped husk on the floor layer for 6 s (fx.decals).
 
+- Draft roundels: synergy tags (config SYNERGY), magenta rare rims, unit-safe text; draft verdict
+  plaque under the heading.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.
@@ -151,7 +154,9 @@
 
 ## Known bugs
 - Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.
-- Source is 175.8 KB > 160 KiB dossier text cap (tail files truncated in dossier text): trim pass needed.
+- Source is 196 KB > 160 KiB dossier text cap: the last 6 files (34 KB) are cut from the dossier text
+  (the judge's outline only reaches ~17 headings anyway). Dead exports/CSS removed; JPEG q74 keeps
+  every shot under 210 KB and the dossier at 1.07 MB (gate 1.5 MiB).
 - Staging: K=1 and K=2 give identical runs on every seed (director turns 1 piece either way?): check.
 - Cover still lacks a fresh bite + Scuttler at the rim + 4 burning; lens/flare overlap blows out.
 - Cover (seed 2023 greedy) has prisms on the board but none in the noon beam.
