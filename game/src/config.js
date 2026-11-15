@@ -82,11 +82,11 @@ export const TINT_EFFECTS = { burnDps: 4, burnSeconds: 3, slowFactor: 0.55, slow
 
 /** hp, speed in cells/s, armour = minimum beam power that hurts it, harm = fountain HP it costs. */
 export const ENEMIES = {
-  scuttler: { name: NAMES.enemy.scuttler, hp: 18, speed: 1.15, armour: 0, flies: false, harm: 1, quartz: 1, score: 20, size: 0.34 },
-  veerwing: { name: NAMES.enemy.veerwing, hp: 11, speed: 1.45, armour: 0, flies: true, harm: 1, quartz: 1, score: 30, size: 0.3 },
-  shellback: { name: NAMES.enemy.shellback, hp: 60, speed: 0.72, armour: 12, flies: false, harm: 2, quartz: 3, score: 60, size: 0.42 },
-  glassback: { name: NAMES.enemy.glassback, hp: 40, speed: 0.95, armour: 0, flies: false, harm: 2, quartz: 2, score: 50, size: 0.4, blocksLight: true },
-  titan: { name: NAMES.enemy.titan, hp: 1100, speed: 0.36, armour: 30, flies: false, harm: 5, quartz: 0, score: 1500, size: 0.62, boss: true },
+  scuttler: { name: NAMES.enemy.scuttler, hp: 18, speed: 1.15, armour: 0, flies: false, harm: 1, quartz: 1, score: 20, size: 0.4 },
+  veerwing: { name: NAMES.enemy.veerwing, hp: 11, speed: 1.45, armour: 0, flies: true, harm: 1, quartz: 1, score: 30, size: 0.36 },
+  shellback: { name: NAMES.enemy.shellback, hp: 60, speed: 0.72, armour: 12, flies: false, harm: 2, quartz: 3, score: 60, size: 0.47 },
+  glassback: { name: NAMES.enemy.glassback, hp: 40, speed: 0.95, armour: 0, flies: false, harm: 2, quartz: 2, score: 50, size: 0.45, blocksLight: true },
+  titan: { name: NAMES.enemy.titan, hp: 1100, speed: 0.36, armour: 30, flies: false, harm: 5, quartz: 0, score: 1500, size: 0.85, boss: true },
 };
 /** The Hornback Titan's carapace opens (armour 0) for `open` seconds out of every `cycle`. */
 export const TITAN_CARAPACE = { cycle: 6, open: 2.5 };

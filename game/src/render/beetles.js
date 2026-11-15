@@ -1,6 +1,6 @@
 // Beetle sprites drawn in code: magenta Scuttlers with walking legs, violet Veerwings with
 // beating wings, armour-plated Shellbacks, and the Hornback Titan with her opening carapace.
-import { carapaceOpen } from '../enemies.js';
+import { armourOf, carapaceOpen } from '../enemies.js';
 import { CELL, toScreenX, toScreenY } from './layout.js';
 
 const HEADING_ANGLE = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
@@ -24,10 +24,15 @@ function drawShell(ctx, rx, ry, top, under, ridge) {
   ctx.beginPath();
   ctx.ellipse(-1, 2, rx, ry, 0, 0, Math.PI * 2);
   ctx.fill();
+  ctx.strokeStyle = '#26091C';
+  ctx.lineWidth = 2;
+  ctx.stroke();
   ctx.fillStyle = top;
   ctx.beginPath();
   ctx.ellipse(0, 0, rx, ry * 0.92, 0, 0, Math.PI * 2);
   ctx.fill();
+  ctx.strokeStyle = '#26091C';
+  ctx.stroke();
   ctx.strokeStyle = ridge;
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -64,12 +69,14 @@ function drawBurnGlow(ctx, power, size) {
   ctx.restore();
 }
 
-function drawHealthBar(ctx, e, x, y, w) {
+/** Heat bar: fills as the beetle sears, glowing from orange to white as it nears death. */
+function drawHeatBar(ctx, e, x, y, w) {
   if (e.hp >= e.maxHp) return;
-  ctx.fillStyle = 'rgba(40,10,40,0.7)';
-  ctx.fillRect(x - w / 2, y, w, 5);
-  ctx.fillStyle = e.def.boss ? '#FF4D8D' : '#FFE14D';
-  ctx.fillRect(x - w / 2, y, w * Math.max(0, e.hp / e.maxHp), 5);
+  const heat = Math.min(1, Math.max(0, 1 - e.hp / e.maxHp));
+  ctx.fillStyle = 'rgba(38,9,28,0.8)';
+  ctx.fillRect(x - w / 2 - 1, y - 1, w + 2, 7);
+  ctx.fillStyle = `rgb(255,${Math.round(130 + 125 * heat)},${Math.round(40 + 215 * heat)})`;
+  ctx.fillRect(x - w / 2, y, w * heat, 5);
 }
 
 /** Little flickering flames on a beetle set burning by red prism light. */
@@ -183,13 +190,19 @@ export function drawEnemy(ctx, e, time) {
     ctx.arc(x, y, size + 5, 0, Math.PI * 2);
     ctx.stroke();
   }
-  drawHealthBar(ctx, e, x, y - size - 10, Math.max(26, size * 1.6));
-  if (e.shielded) {
-    ctx.fillStyle = '#F2C14E';
-    ctx.font = 'bold 12px system-ui, sans-serif';
+  drawHeatBar(ctx, e, x, y - size - 12, Math.max(30, size * 1.6));
+  const tag = e.shielded ? `ARMOUR ${armourOf(e)}` : e.deflecting ? 'DEFLECTS' : '';
+  if (tag) {
+    ctx.font = '900 15px system-ui, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('ARMOUR', x, y + size + 14);
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#26091C';
+    ctx.strokeText(tag, x, y + size + 16);
+    ctx.fillStyle = e.shielded ? '#F2C14E' : '#BFE6FF';
+    ctx.fillText(tag, x, y + size + 16);
   }
+
 }
 
 export function drawEnemies(ctx, run, time) {

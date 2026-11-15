@@ -37,7 +37,8 @@ export function applyBeamDamage(run, dt) {
     e.litPower = power;
     e.shielded = power > 0 && power < armourOf(e) && !(tint & TINT_GOLD);
     if (e.shielded && e.type === 'shellback') noteOnce(run, 'shrug', e);
-    if (power > 0 && e.def.blocksLight && !(tint & TINT_GOLD)) noteOnce(run, 'deflect', e);
+    e.deflecting = power > 0 && !!e.def.blocksLight && !(tint & TINT_GOLD);
+    if (e.deflecting) noteOnce(run, 'deflect', e);
     if (power > 0 && !e.shielded) e.hp -= power * dt;
     if (power > 0 && tint & TINT_RED) e.burn = TINT_EFFECTS.burnSeconds;
     if (power > 0 && tint & TINT_BLUE) e.slow = TINT_EFFECTS.slowSeconds;
