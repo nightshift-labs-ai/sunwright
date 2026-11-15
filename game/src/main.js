@@ -2,18 +2,18 @@
 // (title / how to play / play + pause), and turning queued input intents into sim orders.
 import { DIFFICULTIES, DT, PIECES, PIECE_ORDER } from './config.js';
 import { createRun, pieceCost, pieceUnlocked, runSummary, stepSim } from './sim.js';
-import { pieceAt, placementCheck, setPiece } from './grid.js';
-import { beamModsFor, litLength, traceBeams } from './beams.js';
-import { freshSeed } from './rng.js';
-import { createInput, drainIntents } from './input.js';
-import { createMenus, renderOptions, restartRun, showDraft, showResults, showScreen, showTitle } from './ui/menus.js';
+import { playSfx, playSizzle, setBeamHum, setVolume, unlockAudio, updateMusic } from './audio.js';
+import { loadBest, loadHistory, loadSettings, recordRun, saveSettings } from './save.js';
 import { drawFrame } from './render/scene.js';
 import { createFx, fxFromEvent, updateFx } from './render/fx.js';
 import { hotbarHit } from './render/hud.js';
-import { VIEW_H, VIEW_W, cellAtPixel } from './render/layout.js';
-import { playSfx, playSizzle, setBeamHum, setVolume, unlockAudio, updateMusic } from './audio.js';
-import { loadBest, loadHistory, loadSettings, recordRun, saveSettings } from './save.js';
+import { createMenus, renderOptions, restartRun, showDraft, showResults, showScreen, showTitle } from './ui/menus.js';
 import { createTitleDemo, stepTitleDemo } from './titledemo.js';
+import { createInput, drainIntents } from './input.js';
+import { pieceAt, placementCheck, setPiece } from './grid.js';
+import { beamModsFor, litLength, traceBeams } from './beams.js';
+import { freshSeed } from './rng.js';
+import { VIEW_H, VIEW_W, cellAtPixel } from './render/layout.js';
 import { installTestHook } from './testhook.js';
 
 const stage = document.getElementById('stage');

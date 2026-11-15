@@ -2,9 +2,6 @@
 // orders, and stepSim applies them at the start of the next 60 Hz tick, then advances the phase
 // machine build -> wave -> draft -> build ... -> won | lost.
 import { BEAM, DIFFICULTIES, DT, ECONOMY, FLARE_CHARGES, FOUNTAIN_MAX, PIECES, WAVE_COUNT } from './config.js';
-import { createRng } from './rng.js';
-import { createGrid, pieceAt, placementCheck, setPiece } from './grid.js';
-import { buildFlowField } from './pathing.js';
 import { beamModsFor, traceBeams } from './beams.js';
 import { sunApertureFor } from './sun.js';
 import { moveEnemies, shellBlockers, spawnEnemy } from './enemies.js';
@@ -12,6 +9,9 @@ import { buildWaveSchedule } from './waves.js';
 import { applyBeamDamage, resolveFallenAndBiters, tickChain, waveClearBonus } from './combat.js';
 import { applyBoon, offerBoons, rerollOffer } from './draft.js';
 import { announceEvents } from './announce.js';
+import { buildFlowField } from './pathing.js';
+import { createGrid, pieceAt, placementCheck, setPiece } from './grid.js';
+import { createRng } from './rng.js';
 
 export function createRun(seed, difficultyId = 'normal') {
   const diff = DIFFICULTIES[difficultyId];

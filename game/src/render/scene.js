@@ -1,15 +1,15 @@
 // One frame of the game: courtyard, glass, shrine, beetles, light, effects, then the HUD.
 // The draft dims the board so the new opening's beam (through the current layout) stands out;
 // a win floods the courtyard with sunrise, a defeat drains the light.
-import { shadowVectorFor, sunApertureFor } from '../sun.js';
 import { drawBeamGhost, drawBeams, drawFx, drawNextSunGhost, drawScreenFx, shakeOffset } from './fx.js';
+import { drawHud } from './hud.js';
+import { drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawShrine } from './board.js';
+import { drawEnemies } from './beetles.js';
+import { drawResultsHero } from './results.js';
+import { shadowVectorFor, sunApertureFor } from '../sun.js';
 import { beamModsFor, traceBeams } from '../beams.js';
 import { NAMES, WAVE_COUNT } from '../config.js';
 import { routeCells } from '../pathing.js';
-import { drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawShrine } from './board.js';
-import { drawEnemies } from './beetles.js';
-import { drawHud } from './hud.js';
-import { drawResultsHero } from './results.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL, WALL_FRONT } from './layout.js';
 
 function drawCellCursor(ctx, cell, ok) {
