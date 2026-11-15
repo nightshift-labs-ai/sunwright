@@ -87,23 +87,32 @@ export function showDraft(menus, run) {
   el('draft-new').textContent = unlocked ? `NEW GLASS: ${PIECES[unlocked].name} [${PIECE_ORDER.indexOf(unlocked) + 1}]` : newFoe ? `NEW: ${ENEMIES[newFoe.type].name}` : '';
 }
 
-/** Break a title at the space nearest its middle (for narrow history cells). */
-function twoLines(title) {
-  const words = title.split(' ');
-  const half = Math.ceil(words.length / 2);
-  return `${words.slice(0, half).join(' ')}<br>${words.slice(half).join(' ')}`;
-}
-
 function clock(seconds) {
   const s = Math.max(0, Math.round(seconds));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
+/** Shrink each stat label horizontally until it fits its tile on one line (needs the overlay shown). */
+function fitLabels(root) {
+  for (const label of root.querySelectorAll('.stats small')) {
+    label.style.setProperty('--fit', '1');
+    const room = label.parentElement.clientWidth - 12;
+    if (label.scrollWidth > room) label.style.setProperty('--fit', String(room / label.scrollWidth));
+  }
+}
+
+/** What to aim for next, from this run's outcome and difficulty. */
+function nextGoal(run) {
+  if (run.phase !== 'won') return `NEXT GOAL: hold ${run.stats.wavesCleared + 1} ${NAMES.suns.toLowerCase()}`;
+  const harder = DIFFICULTY_ORDER[DIFFICULTY_ORDER.indexOf(run.difficultyId) + 1];
+  return harder ? `NEXT GOAL: win on ${DIFFICULTIES[harder].name}` : `NEXT GOAL: beat ${run.score.toLocaleString('en-US')}`;
+}
+
 /**
  * Results: THE TITAN IS ASH (or THE SWARM BROKE THROUGH) across the top, then score with NEW BEST,
- * one-line tiles and the restart keys; the canvas draws the Titan's carcass beside it.
+ * stat tiles, run line, RUN HISTORY and the restart keys; the canvas draws the Titan beside it.
  */
-export function showResults(menus, run, isBest, history) {
+export function showResults(menus, run, record, history) {
   const key = `${run.seed}|${run.phase}|${run.score}|${history.length}`;
   if (key === menus.resultsKey) return;
   menus.resultsKey = key;
@@ -115,22 +124,24 @@ export function showResults(menus, run, isBest, history) {
   el('results-sub').textContent = won
     ? `Courtyard held - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`
     : `Fell on Day ${run.aperture.day} ${run.aperture.phase.name.toLowerCase()} - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`;
-  el('results-score').innerHTML = `${run.score.toLocaleString('en-US')}${isBest ? '<em>NEW BEST</em>' : ''}`;
+  el('results-score').innerHTML = `${run.score.toLocaleString('en-US')}${record.isBest ? '<em>NEW BEST</em>' : ''}`;
   const tiles = [
-    [`LONGEST ${NAMES.combo}`, `x${run.chain.best}`],
+    ['BEETLES BURNED', run.stats.kills],
+    [NAMES.suns, `${run.stats.wavesCleared}/${WAVE_COUNT}`],
     [NAMES.fountainShort, `${run.shrineHp}/${run.shrineMax}`],
-    won && run.stats.titanSeconds !== undefined ? ['TITAN BURNED', clock(run.stats.titanSeconds)] : ['BEETLES', run.stats.kills],
+    [`LONGEST ${NAMES.combo}`, `x${run.chain.best}`],
   ];
   el('results-stats').innerHTML = tiles.map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('');
+  requestAnimationFrame(() => fitLabels(el('results-stats')));
+  const delta = run.score - record.previousBest;
+  el('results-meta').textContent = `${run.diff.name} - seed ${run.seed} - ${clock(run.time)} - ${delta >= 0 ? `+${delta.toLocaleString('en-US')} over best` : `${(-delta).toLocaleString('en-US')} under best`}`;
+  const losses = history.some((h) => h.outcome !== 'won');
   el('results-history').innerHTML =
-    '<span class="label">RUN HISTORY</span>' +
+    (losses ? `<span class="cap">${RESULT_LOSE_TITLE}</span>` : '') +
     history
-      .map((h) =>
-        h.outcome === 'won'
-          ? `<div class="won"><b>WON ${h.suns}/${WAVE_COUNT}</b><small>${h.score.toLocaleString('en-US')}</small></div>`
-          : `<div class="fell"><i class="dry"></i><b>${twoLines(RESULT_LOSE_TITLE)}</b><small>Day ${h.day} ${h.phase.toLowerCase()}</small></div>`,
-      )
+      .map((h) => (h.outcome === 'won' ? `<span class="chip won">WON ${h.suns}/${WAVE_COUNT}</span>` : `<span class="chip fell">Day ${h.day} ${h.phase.toLowerCase()}</span>`))
       .join('');
+  el('results-next').textContent = nextGoal(run);
 }
 
 /** R / S on the results screen (and the RUN AGAIN / SAME SEED buttons): queue a fresh run. */

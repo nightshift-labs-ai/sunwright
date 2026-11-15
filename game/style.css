@@ -71,31 +71,31 @@ button.big:hover { background: #cf3f93; }
 .chip { padding: 5px 12px; border-radius: 16px; font-weight: 800; font-size: 15px; background: hsl(var(--hue) 70% 40%); border: 2px solid #f2c14e; }
 .none { opacity: 0.7; font-weight: 700; }
 
-/* Results: a full-width title plaque, the hero art on the canvas at the left, an opaque plaque at the right. */
+/* Results: a full-width title plaque, the hero art on the canvas at the left, an opaque plaque at the right,
+   all inside a 24 px margin. */
 #results-screen { display: block; background: none; }
-.results-head { position: absolute; left: 20px; right: 20px; top: 16px; height: 140px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(#2d5bd0, #1f3f99); border: 5px solid #f2c14e; border-radius: 18px; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
-#results-title { margin: 0; width: max-content; white-space: nowrap; font: 900 112px system-ui, sans-serif; line-height: 1; letter-spacing: -1px; color: #ffe27a; -webkit-text-stroke: 3px #3b1247; paint-order: stroke fill; transform: scaleX(var(--fit, 1)); }
+.results-head { position: absolute; left: 24px; right: 24px; top: 24px; height: 126px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(#2d5bd0, #1f3f99); border: 5px solid #f2c14e; border-radius: 18px; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
+#results-title { margin: 0; width: max-content; white-space: nowrap; font: 900 104px system-ui, sans-serif; line-height: 1; letter-spacing: -1px; color: #ffe27a; -webkit-text-stroke: 3px #3b1247; paint-order: stroke fill; transform: scaleX(var(--fit, 1)); }
 .lost #results-title { color: #ff8a8a; }
-.sheet.results { position: absolute; right: 20px; top: 170px; width: 780px; margin: 0; padding: 12px 24px 14px; gap: 10px; background: linear-gradient(#fdf0d0, #f0d39c); border: 5px solid #f2c14e; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
+.sheet.results { position: absolute; right: 24px; top: 164px; width: 876px; box-sizing: border-box; margin: 0; padding: 10px 18px 12px; gap: 8px; background: linear-gradient(#fdf0d0, #f0d39c); border: 5px solid #f2c14e; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
 .lost .sheet.results { border-color: #ff8a8a; }
 .results .sub { margin: 0; font-size: 34px; font-weight: 900; color: #3b1247; text-shadow: none; }
 .score { font: 900 76px system-ui, sans-serif; line-height: 1; color: #7a2e14; display: flex; align-items: center; gap: 18px; }
-.score em { font: 900 34px system-ui, sans-serif; font-style: normal; color: #3b1247; background: #7dffc4; border-radius: 10px; padding: 4px 14px; -webkit-text-stroke: 0; }
-.stats { display: flex; gap: 12px; }
-.stats div { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 220px; padding: 6px 10px; background: #2d5bd0; border: 3px solid #f2c14e; border-radius: 12px; }
-.stats small { font-size: 30px; font-weight: 900; color: #ffe27a; line-height: 1.1; white-space: nowrap; letter-spacing: -1px; }
-.stats b { font-size: 38px; font-weight: 900; color: #fff6df; line-height: 1.05; }
-.history { display: flex; gap: 10px; width: 100%; }
+.score em { font: 900 34px system-ui, sans-serif; font-style: normal; color: #3b1247; background: #7dffc4; border-radius: 10px; padding: 4px 14px; }
+.stats { display: flex; gap: 8px; width: 100%; }
+.stats div { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px 6px; background: #2d5bd0; border: 3px solid #f2c14e; border-radius: 12px; overflow: hidden; }
+.stats small { display: inline-block; font-size: 30px; font-weight: 900; color: #ffe27a; line-height: 1.1; white-space: nowrap; transform: scaleX(var(--fit, 1)); }
+.stats b { font-size: 38px; font-weight: 900; color: #fff6df; line-height: 1.05; white-space: nowrap; }
+.meta, .next-goal { margin: 0; font: 900 30px system-ui, sans-serif; color: #3b1247; white-space: nowrap; }
+.next-goal { color: #7a2e14; }
+.history { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px 10px; width: 100%; max-height: 90px; }
 .history:empty { display: none; }
-.history .label { display: none; }
-.history div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 4px; border-radius: 12px; border: 3px solid #f2c14e; background: #fff6df; }
-.history b { display: inline-block; white-space: nowrap; font: 900 30px system-ui, sans-serif; line-height: 1.02; text-align: center; letter-spacing: -1px; transform: scaleX(0.86); }
-.history small { font: 800 30px system-ui, sans-serif; color: #3b1247; line-height: 1.1; white-space: nowrap; letter-spacing: -1px; }
-.history .fell b { color: #d42a2a; }
-.history .won { background: #2d5bd0; }
-.history .won b { color: #ffe27a; font-size: 34px; }
-.history .won small { color: #fff6df; }
-.history .dry { display: block; width: 56px; height: 26px; border-radius: 50%; background: radial-gradient(ellipse at center, #7a4a22 0 52%, #f0cf97 56% 78%, #a8723f 82%); }
-.buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 14px; align-items: center; width: 100%; }
-.buttons button { font-size: 30px; padding: 6px 18px; white-space: nowrap; }
-.buttons button.big { flex-basis: 100%; font-size: 44px; padding: 4px 22px; }
+.history .cap { flex-basis: 100%; text-align: center; font: 900 30px system-ui, sans-serif; color: #d42a2a; line-height: 1.05; }
+.history .chip { font: 900 30px system-ui, sans-serif; padding: 2px 16px; border-radius: 22px; border: 3px solid #f2c14e; white-space: nowrap; }
+.history .fell { color: #fff6df; background: #c0303a; }
+.history .won { color: #3b1247; background: #ffe27a; }
+.buttons { display: flex; justify-content: center; gap: 8px; align-items: center; width: 100%; }
+.buttons button { font-size: 30px; padding: 6px 10px; white-space: nowrap; letter-spacing: 0; }
+.buttons button.big { font-size: 44px; padding: 14px 22px; }
+.buttons .minor { display: flex; flex-direction: column; gap: 6px; }
+.buttons .minor button { font-size: 30px; padding: 2px 14px; }

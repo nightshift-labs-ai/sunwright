@@ -26,7 +26,7 @@ const HISTORY_KEEP = 10;
 
 /**
  * Record a finished run (summary: { difficultyId, outcome, score, suns, day, phase }) in the
- * history and the per-difficulty best; returns true when it is a new best score.
+ * history and the per-difficulty best; returns { isBest, previousBest }.
  */
 export function recordRun(summary) {
   const data = readSave();
@@ -36,7 +36,7 @@ export function recordRun(summary) {
   data.best[summary.difficultyId] = { score: Math.max(old.score, summary.score), waves: Math.max(old.waves, summary.suns) };
   data.history = [...(data.history ?? []), summary].slice(-HISTORY_KEEP);
   writeSave(data);
-  return isBest;
+  return { isBest, previousBest: old.score };
 }
 
 /** Finished runs, oldest first. */

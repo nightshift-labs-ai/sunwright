@@ -7,7 +7,7 @@ import { drawCharmBadge } from './charms.js';
 import { drawSunTrack } from './hud.js';
 import { VIEW_H, VIEW_W } from './layout.js';
 
-const HERO = { x: 178, y: 400 };
+const HERO = { x: 182, y: 336 };
 
 /** The Titan on its back: pale belly plates, legs kicked up, horns, smoke curling off it. */
 function drawTitanCarcass(ctx, x, y, s, time) {
@@ -103,26 +103,51 @@ function drawDrainedFountain(ctx, x, y, s) {
   ctx.restore();
 }
 
+function caption(ctx, str, x, y, size, color) {
+  ctx.font = `900 ${size}px system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = '#3A1A08';
+  ctx.strokeText(str, x, y);
+  ctx.fillStyle = color;
+  ctx.fillText(str, x, y);
+}
+
+function clock(seconds) {
+  const s = Math.max(0, Math.round(seconds));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
 /** Everything the results screen shows on the canvas (the DOM plaque sits to the right). */
 export function drawResultsHero(ctx, run, time) {
   ctx.fillStyle = 'rgba(70,40,15,0.35)';
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
   const won = run.phase === 'won';
-  if (won) drawTitanCarcass(ctx, HERO.x, HERO.y, 0.9, time);
-  else drawDrainedFountain(ctx, HERO.x, HERO.y, 1);
-  ctx.fillStyle = 'rgba(31,63,153,0.9)';
+  ctx.fillStyle = 'rgba(31,63,153,0.92)';
   ctx.beginPath();
-  ctx.roundRect(20, 586, 392, 196, 16);
+  ctx.roundRect(24, 164, 336, 58, 14);
   ctx.fill();
   ctx.strokeStyle = '#F2C14E';
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 3;
   ctx.stroke();
-  drawSunTrack(ctx, 50, 636, 42, 15, run.stats.wavesCleared, won ? -1 : run.waveIndex);
-  run.boons.slice(0, 8).forEach((id, k) => drawCharmBadge(ctx, boonById(id), 52 + (k % 4) * 94, 704 + Math.floor(k / 4) * 50, 22));
-  if (run.boons.length === 0) {
-    ctx.font = '900 30px system-ui, sans-serif';
-    ctx.fillStyle = '#FFF6DF';
-    ctx.textAlign = 'center';
-    ctx.fillText(`${run.stats.wavesCleared}/${WAVE_COUNT}`, 216, 720);
+  drawSunTrack(ctx, 48, 193, 36, 12, run.stats.wavesCleared, won ? -1 : run.waveIndex);
+  if (won) {
+    drawTitanCarcass(ctx, HERO.x, HERO.y, 0.72, time);
+    if (run.stats.titanSeconds !== undefined) {
+      caption(ctx, 'TITAN BURNED IN', 192, 474, 30, '#FFE27A');
+      caption(ctx, clock(run.stats.titanSeconds), 192, 514, 40, '#FFFFFF');
+    }
+  } else {
+    drawDrainedFountain(ctx, HERO.x, HERO.y, 0.8);
   }
+  ctx.fillStyle = 'rgba(31,63,153,0.92)';
+  ctx.beginPath();
+  ctx.roundRect(24, 536, 336, 240, 16);
+  ctx.fill();
+  ctx.strokeStyle = '#F2C14E';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  run.boons.slice(0, 8).forEach((id, k) => drawCharmBadge(ctx, boonById(id), 66 + (k % 4) * 84, 600 + Math.floor(k / 4) * 84, 30));
+  if (run.boons.length === 0) caption(ctx, `${run.stats.wavesCleared}/${WAVE_COUNT}`, 192, 660, 34, '#FFF6DF');
 }

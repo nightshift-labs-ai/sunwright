@@ -61,6 +61,8 @@ for (const shot of manifest.shots) {
   console.log(`${shot.name}: tick ${shot.state.tick} ${truth.phase} day ${truth.day} ${truth.sun} wave ${truth.wave}/${truth.waves} score ${truth.score} quartz ${truth.quartz} hp ${truth.shrineHp}/${truth.shrineMax}`);
 }
 
+for (const shot of manifest.shots) if (shot.textOutside) check(shot.textOutside.length === 0, `${shot.name} text outside its plaque: ${shot.textOutside.join(' | ')}`);
+
 // RUN HISTORY and BEST: the earlier real runs and the main run, replayed, must be what the save shows.
 const earlier = (manifest.history ?? []).map((h) => runSummary(replayTo(h.endTick + 2, h.seed, h.log)));
 const bestBefore = Math.max(0, ...earlier.map((h) => h.score));

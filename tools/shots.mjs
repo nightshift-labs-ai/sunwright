@@ -60,6 +60,21 @@ await page.evaluate(() => window.__test.pointAt(-1, -1));
 await capture('1-play.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, cover.tick]));
 await capture('3-draft.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, draftTick]));
 await capture('4-results.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, endTick + 150]));
+await page.waitForTimeout(100);
+// Every results text box must sit inside its plaque, and the plaques inside a 24 px margin.
+manifest.shots.at(-1).textOutside = await page.evaluate(() => {
+  const bad = [];
+  for (const plaque of document.querySelectorAll('#results-screen .sheet, #results-screen .results-head')) {
+    const p = plaque.getBoundingClientRect();
+    if (p.left < 24 || p.top < 24 || p.right > 1256 || p.bottom > 776) bad.push(`plaque ${plaque.className} outside the 24 px margin`);
+    for (const node of plaque.querySelectorAll('*')) {
+      if (node.childElementCount || !node.textContent.trim()) continue;
+      const r = node.getBoundingClientRect();
+      if (r.left < p.left || r.right > p.right || r.top < p.top || r.bottom > p.bottom) bad.push(node.textContent.trim().slice(0, 40));
+    }
+  }
+  return bad;
+});
 manifest.log = log;
 writeFileSync('tools/shots-manifest.json', JSON.stringify(manifest));
 console.log(errors.length ? `console errors: ${errors.join(' | ')}` : 'no console errors');

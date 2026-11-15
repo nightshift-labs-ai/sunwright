@@ -35,7 +35,7 @@ const app = {
   fx: createFx(),
   ui: { selected: 'mirror', ghostRot: 0, ghost: null, ghostTrace: null, ghostKey: '', hint: '', hintBad: false, hoverCell: null, hoverPiece: null, best: 0, fast: false },
   orders: [],
-  isBest: false,
+  record: { isBest: false, previousBest: 0 },
   shrineHurtAt: -9,
   accumulator: 0,
   lastFrame: 0,
@@ -63,7 +63,7 @@ function startRun(seed = freshSeed(), difficulty = app.settings.difficulty) {
   app.paused = false;
   app.fx = createFx();
   app.orders = [];
-  app.isBest = false;
+  app.record = { isBest: false, previousBest: 0 };
   app.shrineHurtAt = -9;
   app.restartArmedUntil = 0;
   app.ui.selected = 'mirror';
@@ -229,7 +229,7 @@ function consumeEvents(run, withSound) {
     fxFromEvent(app.fx, ev);
     if (withSound && EVENT_SOUNDS[ev.type]) playSfx(EVENT_SOUNDS[ev.type]);
     if (ev.type === 'bite') app.shrineHurtAt = run.time;
-    if (ev.type === 'won' || ev.type === 'lost') app.isBest = recordRun(runSummary(run));
+    if (ev.type === 'won' || ev.type === 'lost') app.record = recordRun(runSummary(run));
   }
   run.events.length = 0;
 }
@@ -308,7 +308,7 @@ function syncOverlays() {
   else if (run.phase === 'draft') want = 'draft';
   else if ((run.phase === 'won' || run.phase === 'lost') && run.time - run.endedAt >= RESULTS_DELAY) want = 'results';
   if (want === 'draft') showDraft(menus, run);
-  if (want === 'results') showResults(menus, run, app.isBest, loadHistory().slice(-3));
+  if (want === 'results') showResults(menus, run, app.record, loadHistory().slice(-3));
   if (want !== app.overlay) {
     if (want === 'title') showTitle(menus, loadBest, app.settings.difficulty);
     showScreen(menus, want);

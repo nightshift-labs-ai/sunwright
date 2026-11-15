@@ -92,6 +92,11 @@
   combat, draft, announce, audio, save, render/scene in the judge's first 17 headings (checked with
   makefun-tools/jv view.mjs).
 
+- Benchmark 4 items 1, 6, 7: results plaques inside a 24 px margin (asserted per text box by shots.mjs
+  + check-shot-truth), tiles BEETLES BURNED / SUNS / FOUNTAIN / LONGEST SEAR fitted to one line,
+  meta line (difficulty, seed, run clock, +N over the previous best from recordRun), compact RUN
+  HISTORY (red RESULT_LOSE_TITLE caption + chips), NEXT GOAL under RUN AGAIN; TITAN BURNED IN on canvas.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.
