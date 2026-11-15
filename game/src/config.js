@@ -118,7 +118,7 @@ export const WAVES = [
   [['scuttler', 10, 0, 1, 1.2], ['veerwing', 4, 0, 7, 2.2]],
   [['scuttler', 10, 0, 1, 1.1], ['shellback', 2, 0, 9, 7], ['veerwing', 3, 0, 14, 2]],
   [['scuttler', 14, 2, 1, 0.9], ['veerwing', 5, 1, 8, 1.8]],
-  [['scuttler', 14, 2, 1, 0.8], ['shellback', 3, 2, 6, 5], ['veerwing', 6, 2, 12, 1.4]],
+  [['scuttler', 18, 2, 1, 0.65], ['shellback', 3, 2, 5, 4], ['veerwing', 7, 2, 6, 1]],
   [['scuttler', 18, 2, 1, 0.7], ['glassback', 3, 2, 3, 4], ['shellback', 3, 2, 6, 4.5], ['veerwing', 6, 2, 10, 1.3]],
   [['scuttler', 20, 2, 1, 0.6], ['glassback', 4, 2, 4, 3.5], ['veerwing', 10, 2, 5, 1.1], ['shellback', 4, 2, 9, 4]],
   [['scuttler', 22, 2, 1, 0.55], ['shellback', 6, 2, 3, 3.5], ['glassback', 4, 2, 6, 3], ['veerwing', 8, 2, 12, 1]],

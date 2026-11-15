@@ -15,7 +15,7 @@ const BOON_TASTE = ['highsun', 'silvered', 'burning', 'spreading', 'sunstone', '
  * How much burning a layout does: beam power summed over the walking route cells, plus light
  * near the shrine for Veerwings. The careful bot also values light that pierces armour (12+).
  */
-function layoutValue(run, grid, careful) {
+export function layoutValue(run, grid, careful) {
   const flow = buildFlowField(grid);
   const trace = traceBeams(grid, run.aperture, beamModsFor(run.boons));
   let v = 0;
@@ -65,9 +65,10 @@ function reaimOrders(run) {
 
 /**
  * Play one run. Returns { result, log, run } where log is [{ tick, orders }] and tick is the
- * run's tick just before the step that applied them. onTick(run, events) is called after every step.
+ * run's tick just before the step that applied them. onTick(run, events) is called after every step;
+ * director(run), if given, returns extra orders for each wave tick (holdFlare: true to save the Flare).
  */
-export function playRun(seed, difficulty, bot = 'greedy', onTick = null) {
+export function playRun(seed, difficulty, bot = 'greedy', onTick = null, director = null) {
   const run = createRun(seed, difficulty);
   const careful = bot === 'careful';
   const log = [];
@@ -88,7 +89,9 @@ export function playRun(seed, difficulty, bot = 'greedy', onTick = null) {
       step([{ type: 'startWave' }]);
     } else if (run.phase === 'wave') {
       const lit = run.enemies.filter((e) => e.litPower > 0).length;
-      step(run.flareCharges > 0 && run.flareLeft <= 0 && lit >= (careful ? 4 : 2) ? [{ type: 'flare' }] : []);
+      const orders = director ? director(run) : [];
+      if (run.flareCharges > 0 && run.flareLeft <= 0 && lit >= (careful ? 4 : 2) && !orders.holdFlare) orders.push({ type: 'flare' });
+      step(orders);
     } else if (run.phase === 'draft') {
       const index = careful ? run.offer.indexOf(BOON_TASTE.find((id) => run.offer.includes(id))) : 0;
       step([{ type: 'pick', index: Math.max(0, index) }]);

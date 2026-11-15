@@ -53,6 +53,12 @@
 - Floating numbers restyled (benchmark 2 item 5) + red -n FOUNTAIN floater; red march chevrons along
   each swarm route and a basin-of-water fountain sprite with its HP ring (item 3).
 
+- Staging v1: tools/stageplan.mjs (pure Node) plans a directed run: on sun 4 the director turns the
+  most useful glass off-target until the fountain is 8/10 (a real live action), sun 5 (now 18
+  Scuttlers + 3 Shellbacks + 7 Veerwings) plays normally and the cover is the best-scoring moment
+  (density, burning, fountain below max, fresh bite, beetle at the rim, 3+ opaque floaters).
+  Seed 2013 K=1: cover 7/10 with 17 beetles, draft 8/10, win 8/10. shots.mjs replays it.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.
@@ -60,6 +66,8 @@
   staging player for waves 1-5 instead of the greedy bot (still one real seeded run, forward order).
 
 ## Known bugs
+- Staging: K=1 and K=2 give identical runs on every seed (director turns 1 piece either way?): check.
+- Cover still lacks a fresh bite + Scuttler at the rim + 4 burning; lens/flare overlap blows out.
 - Cover (seed 2023 greedy) has prisms on the board but none in the noon beam.
 
 ## Balance tally

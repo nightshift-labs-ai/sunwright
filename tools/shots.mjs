@@ -6,7 +6,7 @@
 //   node tools/shots.mjs [seed] [difficulty=normal] [bot=greedy] [quality=80]
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { playRun } from './balance.mjs';
+import { COVER_WAVE, planRun } from './stageplan.mjs';
 const require = createRequire('/home/agent/tools/pw/node_modules/');
 const { chromium } = require('playwright');
 
@@ -15,25 +15,10 @@ const DIFF = process.argv[3] ?? 'normal';
 const BOT = process.argv[4] ?? 'greedy';
 const QUALITY = Number(process.argv[5] ?? 80);
 const URL = 'http://127.0.0.1:8796/index.html?test=1';
-const COVER_WAVE = 4;
 
-let cover = { tick: -1, score: -1 };
-let draftTick = -1;
-let endTick = -1;
-const floaters = []; // times of kills and bites: each leaves a floating number, opaque for 0.98 s
-const { result, log } = playRun(SEED, DIFF, BOT, (run, events) => {
-  for (const ev of events) if (ev.type === 'kill' || ev.type === 'bite') floaters.push(run.time);
-  if (run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0) {
-    const opaque = floaters.filter((t) => run.time - t < 0.98).length;
-    const burning = run.enemies.filter((e) => e.litPower > 0 && !e.shielded).length;
-    const types = new Set(run.enemies.map((e) => e.type)).size;
-    const score = opaque >= 3 ? burning * 2 + types * 3 + Math.min(opaque, 6) * 2 + (run.enemies.some((e) => e.shielded) ? 3 : 0) + Math.min(run.enemies.length, 20) : -1;
-    if (score > cover.score) cover = { tick: run.tick, score, opaque };
-  }
-  if (run.phase === 'draft' && run.waveIndex === COVER_WAVE + 1 && draftTick < 0) draftTick = run.tick;
-  if ((run.phase === 'won' || run.phase === 'lost') && endTick < 0) endTick = run.tick;
-});
-console.log(JSON.stringify({ result, cover, draftTick, endTick, orders: log.length }));
+const plan = planRun(SEED, Number(process.env.STAGE_K ?? 2), DIFF, BOT);
+const { result, log, cover, draftTick, endTick } = plan;
+console.log(JSON.stringify({ result, cover, draftTick, draftHp: plan.draftHp, endTick, orders: log.length }));
 if (result.phase !== 'won') console.log('WARNING: this run is not a win');
 
 const browser = await chromium.launch();
