@@ -2,6 +2,8 @@
 // screenshots are taken at. tools/shots.mjs replays the plan in the browser; tools/stage-search
 // style loops can call planRun over many seeds without a browser.
 import { layoutValue, playRun } from './balance.mjs';
+import { createFx, floaterConflicts, fxFromEvent, updateFx } from '../game/src/render/fx.js';
+import { DT } from '../game/src/config.js';
 
 export const COVER_WAVE = 4;
 const DIFF = 'normal';
@@ -59,22 +61,23 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT) {
   let draftTick = -1;
   let draftHp = -1;
   let endTick = -1;
-  const floaters = []; // kill and bite times: each leaves a floating number, opaque for 0.98 s
+  const fx = createFx(); // the same deterministic effects the browser runs, to count real floaters
   const bites = [];
   const { result, log } = playRun(seed, difficulty, bot, (run, events) => {
     for (const ev of events) {
-      if (ev.type === 'kill' || ev.type === 'bite') floaters.push(run.time);
+      fxFromEvent(fx, ev, run);
       if (ev.type === 'bite') bites.push(run.time);
     }
+    updateFx(fx, run, DT);
     if (run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0) {
-      const opaque = floaters.filter((t) => run.time - t < 0.98).length;
+      const opaque = floaterConflicts(fx, run) === 0 ? fx.texts.filter((t) => t.life / t.max > 0.3).length : 0;
       const freshBite = bites.some((t) => run.time - t < 0.9);
       const s = run.grid.shrine;
       const atRim = run.enemies.some((e) => e.type === 'scuttler' && Math.hypot(e.x - s.c - 0.5, e.y - s.r - 0.5) < 1.6);
       const burning = run.enemies.filter((e) => e.litPower > 0 && !e.shielded).length;
       const types = new Set(run.enemies.map((e) => e.type)).size;
       const hurt = run.shrineHp < run.shrineMax;
-      const score = Math.min(run.enemies.length, 24) * 2 + Math.min(burning, 8) * 2 + types * 4 + Math.min(opaque, 6) * 3 + (freshBite ? 12 : 0) + (atRim ? 12 : 0) + (hurt ? 20 : 0) + (run.enemies.some((e) => e.shielded) ? 4 : 0);
+      const score = Math.min(run.enemies.length, 24) * 2 + Math.min(burning, 8) * 2 + types * 4 + Math.min(opaque, 6) * 3 + (opaque >= 3 ? 30 : 0) + (freshBite ? 12 : 0) + (atRim ? 12 : 0) + (hurt ? 20 : 0) + (run.enemies.some((e) => e.shielded) ? 4 : 0);
       if (score > cover.score) cover = { tick: run.tick, score, hp: run.shrineHp, enemies: run.enemies.length, burning, types, opaque, freshBite, atRim };
     }
     if (run.phase === 'draft' && run.waveIndex === COVER_WAVE + 1 && draftTick < 0) {

@@ -6,6 +6,30 @@ import { enemiesRemaining } from './sim.js';
 import { rankFor } from './combat.js';
 import { currentBanner, winLoseHeadline } from './announce.js';
 import { loadHistory } from './save.js';
+import { boardTextBoxes, boxTouchesBeam } from './render/fx.js';
+
+/** Measure each floating number as drawn now and list any that overlap another, a label or a beam core. */
+function floaterOverlaps(app) {
+  const run = app.run;
+  if (!run) return [];
+  const g = document.createElement('canvas').getContext('2d');
+  const boxes = app.fx.texts.map((t) => {
+    const age = t.max - t.life;
+    const pop = age < 0.15 ? 1.4 - (age / 0.15) * 0.4 : 1;
+    g.font = `900 ${Math.round(t.size * pop)}px system-ui, sans-serif`;
+    const w = g.measureText(t.text).width;
+    const h = t.size * pop;
+    return { text: t.text, x0: t.x - w / 2, x1: t.x + w / 2, y0: t.y - h * 0.8, y1: t.y + h * 0.2 };
+  });
+  const hit = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+  const bad = [];
+  boxes.forEach((b, i) => {
+    boxes.slice(i + 1).forEach((o) => hit(b, o) && bad.push(`${b.text} / ${o.text}`));
+    boardTextBoxes(run).forEach((l) => hit(b, l) && bad.push(`${b.text} / label ${l.text}`));
+    if (boxTouchesBeam(b, run.trace.legs)) bad.push(`${b.text} / beam`);
+  });
+  return bad;
+}
 
 export function installTestHook(app, api) {
   app.manual = true;
@@ -38,6 +62,13 @@ export function installTestHook(app, api) {
     },
     pointAt(x, y) {
       api.pointAt(x, y);
+    },
+    /** Floating numbers that overlap each other, a floor label or a beam core (measured boxes). */
+    textOverlaps() {
+      return floaterOverlaps(app);
+    },
+    floaterCount() {
+      return app.fx.texts.length;
     },
     /** Every number the HUD draws, straight from sim state. */
     state() {

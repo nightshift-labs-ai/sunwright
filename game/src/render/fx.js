@@ -1,8 +1,11 @@
 // Light and juice: additive sunbeams with starbursts at bounces, sparks on burning beetles,
 // smoke and flipped husks on kills, quartz that fly to the HUD counter, floating CHAIN text,
 // screen shake, the Flare flash and the red hurt vignette. Effects advance with sim time.
-import { NAMES } from '../config.js';
-import { QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
+import { NAMES, WAVE_COUNT } from '../config.js';
+import { beamModsFor, traceBeams } from '../beams.js';
+import { sunApertureFor } from '../sun.js';
+import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
+import { boardLabelBoxes } from './board.js';
 
 /** Seconds a floating number lives (opaque for the first 70%). */
 export const FLOATER_LIFE = 1.4;
@@ -24,8 +27,60 @@ function burst(fx, x, y, n, kind, color, speed, life, size) {
   }
 }
 
-/** Turn one sim event into effects. */
-export function fxFromEvent(fx, ev) {
+/** A floater's box (screen px) now, or over the rest of its life when rising (24 px/s). */
+export function floaterBox(t, rising = false) {
+  const w = t.text.length * t.size * 0.62 * 1.1;
+  return { x0: t.x - w / 2, x1: t.x + w / 2, y0: t.y - t.size * 1.15 - (rising ? 24 * t.life : 0), y1: t.y + t.size * 0.3 };
+}
+
+/** Floaters (as boxes now) that overlap another floater, a floor label or a beam core. */
+export function floaterConflicts(fx, run) {
+  const labels = boardTextBoxes(run);
+  let n = 0;
+  fx.texts.forEach((t, i) => {
+    const box = floaterBox(t);
+    if (fx.texts.slice(i + 1).some((o) => overlaps(box, floaterBox(o)))) n++;
+    if (labels.some((l) => overlaps(box, l)) || boxTouchesBeam(box, run.trace.legs)) n++;
+  });
+  return n;
+}
+
+function overlaps(a, b) {
+  return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+}
+
+/** Does a box touch a beam's white core (legs are straight and axis-aligned)? */
+export function boxTouchesBeam(box, legs) {
+  return legs.some((leg) => {
+    const x0 = toScreenX(Math.min(leg.x0, leg.x1)) - 5;
+    const x1 = toScreenX(Math.max(leg.x0, leg.x1)) + 5;
+    const y0 = toScreenY(Math.min(leg.y0, leg.y1)) - 5;
+    const y1 = toScreenY(Math.max(leg.y0, leg.y1)) + 5;
+    return overlaps(box, { x0, x1, y0, y1 });
+  });
+}
+
+const FLOATER_SPOTS = [[0, 0], [0, -30], [40, -20], [-40, -20], [0, 34], [70, 0], [-70, 0], [0, -64], [90, 30], [-90, 30], [0, 70], [110, -40], [-110, -40], [0, -100], [0, 100]];
+
+/** Place a floating number at the first spot near the kill that keeps clear of other floaters,
+ *  the floor labels and the beam cores, inside the courtyard; drop it if there is none. */
+function placeFloater(fx, t, run) {
+  const labels = run ? boardTextBoxes(run) : [];
+  const legs = run?.trace?.legs ?? [];
+  for (const [dx, dy] of FLOATER_SPOTS) {
+    const cand = { ...t, x: t.x + dx, y: t.y + dy };
+    const box = floaterBox(cand);
+    const path = floaterBox(cand, true);
+    if (path.x0 < BOARD_X + 4 || path.x1 > BOARD_X + BOARD_W - 4 || path.y0 < BOARD_Y + 4 || box.y1 > BOARD_Y + BOARD_H - 4) continue;
+    if (fx.texts.some((o) => overlaps(box, floaterBox(o)))) continue;
+    if (labels.some((l) => overlaps(path, l)) || boxTouchesBeam(box, legs)) continue;
+    fx.texts.push(cand);
+    return;
+  }
+}
+
+/** Turn one sim event into effects (run gives the beams and labels floaters must avoid). */
+export function fxFromEvent(fx, ev, run = null) {
   if (ev.type === 'kill') {
     const x = toScreenX(ev.x);
     const y = toScreenY(ev.y);
@@ -36,11 +91,11 @@ export function fxFromEvent(fx, ev) {
       fx.particles.push({ kind: 'quartz', x: x + k * 6, y, sx: x + k * 6, sy: y, vx: 0, vy: 0, life: 0.75 + k * 0.08, max: 0.75 + k * 0.08, size: 6, color: '#7FE8FF' });
     }
     const label = ev.mult > 1 ? `+${ev.points}  ${NAMES.combo} x${ev.mult}` : `+${ev.points}`;
-    fx.texts.push({ x, y: y - 18, text: label, life: FLOATER_LIFE, max: FLOATER_LIFE, color: ev.mult >= 4 ? '#FFFFFF' : '#F2C14E', size: 28 + (Math.min(ev.mult, 5) - 1) * 4 });
+    placeFloater(fx, { x, y: y - 18, text: label, life: FLOATER_LIFE, max: FLOATER_LIFE, color: ev.mult >= 4 ? '#FFFFFF' : '#F2C14E', size: 28 + (Math.min(ev.mult, 5) - 1) * 4 }, run);
   } else if (ev.type === 'bite') {
     fx.shake = Math.min(14, fx.shake + 6 + ev.harm * 2);
     fx.hurt = 1;
-    fx.texts.push({ x: toScreenX(ev.x), y: toScreenY(ev.y) - 30, text: `-${ev.harm} ${NAMES.fountainShort}`, life: FLOATER_LIFE, max: FLOATER_LIFE, color: '#FF5C5C', size: 32 });
+    placeFloater(fx, { x: toScreenX(ev.x), y: toScreenY(ev.y) - 30, text: `-${ev.harm} ${NAMES.fountainShort}`, life: FLOATER_LIFE, max: FLOATER_LIFE, color: '#FF5C5C', size: 32 }, run);
     burst(fx, toScreenX(ev.x), toScreenY(ev.y), 12, 'spark', '#FF5C5C', 120, 0.5, 3);
   } else if (ev.type === 'placed' || ev.type === 'lifted') {
     burst(fx, toScreenX(ev.c + 0.5), toScreenY(ev.r + 0.85), 12, 'smoke', 'rgba(232,196,140,', 50, 0.6, 7);
@@ -209,6 +264,28 @@ export function drawBeamGhost(ctx, trace, pathCellsLit, time) {
   ctx.restore();
 }
 
+/** Where the NEXT SUN label sits beside the ghost beam's window (shared by drawing and floaters). */
+export function ghostLabelBox(trace, label) {
+  const start = trace.legs[0];
+  const x = toScreenX(start.x0) + (start.x1 > start.x0 ? 12 : start.x1 < start.x0 ? -12 : 0);
+  const y = toScreenY(start.y0) + (start.y1 > start.y0 ? 40 : -16);
+  const align = start.x1 < start.x0 ? 'right' : start.x1 > start.x0 ? 'left' : 'center';
+  const w = label.length * 13;
+  const x0 = align === 'right' ? x - w : align === 'left' ? x : x - w / 2;
+  return { align, x0, x1: x0 + w, y0: y - 18, y1: y + 4 };
+}
+
+/** Labels on the board that floaters must keep clear of: floor words and the NEXT SUN tag. */
+export function boardTextBoxes(run) {
+  const boxes = boardLabelBoxes(run);
+  if ((run.phase === 'wave' || run.phase === 'build') && run.waveIndex + 1 < WAVE_COUNT) {
+    const ap = sunApertureFor(run.seed, run.waveIndex + 1);
+    const trace = traceBeams(run.grid, ap, beamModsFor(run.boons));
+    if (trace.legs.length) boxes.push({ text: 'NEXT SUN', ...ghostLabelBox(trace, `NEXT ${NAMES.sun} (${ap.phase.wallName[0]})`) });
+  }
+  return boxes;
+}
+
 /** The next sun's light through today's glass: a faint white dashed line labelled at its window. */
 export function drawNextSunGhost(ctx, trace, label, time) {
   if (!trace.legs.length) return;
@@ -227,11 +304,11 @@ export function drawNextSunGhost(ctx, trace, label, time) {
     }
   }
   ctx.setLineDash([]);
-  const start = trace.legs[0];
-  const x = toScreenX(start.x0) + (start.x1 > start.x0 ? 12 : start.x1 < start.x0 ? -12 : 0);
-  const y = toScreenY(start.y0) + (start.y1 > start.y0 ? 40 : -16);
+  const at = ghostLabelBox(trace, label);
+  const x = at.align === 'right' ? at.x1 : at.align === 'left' ? at.x0 : (at.x0 + at.x1) / 2;
+  const y = at.y1 - 4;
   ctx.font = '900 20px system-ui, sans-serif';
-  ctx.textAlign = start.x1 < start.x0 ? 'right' : start.x1 > start.x0 ? 'left' : 'center';
+  ctx.textAlign = at.align;
   ctx.lineJoin = 'round';
   ctx.lineWidth = 5;
   ctx.strokeStyle = '#3A1A08';

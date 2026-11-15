@@ -58,6 +58,8 @@ await capture('2-title.jpg', await page.evaluate(() => window.__test.advance(240
 await page.evaluate(([seed, diff]) => window.__test.start(seed, diff), [SEED, DIFF]);
 await page.evaluate(() => window.__test.pointAt(-1, -1));
 await capture('1-play.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, cover.tick]));
+manifest.shots.at(-1).textOverlaps = await page.evaluate(() => window.__test.textOverlaps());
+manifest.shots.at(-1).floaters = await page.evaluate(() => window.__test.floaterCount());
 await capture('3-draft.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, draftTick]));
 await capture('4-results.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, endTick + 150]));
 await page.waitForTimeout(100);

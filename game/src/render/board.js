@@ -191,13 +191,20 @@ function drawWindowLabel(ctx, ap, slot, lit) {
 }
 
 /** Words painted on the floor: SWARM at the burrows, FOUNTAIN under the shrine. */
+/** The words painted on the floor and their boxes: SWARM at each burrow, FOUNTAIN under the basin. */
+export function boardLabelBoxes(run) {
+  const s = run.grid.shrine;
+  const labels = run.grid.gates.map((g) => ({ text: 'SWARM', x: BOARD_X + g.c * CELL + CELL / 2, y: BOARD_Y + BOARD_H - 6 }));
+  labels.push({ text: 'FOUNTAIN', x: BOARD_X + s.c * CELL + CELL / 2, y: BOARD_Y + (s.r + 1) * CELL + 14 });
+  for (const l of labels) Object.assign(l, { x0: l.x - l.text.length * 6, x1: l.x + l.text.length * 6, y0: l.y - 13, y1: l.y + 3 });
+  return labels;
+}
+
 function drawFloorLabels(ctx, run) {
   ctx.font = '900 15px system-ui, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(120,62,24,0.6)';
-  for (const g of run.grid.gates) ctx.fillText('SWARM', BOARD_X + g.c * CELL + CELL / 2, BOARD_Y + BOARD_H - 6);
-  const s = run.grid.shrine;
-  ctx.fillText('FOUNTAIN', BOARD_X + s.c * CELL + CELL / 2, BOARD_Y + (s.r + 1) * CELL + 14);
+  for (const l of boardLabelBoxes(run)) ctx.fillText(l.text, l.x, l.y);
 }
 
 /** Floor, walls, the day's three sun windows (lit / next / shuttered), labels and the burrows. */

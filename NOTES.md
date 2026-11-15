@@ -108,6 +108,11 @@
 - Benchmark 4 item 5: rank ring (S/A/B/C, 128 px) beside the score from RANK_THRESHOLDS via
   combat.rankFor (score, fountain left, Titan burn time), truth-checked. Staged run = A.
 
+- Benchmark 4 item 8: floaters are placed (15 candidate spots) clear of other floaters, the floor
+  labels and the NEXT SUN tag over their whole rise, and of beam cores where they appear, inside the
+  courtyard; else dropped. stageplan.mjs runs the same deterministic fx in Node to pick the cover;
+  the test hook measures real boxes and check-shot-truth asserts zero overlaps.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.
@@ -115,6 +120,7 @@
   staging player for waves 1-5 instead of the greedy bot (still one real seeded run, forward order).
 
 ## Known bugs
+- Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.
 - Source is 175.8 KB > 160 KiB dossier text cap (tail files truncated in dossier text): trim pass needed.
 - Staging: K=1 and K=2 give identical runs on every seed (director turns 1 piece either way?): check.
 - Cover still lacks a fresh bite + Scuttler at the rim + 4 burning; lens/flare overlap blows out.

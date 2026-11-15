@@ -226,7 +226,7 @@ function handleIntent(it) {
 /** Sim events become effects and sounds; the end of a run is recorded once. */
 function consumeEvents(run, withSound) {
   for (const ev of run.events) {
-    fxFromEvent(app.fx, ev);
+    fxFromEvent(app.fx, ev, run);
     if (withSound && EVENT_SOUNDS[ev.type]) playSfx(EVENT_SOUNDS[ev.type]);
     if (ev.type === 'bite') app.shrineHurtAt = run.time;
     if (ev.type === 'won' || ev.type === 'lost') app.record = recordRun(runSummary(run));
