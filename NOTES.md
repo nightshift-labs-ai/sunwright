@@ -238,6 +238,12 @@
 - Benchmark 3 item 5 rest: board >= 58% of the cover (now ~52% incl. walls: needs a layout change),
   (HUD type sizes done: 15 / 20 / 32 px plus the 61 px banner.)
 
+- Cover staging scan (21:35 UTC, after the pill + floater rules): seeds 2001-2300 K=1 greedy, 22 wins.
+  Only check-passing ticks count now. 2013 stays best (17 beetles, 2 floaters, SEAR x3, fountain 7/10,
+  win 8/10); 2112 has 3 lit beetles but no floaters and a flawless 10/10 win. In 2013's sun 5 no clean
+  tick has more than 1 lit beetle (STAGE_DUMP=1 lists all 866 candidates): the beams and the swarm's
+  path barely cross, so >= 4 burning needs a director that aims glass at the path, not tick picking.
+
 ## Known bugs
 - Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.
 - Source is 196 KB > 160 KiB dossier text cap: the last 6 files (34 KB) are cut from the dossier text

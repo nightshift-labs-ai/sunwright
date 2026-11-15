@@ -134,6 +134,7 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT, scars = null) {
       const types = new Set(run.enemies.map((e) => e.type)).size;
       const hurt = run.shrineHp < run.shrineMax;
       const score = Math.min(run.enemies.length, 24) * 2 + Math.min(burning, 8) * 6 + types * 4 + Math.min(opaque, 6) * 3 + (opaque >= 3 ? 30 : 0) + (freshBite ? 12 : 0) + (atRim ? 12 : 0) + (hurt ? 20 : 0) + (run.shrineHp === 7 ? 25 : 0) + (run.enemies.some((e) => e.shielded) ? 4 : 0) + (run.chain.count >= 2 ? 15 : 0);
+      if (process.env.STAGE_DUMP === '1') console.error(JSON.stringify({ tick: run.tick, score, hp: run.shrineHp, enemies: run.enemies.length, burning, opaque, chain: run.chain.count }));
       if (score > cover.score) cover = { tick: run.tick, score, hp: run.shrineHp, enemies: run.enemies.length, burning, types, opaque, freshBite, atRim };
     }
     if (run.phase === 'draft' && run.waveIndex === COVER_WAVE + 1 && draftTick < 0) {
