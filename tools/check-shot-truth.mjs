@@ -64,6 +64,7 @@ for (const shot of manifest.shots) {
   console.log(`${shot.name}: tick ${shot.state.tick} ${truth.phase} day ${truth.day} ${truth.sun} wave ${truth.wave}/${truth.waves} score ${truth.score} quartz ${truth.quartz} hp ${truth.shrineHp}/${truth.shrineMax}`);
 }
 
+for (const shot of manifest.shots) if (shot.tagOverlaps) check(shot.tagOverlaps.length === 0, `${shot.name} board tag covered: ${shot.tagOverlaps.join(' | ')}`);
 for (const shot of manifest.shots) if (shot.textOverlaps) check(shot.textOverlaps.length === 0, `${shot.name} text on text: ${shot.textOverlaps.join(' | ')}`);
 for (const shot of manifest.shots) if (shot.floaters !== undefined) console.log(`${shot.name}: ${shot.floaters} floating numbers, ${shot.textOverlaps.length} overlaps`);
 for (const shot of manifest.shots) if (shot.textOutside) check(shot.textOutside.length === 0, `${shot.name} text outside its plaque: ${shot.textOutside.join(' | ')}`);

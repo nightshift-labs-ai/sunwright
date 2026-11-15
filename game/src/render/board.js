@@ -191,20 +191,62 @@ function drawWindowLabel(ctx, ap, slot, lit) {
 }
 
 /** Words painted on the floor: SWARM at the burrows, FOUNTAIN under the shrine. */
-/** The words painted on the floor and their boxes: SWARM at each burrow, FOUNTAIN under the basin. */
+function boxHitsBeam(box, legs) {
+  return legs.some((leg) => {
+    const x0 = BOARD_X + Math.min(leg.x0, leg.x1) * CELL - 5;
+    const x1 = BOARD_X + Math.max(leg.x0, leg.x1) * CELL + 5;
+    const y0 = BOARD_Y + Math.min(leg.y0, leg.y1) * CELL - 5;
+    const y1 = BOARD_Y + Math.max(leg.y0, leg.y1) * CELL + 5;
+    return box.x0 < x1 && x0 < box.x1 && box.y0 < y1 && y0 < box.y1;
+  });
+}
+
+function boxHitsBeetle(box, run) {
+  return run.enemies.some((e) => {
+    const r = e.def.size * CELL;
+    const x = BOARD_X + e.x * CELL;
+    const y = BOARD_Y + e.y * CELL;
+    return box.x0 < x + r && x - r < box.x1 && box.y0 < y + r && y - r < box.y1;
+  });
+}
+
+function tagBox(text, x, y) {
+  const w = text.length * 11 + 16;
+  return { text, x, y, x0: x - w / 2, x1: x + w / 2, y0: y - 15, y1: y + 7 };
+}
+
+const FOUNTAIN_TAG_SPOTS = [[0, 46], [-78, 34], [78, 34], [0, -46], [-86, -10], [86, -10]];
+
+/**
+ * The board's name tags and their boxes: SWARM on the south wall beside each burrow, and
+ * FOUNTAIN at the first spot round the basin that no beam core or beetle covers.
+ */
 export function boardLabelBoxes(run) {
+  const labels = run.grid.gates.map((g) => tagBox('SWARM', BOARD_X + g.c * CELL + CELL / 2 + 66, BOARD_Y + BOARD_H + 19));
   const s = run.grid.shrine;
-  const labels = run.grid.gates.map((g) => ({ text: 'SWARM', x: BOARD_X + g.c * CELL + CELL / 2, y: BOARD_Y + BOARD_H - 6 }));
-  labels.push({ text: 'FOUNTAIN', x: BOARD_X + s.c * CELL + CELL / 2, y: BOARD_Y + (s.r + 1) * CELL + 14 });
-  for (const l of labels) Object.assign(l, { x0: l.x - l.text.length * 6, x1: l.x + l.text.length * 6, y0: l.y - 13, y1: l.y + 3 });
+  const fx = BOARD_X + s.c * CELL + CELL / 2;
+  const fy = BOARD_Y + s.r * CELL + CELL / 2;
+  const legs = run.trace?.legs ?? [];
+  const spots = FOUNTAIN_TAG_SPOTS.map(([dx, dy]) => tagBox('FOUNTAIN', fx + dx, fy + dy));
+  labels.push(spots.find((b) => !boxHitsBeam(b, legs) && !boxHitsBeetle(b, run)) ?? spots[0]);
   return labels;
 }
 
-function drawFloorLabels(ctx, run) {
+/** Board tags drawn last, as small lapis plaques with gold lettering. */
+export function drawBoardTags(ctx, run) {
   ctx.font = '900 15px system-ui, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(120,62,24,0.6)';
-  for (const l of boardLabelBoxes(run)) ctx.fillText(l.text, l.x, l.y);
+  for (const t of boardLabelBoxes(run)) {
+    ctx.fillStyle = 'rgba(31,63,153,0.92)';
+    ctx.beginPath();
+    ctx.roundRect(t.x0, t.y0 - 2, t.x1 - t.x0, t.y1 - t.y0 + 4, 7);
+    ctx.fill();
+    ctx.strokeStyle = PALETTE.gold;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#FFE27A';
+    ctx.fillText(t.text, t.x, t.y);
+  }
 }
 
 /** Floor, walls, the day's three sun windows (lit / next / shuttered), labels and the burrows. */
@@ -213,7 +255,6 @@ export function drawCourtyard(ctx, run, time, allLit = false) {
   wallCanvas ??= buildWallTexture();
   ctx.drawImage(wallCanvas, 0, 0);
   ctx.drawImage(floorCanvas, BOARD_X, BOARD_Y);
-  drawFloorLabels(ctx, run);
   const now = run.aperture;
   const dayStart = (now.day - 1) * 3;
   for (let k = 0; k < 3; k++) {

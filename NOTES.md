@@ -117,6 +117,10 @@
   SCORE), banner plaque 60% wide at cap 44 inside the north wall (floaters avoid it), wide top bar
   with DAY - PHASE - SUN n/9 and the 9-sun track; left panel = sun dial + fountain.
 
+- Benchmark 3 item 4: board tags (SWARM on the south wall beside each burrow, FOUNTAIN at the first
+  spot round the basin clear of beam cores and beetles) drawn last as lapis plaques; the test hook
+  measures tag overlaps and check-shot-truth asserts none.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

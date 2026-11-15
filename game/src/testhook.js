@@ -7,6 +7,24 @@ import { rankFor } from './combat.js';
 import { currentBanner, winLoseHeadline } from './announce.js';
 import { loadHistory } from './save.js';
 import { boardTextBoxes, boxTouchesBeam } from './render/fx.js';
+import { boardLabelBoxes } from './render/board.js';
+
+/** Board tags (SWARM, FOUNTAIN) that a beam core or a beetle covers right now. */
+function tagOverlaps(app) {
+  const run = app.run;
+  if (!run) return [];
+  const bad = [];
+  for (const t of boardLabelBoxes(run)) {
+    if (boxTouchesBeam(t, run.trace.legs)) bad.push(`${t.text} / beam`);
+    for (const e of run.enemies) {
+      const r = e.def.size * 60;
+      const x = 250 + e.x * 60;
+      const y = 140 + e.y * 60;
+      if (t.x0 < x + r && x - r < t.x1 && t.y0 < y + r && y - r < t.y1) bad.push(`${t.text} / ${e.type}`);
+    }
+  }
+  return bad;
+}
 
 /** Measure each floating number as drawn now and list any that overlap another, a label or a beam core. */
 function floaterOverlaps(app) {
@@ -66,6 +84,9 @@ export function installTestHook(app, api) {
     /** Floating numbers that overlap each other, a floor label or a beam core (measured boxes). */
     textOverlaps() {
       return floaterOverlaps(app);
+    },
+    tagOverlaps() {
+      return tagOverlaps(app);
     },
     floaterCount() {
       return app.fx.texts.length;

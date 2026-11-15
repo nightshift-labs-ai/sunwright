@@ -60,6 +60,7 @@ await page.evaluate(() => window.__test.pointAt(-1, -1));
 await capture('1-play.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, cover.tick]));
 manifest.shots.at(-1).textOverlaps = await page.evaluate(() => window.__test.textOverlaps());
 manifest.shots.at(-1).floaters = await page.evaluate(() => window.__test.floaterCount());
+manifest.shots.at(-1).tagOverlaps = await page.evaluate(() => window.__test.tagOverlaps());
 await capture('3-draft.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, draftTick]));
 await capture('4-results.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, endTick + 150]));
 await page.waitForTimeout(100);
