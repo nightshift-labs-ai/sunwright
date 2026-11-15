@@ -1,12 +1,15 @@
-// Headless balance runs: a greedy bot plays seeded runs through the real sim modules (no DOM)
-// and prints how far it gets at each difficulty.
+// Headless balance runs: bots play seeded runs through the real sim modules (no DOM) and we
+// print how far they get at each difficulty. playRun also records every order with the tick it
+// was applied on, so tools/shots.mjs can replay the exact run in the browser.
 //   node tools/balance.mjs [runsPerDifficulty=8] [bot=greedy|careful]
-import { DIFFICULTY_ORDER, PIECE_ORDER, WAVE_COUNT } from '../game/src/config.js';
+import { DIFFICULTY_ORDER, DX, DY, PIECE_ORDER, WAVE_COUNT } from '../game/src/config.js';
 import { createRun, pieceCost, stepSim } from '../game/src/sim.js';
 import { placementCheck, setPiece } from '../game/src/grid.js';
 import { buildFlowField, flowDirectionAt } from '../game/src/pathing.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
-import { DX, DY } from '../game/src/config.js';
+
+/** Boons the careful bot prefers, best first. */
+const BOON_TASTE = ['highsun', 'silvered', 'burning', 'kindling', 'sunstone', 'flare2', 'magnet', 'discount', 'longchain', 'mend'];
 
 /** Cells walkers step through from each burrow to the shrine (counted once per burrow). */
 function routeCells(grid, flow) {
@@ -25,13 +28,15 @@ function routeCells(grid, flow) {
   return cells;
 }
 
-/** How much burning a layout does: beam power summed over the walking route cells. */
-function layoutValue(run, grid) {
+/**
+ * How much burning a layout does: beam power summed over the walking route cells, plus light
+ * near the shrine for Lampmoths. The careful bot also values light that pierces armour (12+).
+ */
+function layoutValue(run, grid, careful) {
   const flow = buildFlowField(grid);
   const trace = traceBeams(grid, run.aperture, beamModsFor(run.boons));
   let v = 0;
-  for (const i of routeCells(grid, flow)) v += trace.lit[i];
-  // Lampmoths fly straight: reward light near the shrine too.
+  for (const i of routeCells(grid, flow)) v += Math.min(trace.lit[i], 30) + (careful && trace.lit[i] >= 12 ? 12 : 0);
   const s = grid.shrine;
   for (let r = s.r; r <= s.r + 2; r++) for (let c = s.c - 1; c <= s.c + 1; c++) if (r < grid.rows) v += trace.lit[r * grid.cols + c] * 0.5;
   return v;
@@ -40,7 +45,7 @@ function layoutValue(run, grid) {
 function bestPlacement(run, careful) {
   const grid = run.grid;
   let best = null;
-  let bestValue = layoutValue(run, grid);
+  const base = layoutValue(run, grid, careful);
   for (const type of PIECE_ORDER) {
     const cost = pieceCost(run, type);
     if (cost > run.shards) continue;
@@ -49,11 +54,10 @@ function bestPlacement(run, careful) {
         if (!placementCheck(grid, c, r).ok) continue;
         for (const rot of type === 'pillar' ? [0] : [0, 1]) {
           setPiece(grid, c, r, { type, rot });
-          const v = layoutValue(run, grid);
+          const v = layoutValue(run, grid, careful);
           setPiece(grid, c, r, null);
-          const gain = careful ? (v - bestValue) / cost : v - bestValue;
-          const bestGain = best ? best.gain : 0.5;
-          if (gain > bestGain) best = { type, c, r, rot, gain, value: v };
+          const gain = careful ? (v - base) / cost : v - base;
+          if (gain > (best ? best.gain : 0.5)) best = { type, c, r, rot, gain };
         }
       }
     }
@@ -61,43 +65,53 @@ function bestPlacement(run, careful) {
   return best;
 }
 
-/** Re-aim existing mirrors for the new opening (careful bot only): try each rotation. */
-function reaimPieces(run) {
+/** Careful bot: turn existing glass when that lights more of the route for the new opening. */
+function reaimOrders(run) {
   const orders = [];
-  for (let i = 0; i < run.grid.pieces.length; i++) {
-    const p = run.grid.pieces[i];
-    if (!p || p.type === 'pillar') continue;
-    const before = layoutValue(run, run.grid);
+  run.grid.pieces.forEach((p, i) => {
+    if (!p || p.type === 'pillar') return;
+    const before = layoutValue(run, run.grid, true);
     p.rot = (p.rot + 1) & 3;
-    const after = layoutValue(run, run.grid);
+    const after = layoutValue(run, run.grid, true);
     p.rot = (p.rot + 3) & 3;
     if (after > before) orders.push({ type: 'rotate', c: i % run.grid.cols, r: Math.floor(i / run.grid.cols), dir: 1 });
-  }
+  });
   return orders;
 }
 
-export function playRun(seed, difficulty, bot = 'greedy') {
+/**
+ * Play one run. Returns { result, log, run } where log is [{ tick, orders }] and tick is the
+ * run's tick just before the step that applied them. onTick(run) is called after every step.
+ */
+export function playRun(seed, difficulty, bot = 'greedy', onTick = null) {
   const run = createRun(seed, difficulty);
   const careful = bot === 'careful';
+  const log = [];
+  const step = (orders) => {
+    if (orders.length) log.push({ tick: run.tick, orders });
+    stepSim(run, orders);
+    run.events.length = 0;
+    if (onTick) onTick(run);
+  };
   for (let guard = 0; guard < 60 * 60 * 40; guard++) {
-    const orders = [];
     if (run.phase === 'build') {
-      if (careful) for (const o of reaimPieces(run)) stepSim(run, [o]);
+      if (careful) for (const o of reaimOrders(run)) step([o]);
       for (let k = 0; k < 20; k++) {
         const p = bestPlacement(run, careful);
         if (!p) break;
-        stepSim(run, [{ type: 'place', piece: p.type, c: p.c, r: p.r, rot: p.rot }]);
+        step([{ type: 'place', piece: p.type, c: p.c, r: p.r, rot: p.rot }]);
       }
-      orders.push({ type: 'startWave' });
+      step([{ type: 'startWave' }]);
     } else if (run.phase === 'wave') {
-      if (run.flareCharges > 0 && run.enemies.filter((e) => e.litPower > 0).length >= (careful ? 4 : 2)) orders.push({ type: 'flare' });
+      const lit = run.enemies.filter((e) => e.litPower > 0).length;
+      step(run.flareCharges > 0 && run.flareLeft <= 0 && lit >= (careful ? 4 : 2) ? [{ type: 'flare' }] : []);
     } else if (run.phase === 'draft') {
-      orders.push({ type: 'pick', index: 0 });
+      const index = careful ? run.offer.indexOf(BOON_TASTE.find((id) => run.offer.includes(id))) : 0;
+      step([{ type: 'pick', index: Math.max(0, index) }]);
     } else break;
-    stepSim(run, orders);
-    run.events.length = 0;
   }
-  return { seed, difficulty, phase: run.phase, waves: run.stats.wavesCleared, score: run.score, hp: run.shrineHp, kills: run.stats.kills, best: run.chain.best };
+  const result = { seed, difficulty, phase: run.phase, waves: run.stats.wavesCleared, score: run.score, hp: run.shrineHp, kills: run.stats.kills, best: run.chain.best };
+  return { result, log, run };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
@@ -105,7 +119,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const bot = process.argv[3] ?? 'greedy';
   for (const difficulty of DIFFICULTY_ORDER) {
     const rows = [];
-    for (let k = 0; k < n; k++) rows.push(playRun(1000 + k * 7919, difficulty, bot));
+    for (let k = 0; k < n; k++) rows.push(playRun(1000 + k * 7919, difficulty, bot).result);
     const wins = rows.filter((r) => r.phase === 'won').length;
     const mean = rows.reduce((s, r) => s + r.waves, 0) / n;
     console.log(`${bot} ${difficulty.padEnd(8)} wins ${wins}/${n}  mean waves ${mean.toFixed(1)}/${WAVE_COUNT}  waves: ${rows.map((r) => r.waves).join(' ')}  scores: ${rows.map((r) => r.score).join(' ')}`);

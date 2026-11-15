@@ -14,6 +14,15 @@ export function installTestHook(app, api) {
       for (let i = 0; i < ticks; i++) api.tick();
       return this.state();
     },
+    /** Replay a recorded order log ([{ tick, orders }]) up to a tick, through the real loop. */
+    replay(log, untilTick) {
+      let k = log.findIndex((entry) => entry.tick >= app.run.tick);
+      while (app.run.tick < untilTick) {
+        if (k >= 0 && k < log.length && log[k].tick === app.run.tick) app.orders.push(...log[k++].orders);
+        api.tick();
+      }
+      return this.state();
+    },
     order(order) {
       app.orders.push(order);
       api.tick();

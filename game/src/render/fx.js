@@ -107,18 +107,18 @@ function drawStarburst(ctx, x, y, r, alpha) {
  */
 export function drawBeams(ctx, trace, opts) {
   const alpha = opts.alpha ?? 1;
-  const surge = 1 + (opts.flare ?? 0) * 0.6;
+  const surge = 1 + (opts.flare ?? 0) * 0.3;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.lineCap = 'round';
   const passes = [
-    [30, 'rgba(255,197,49,', 0.2],
-    [14, 'rgba(255,214,90,', 0.42],
+    [26, 'rgba(255,197,49,', 0.18],
+    [12, 'rgba(255,214,90,', 0.4],
     [5, 'rgba(255,251,230,', 0.95],
   ];
   for (const [width, color, a] of passes) {
     for (const leg of trace.legs) {
-      const w = Math.min(2.6, Math.max(0.45, leg.power / 10)) * surge * (leg.focused ? 1.25 : 1);
+      const w = Math.min(1.7, Math.max(0.5, Math.sqrt(leg.power / 10))) * surge;
       ctx.strokeStyle = leg.focused && width > 5 ? `rgba(255,140,60,${a * alpha})` : `${color}${a * alpha})`;
       ctx.lineWidth = width * w;
       ctx.beginPath();
@@ -128,7 +128,7 @@ export function drawBeams(ctx, trace, opts) {
     }
   }
   const twinkle = 0.85 + Math.sin((opts.time ?? 0) * 7) * 0.15;
-  for (const b of trace.bursts) drawStarburst(ctx, toScreenX(b.x), toScreenY(b.y), 26 * Math.min(1.8, Math.max(0.6, b.power / 10)) * twinkle, 0.9 * alpha);
+  for (const b of trace.bursts) drawStarburst(ctx, toScreenX(b.x), toScreenY(b.y), 24 * Math.min(1.3, Math.max(0.7, Math.sqrt(b.power / 10))) * twinkle, 0.85 * alpha);
   ctx.restore();
 }
 

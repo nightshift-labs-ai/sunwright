@@ -46,6 +46,10 @@ export const ENEMIES = {
 /** The Matriarch's carapace opens (armour 0) for `open` seconds out of every `cycle`. */
 export const MATRIARCH_CARAPACE = { cycle: 6, open: 2.5 };
 
+/** Lampmoths steer this hard towards nearby light, and move at this fraction of their speed while lit. */
+export const MOTH_LURE = 1.4;
+export const MOTH_DAZZLE = 0.5;
+
 /** The order enemies first appear in, used for the NEW tag in the draft preview. */
 export const ENEMY_ORDER = ['scuttler', 'lampmoth', 'shellback', 'matriarch'];
 

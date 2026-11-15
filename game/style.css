@@ -35,11 +35,11 @@ button.big:hover { background: #cf3f93; }
 .howto-cols b { color: #ffe27a; }
 
 /* Draft */
-#draft-screen { padding-top: 54px; }
-.sunbanner { margin: 0; padding: 10px 34px; white-space: nowrap; font: 900 30px Georgia, serif; color: #fff2a8; background: rgba(31, 63, 153, 0.92); border: 3px solid #f2c14e; border-radius: 12px; letter-spacing: 2px; }
+#draft-screen { padding-top: 96px; }
+.sunbanner { margin: 0; padding: 8px 26px; white-space: nowrap; font: 900 24px Georgia, serif; color: #fff2a8; background: rgba(31, 63, 153, 0.92); border: 3px solid #f2c14e; border-radius: 12px; letter-spacing: 0.5px; }
 .sub { margin: 10px 0 0; font-size: 20px; font-weight: 700; text-shadow: 0 2px 3px #3b1247; }
-.roundels { display: flex; gap: 38px; margin-top: 28px; }
-.roundel { position: relative; width: 250px; height: 250px; border-radius: 50%; padding: 0 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 7px solid #f2c14e; overflow: hidden; background: #1f3f99; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.5), 0 0 30px rgba(255, 210, 90, 0.35); }
+.roundels { display: flex; gap: 34px; margin-top: 20px; }
+.roundel { position: relative; width: 240px; height: 240px; border-radius: 50%; padding: 0 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 7px solid #f2c14e; overflow: hidden; background: #1f3f99; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.5), 0 0 30px rgba(255, 210, 90, 0.35); }
 .roundel.rare { border-color: #fff6df; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.5), 0 0 40px rgba(255, 255, 220, 0.8); }
 .roundel .glass { position: absolute; inset: 0; z-index: 0; background: conic-gradient(from 15deg, hsl(var(--hue) 80% 52%) 0 60deg, hsl(calc(var(--hue) + 35) 80% 38%) 0 120deg, hsl(var(--hue) 75% 60%) 0 180deg, hsl(calc(var(--hue) + 35) 80% 42%) 0 240deg, hsl(var(--hue) 80% 50%) 0 300deg, hsl(calc(var(--hue) + 35) 75% 36%) 0); opacity: 0.92; }
 .roundel .glass::after { content: ""; position: absolute; inset: 34px; border-radius: 50%; background: radial-gradient(rgba(20, 20, 60, 0.72), rgba(20, 20, 60, 0.55)); border: 3px solid rgba(242, 193, 78, 0.85); }

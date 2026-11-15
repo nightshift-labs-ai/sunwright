@@ -1,7 +1,7 @@
 // Beetle behaviour: Scuttlers and Shellbacks walk the flow field around pieces, Lampmoths fly
 // over everything towards the shrine but veer into the brightest light nearby, and the Umbral
 // Matriarch walks slowly with a carapace that only opens part of the time.
-import { BOARD, DX, DY, ENEMIES, MATRIARCH_CARAPACE } from './config.js';
+import { BOARD, DX, DY, ENEMIES, MATRIARCH_CARAPACE, MOTH_DAZZLE, MOTH_LURE } from './config.js';
 import { flowDirectionAt } from './pathing.js';
 
 export function spawnEnemy(run, type, gateIndex) {
@@ -64,7 +64,10 @@ function stepWalker(run, e, dt) {
   }
 }
 
-/** Lampmoths: fly at the shrine, pulled sideways towards the brightest lit cell within 2.5 cells. */
+/**
+ * Lampmoths: fly at the shrine, pulled hard towards the brightest lit cell within 2.5 cells,
+ * and dazzled (slowed) while they flutter in the light.
+ */
 function stepFlyer(run, e, dt) {
   const sx = run.grid.shrine.c + 0.5;
   const sy = run.grid.shrine.r + 0.5;
@@ -78,13 +81,14 @@ function stepFlyer(run, e, dt) {
     const lx = lure.x - e.x;
     const ly = lure.y - e.y;
     const ll = Math.hypot(lx, ly) || 1;
-    vx += (lx / ll) * 0.75;
-    vy += (ly / ll) * 0.75;
+    vx += (lx / ll) * MOTH_LURE;
+    vy += (ly / ll) * MOTH_LURE;
   }
   vx += Math.cos(e.age * 3 + e.wobble) * 0.35;
   const vl = Math.hypot(vx, vy) || 1;
-  e.x += (vx / vl) * e.def.speed * dt;
-  e.y += (vy / vl) * e.def.speed * dt;
+  const speed = e.def.speed * (e.litPower > 0 ? MOTH_DAZZLE : 1);
+  e.x += (vx / vl) * speed * dt;
+  e.y += (vy / vl) * speed * dt;
   e.heading = Math.abs(vx) > Math.abs(vy) ? (vx > 0 ? 0 : 2) : vy > 0 ? 1 : 3;
 }
 
