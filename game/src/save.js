@@ -18,8 +18,10 @@ function writeSave(data) {
   }
 }
 
+/** { score, waves, played } for a difficulty; played is false until a run there has ended. */
 export function loadBest(difficultyId) {
-  return readSave().best?.[difficultyId] ?? { score: 0, waves: 0 };
+  const best = readSave().best?.[difficultyId];
+  return best ? { ...best, played: true } : { score: 0, waves: 0, played: false };
 }
 
 const HISTORY_KEEP = 10;

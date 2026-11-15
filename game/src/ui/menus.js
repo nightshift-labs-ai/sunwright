@@ -49,7 +49,7 @@ export function showTitle(menus, bestFor, selected) {
   el('difficulty-picker').innerHTML = DIFFICULTY_ORDER.map((id) => {
     const best = bestFor(id);
     return `<button class="diff ${id === selected ? 'on' : ''}" data-action="difficulty" data-arg="${id}">
-      <b>${DIFFICULTIES[id].name}</b><small>best ${best.score.toLocaleString('en-US')}</small></button>`;
+      <b>${DIFFICULTIES[id].name}</b><small>${best.played ? `best ${best.score.toLocaleString('en-US')}` : 'not played yet'}</small></button>`;
   }).join('');
   el('rule-scope').textContent = SCOPE_LINE;
 }
