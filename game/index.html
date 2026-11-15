@@ -8,10 +8,14 @@
 </head>
 <body>
 <!--
+  5 glass - 4 beetles + the Titan - 9 suns - 12 charms - 3 difficulties.
   Reviewer note: SUNWRIGHT is a light-beam tower defense built by an AI agent (Claude Code) for
-  Nightshift Labs. Plain canvas 2D + DOM overlays + WebAudio, no library, no network. The sim
-  (src/sim.js, beams.js, pathing.js, enemies.js, waves.js, combat.js, draft.js, sun.js) has no
-  DOM code and runs headless in tools/balance.mjs.
+  Nightshift Labs. The sun moves every wave (morning east, noon north, evening west), so the glass
+  that burned the swarm at noon can miss it in the evening. Win: hold the courtyard for 9 suns, the
+  last one against the Hornback Titan. Lose: beetles drain the Sun Fountain to 0. R restarts a run.
+  Plain canvas 2D + DOM overlays + WebAudio, no library, no network. The sim (src/sim.js, beams.js,
+  pathing.js, enemies.js, waves.js, combat.js, draft.js, sun.js, announce.js) has no DOM code and
+  runs headless in tools/balance.mjs; tools/check-shot-truth.mjs checks every staged screenshot.
 -->
 <div id="stage">
   <canvas id="board" width="1280" height="800" aria-label="SUNWRIGHT courtyard"></canvas>
@@ -19,8 +23,8 @@
   <section id="title-screen" class="overlay">
     <div class="banner">
       <h1 id="wordmark">SUNWRIGHT</h1>
-      <p id="tagline">Mirrors of the Noon Courtyard</p>
     </div>
+    <p id="rule-sun" class="hook">THE SUN MOVES EVERY WAVE</p>
     <div class="menu">
       <button id="play-button" class="big" data-action="play">PLAY</button>
       <div id="difficulty-picker" class="picker"></div>
@@ -30,9 +34,9 @@
       </div>
     </div>
     <div id="rules-strip" class="rules">
-      <p id="rule-sun">THE SUN MOVES EVERY WAVE</p>
-      <p id="rule-goal">Hold the courtyard for 3 days - 9 suns</p>
-      <p id="rule-controls">1-5 glass - Q/E turn - SPACE Flare - ENTER start</p>
+      <div id="rule-loop" class="loop"></div>
+      <p id="rule-lose">Burn the beetles before they drain the FOUNTAIN</p>
+      <p id="rule-scope"></p>
     </div>
   </section>
 

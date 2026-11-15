@@ -52,7 +52,13 @@ export function drawFrame(ctx, frame) {
   ctx.save();
   const s = frame.shake ? shakeOffset(fx, time) : { x: 0, y: 0 };
   ctx.translate(s.x, s.y);
-  drawCourtyard(ctx, run, time);
+  if (frame.titleTraces) {
+    // Title: the courtyard fills the frame and bleeds past it, every sun window ablaze.
+    ctx.translate(VIEW_W / 2, VIEW_H / 2 + 20);
+    ctx.scale(1.2, 1.2);
+    ctx.translate(-VIEW_W / 2, -VIEW_H / 2);
+  }
+  drawCourtyard(ctx, run, time, !!frame.titleTraces);
   if (frame.showHud && (phase === 'build' || phase === 'wave')) drawMarchLines(ctx, run, time);
   const shadow = shadowVectorFor(run.aperture.wall);
   drawPieces(ctx, run.grid, shadow, time);
@@ -71,6 +77,8 @@ export function drawFrame(ctx, frame) {
   if (phase === 'draft') {
     const onPath = new Set(routeCells(run.grid, run.flow).filter((i) => run.trace.lit[i] > 0)).size;
     drawBeamGhost(ctx, run.trace, onPath, time);
+  } else if (frame.titleTraces) {
+    for (const trace of frame.titleTraces) drawBeams(ctx, trace, { alpha: 1, flare: 0, time });
   } else if (phase !== 'lost') {
     if (frame.showHud && (phase === 'wave' || phase === 'build') && run.waveIndex + 1 < WAVE_COUNT) {
       const next = nextSunTrace(run);

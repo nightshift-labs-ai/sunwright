@@ -319,7 +319,7 @@ function render() {
     updateMusic(run.waveIndex, run.phase === 'wave' && !app.paused);
     if (run.phase === 'wave' && !app.paused) playSizzle(run.enemies.reduce((n, e) => n + (e.litPower > 0 && !e.shielded ? 1 : 0), 0));
   } else {
-    drawFrame(ctx, { run: app.demo.run, ui: NO_UI, fx: app.fx, time: app.demo.run.time, showHud: false, shake: false });
+    drawFrame(ctx, { run: app.demo.run, ui: NO_UI, fx: app.fx, time: app.demo.run.time, showHud: false, shake: false, titleTraces: app.demo.traces });
     setBeamHum(0, false);
     updateMusic(0, false);
   }

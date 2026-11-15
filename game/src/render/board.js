@@ -192,7 +192,7 @@ function drawFloorLabels(ctx, run) {
 }
 
 /** Floor, walls, the day's three sun windows (lit / next / shuttered), labels and the burrows. */
-export function drawCourtyard(ctx, run, time) {
+export function drawCourtyard(ctx, run, time, allLit = false) {
   floorCanvas ??= buildFloorTexture();
   wallCanvas ??= buildWallTexture();
   ctx.drawImage(wallCanvas, 0, 0);
@@ -203,7 +203,7 @@ export function drawCourtyard(ctx, run, time) {
   for (let k = 0; k < 3; k++) {
     const ap = sunApertureFor(run.seed, dayStart + k);
     const slot = windowRect(ap);
-    const lit = ap.wall === now.wall;
+    const lit = allLit || ap.wall === now.wall;
     const next = run.waveIndex + 1 === dayStart + k;
     ctx.fillStyle = lit ? '#FFF4C8' : '#4A3A6A';
     ctx.beginPath();

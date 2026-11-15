@@ -154,3 +154,6 @@ export const BOONS = [
   { id: 'trueprism', name: NAMES.charm.trueprism, text: 'Prism branches keep 75% power', weight: 2, hue: 300 },
 ];
 export const SPREAD_BURN = { radius: 1.1, damage: 12 };
+
+/** The game's scope in one line, counted from the tables above (title screen and index.html note). */
+export const SCOPE_LINE = `${PIECE_ORDER.length} glass - ${ENEMY_ORDER.filter((t) => !ENEMIES[t].boss).length} beetles + the Titan - ${WAVE_COUNT} suns - ${BOONS.length} charms - ${DIFFICULTY_ORDER.length} difficulties`;

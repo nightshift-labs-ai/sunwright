@@ -1,11 +1,12 @@
 // DOM overlays above the canvas: title (with difficulty picker and best scores), how to play,
 // pause, the draft's stained-glass roundels, and the results screen. Buttons only queue
 // { kind: 'ui', action, arg } intents; main.js decides what they do.
-import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, NAMES, PIECES, PIECE_ORDER, RESULT_LOSE_TITLE, RESULT_WIN_TITLE, WAVE_COUNT } from '../config.js';
+import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, NAMES, PIECES, PIECE_ORDER, RESULT_LOSE_TITLE, RESULT_WIN_TITLE, SCOPE_LINE, WAVE_COUNT } from '../config.js';
 import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { drawCharmGlyph } from '../render/charms.js';
+import { drawLoopPicto } from '../render/pictos.js';
 
 
 const SCREENS = ['title', 'howto', 'options', 'pause', 'draft', 'results'];
@@ -51,6 +52,13 @@ export function showTitle(menus, bestFor, selected) {
     return `<button class="diff ${id === selected ? 'on' : ''}" data-action="difficulty" data-arg="${id}">
       <b>${DIFFICULTIES[id].name}</b><small>best ${best.score.toLocaleString('en-US')}</small></button>`;
   }).join('');
+  el('rule-scope').textContent = SCOPE_LINE;
+  if (!el('rule-loop').childElementCount) {
+    el('rule-loop').innerHTML = [['place', 'PLACE'], ['burn', 'BURN'], ['reaim', 'RE-AIM']]
+      .map(([kind, label], k) => `${k ? '<span class="arrow">-&gt;</span>' : ''}<canvas width="52" height="52" data-picto="${kind}"></canvas><span>${label}</span>`)
+      .join('');
+    for (const canvas of el('rule-loop').querySelectorAll('canvas')) drawLoopPicto(canvas.getContext('2d'), canvas.dataset.picto, 52);
+  }
 }
 
 /** The draft: a huge "SUN MOVES WEST - PICK 1", three roundels (effect on hover), reroll, NEW chip. */

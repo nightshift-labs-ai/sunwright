@@ -76,6 +76,12 @@
   BEST (18,260 on the cover) are real; check-shot-truth asserts BEST and the history against
   headless replays. menus.js exports showTitle / showDraft / showResults / restartRun.
 
+- Title (benchmark 1 item 8, 2 items 2 and 16, 3 item 6): stained-glass SUNWRIGHT wordmark (196 px,
+  coloured panes + lead lines on a bright plaque), hook THE SUN MOVES EVERY WAVE 52 px, 56 px PLAY,
+  difficulty pills with real bests, rules box: PLACE -> BURN -> RE-AIM pictograms, lose rule line,
+  SCOPE_LINE (counted from config.js; also the first line of the index.html note, which now names the
+  moving sun, the 9-sun win, the lose rule and R). Demo scaled 1.2x with all three suns beaming.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

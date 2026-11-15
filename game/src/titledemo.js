@@ -4,6 +4,8 @@ import { DT } from './config.js';
 import { setPiece } from './grid.js';
 import { buildFlowField } from './pathing.js';
 import { createRun, refreshLight, stepSim } from './sim.js';
+import { beamModsFor, traceBeams } from './beams.js';
+import { sunApertureFor } from './sun.js';
 
 const DEMO_SEED = 1717;
 const SUN_HOP_SECONDS = 4.5;
@@ -24,7 +26,9 @@ export function createTitleDemo() {
   run.flow = buildFlowField(run.grid);
   refreshLight(run);
   stepSim(run, [{ type: 'startWave' }]);
-  return { run, clock: 0 };
+  // All three suns of the day at once, for the title's light show.
+  const traces = [0, 1, 2].map((w) => traceBeams(run.grid, sunApertureFor(DEMO_SEED, w), beamModsFor([])));
+  return { run, clock: 0, traces };
 }
 
 export function stepTitleDemo(demo) {
