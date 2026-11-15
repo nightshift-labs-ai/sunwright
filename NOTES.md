@@ -121,6 +121,12 @@
   spot round the basin clear of beam cores and beetles) drawn last as lapis plaques; the test hook
   measures tag overlaps and check-shot-truth asserts none.
 
+- Benchmark 3 item 3 (part): glass lit by the current sun gets a white rim + glow, glass only the
+  next sun reaches gets a dashed gold outline + its wall letter (W). Staging prune (swap stray panes
+  for pillars before the cover, restore after) exists behind STAGE_PRUNE=1 but no seed wins with it
+  yet, so the cover's solved-plan ratio is reported, not enforced. Defeat title fit now measured
+  after the overlay shows (it overflowed before).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

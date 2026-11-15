@@ -445,11 +445,45 @@ export function drawPiece(ctx, piece, c, r, shadow, time, alpha = 1) {
   ctx.restore();
 }
 
-export function drawPieces(ctx, grid, shadow, time) {
+/**
+ * Draw every piece. Glass the current light reaches gets a white rim and glow; glass only the
+ * next sun will reach gets a dashed gold outline tagged with that sun's wall letter.
+ */
+export function drawPieces(ctx, grid, shadow, time, lit = null, next = null) {
   for (let r = 0; r < grid.rows; r++) {
     for (let c = 0; c < grid.cols; c++) {
-      const p = grid.pieces[r * grid.cols + c];
-      if (p) drawPiece(ctx, p, c, r, shadow, time);
+      const i = r * grid.cols + c;
+      const p = grid.pieces[i];
+      if (!p) continue;
+      drawPiece(ctx, p, c, r, shadow, time);
+      if (!lit || p.type === 'pillar') continue;
+      const x = BOARD_X + c * CELL;
+      const y = BOARD_Y + r * CELL;
+      if (lit[i] > 0) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.strokeStyle = 'rgba(255,240,190,0.55)';
+        ctx.lineWidth = 8;
+        ctx.strokeRect(x + 5, y + 5, CELL - 10, CELL - 10);
+        ctx.restore();
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(x + 5, y + 5, CELL - 10, CELL - 10);
+      } else if (next && next.lit[i] > 0) {
+        ctx.setLineDash([7, 5]);
+        ctx.strokeStyle = PALETTE.gold;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x + 5, y + 5, CELL - 10, CELL - 10);
+        ctx.setLineDash([]);
+        ctx.fillStyle = PALETTE.gold;
+        ctx.beginPath();
+        ctx.arc(x + CELL - 10, y + 10, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#3B1247';
+        ctx.font = '900 13px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(next.wall, x + CELL - 10, y + 15);
+      }
     }
   }
 }

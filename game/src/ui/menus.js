@@ -114,7 +114,7 @@ export function showResults(menus, run, record, history) {
   el('results-screen').classList.toggle('lost', !won);
   const title = el('results-title');
   title.textContent = won ? RESULT_WIN_TITLE : RESULT_LOSE_TITLE;
-  title.style.setProperty('--fit', String(Math.min(1, 1180 / title.offsetWidth)));
+  requestAnimationFrame(() => title.style.setProperty('--fit', String(Math.min(1, 1180 / title.offsetWidth))));
   el('results-sub').textContent = won
     ? `Courtyard held - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`
     : `Fell on Day ${run.aperture.day} ${run.aperture.phase.name.toLowerCase()} - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`;

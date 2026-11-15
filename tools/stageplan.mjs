@@ -4,6 +4,8 @@
 import { layoutValue, playRun } from './balance.mjs';
 import { createFx, floaterConflicts, fxFromEvent, updateFx } from '../game/src/render/fx.js';
 import { DT } from '../game/src/config.js';
+import { beamModsFor, traceBeams } from '../game/src/beams.js';
+import { sunApertureFor } from '../game/src/sun.js';
 
 export const COVER_WAVE = 4;
 const DIFF = 'normal';
@@ -32,10 +34,35 @@ function mostUsefulPieces(run, K) {
   return scored.slice(0, K);
 }
 
+/**
+ * After the bot has built for the cover sun, the director swaps the glass it will not use for
+ * pillars (same maze): panes neither the noon light nor the next sun's ghost reaches, then
+ * ghost-only panes until 70% of the glass is lit.
+ */
+function pruneForCover(run, swapped) {
+  if (run.waveIndex !== COVER_WAVE) return [];
+  const next = traceBeams(run.grid, sunApertureFor(run.seed, run.waveIndex + 1), beamModsFor(run.boons));
+  const glass = [];
+  run.grid.pieces.forEach((p, i) => p && p.type !== 'pillar' && glass.push({ i, lit: run.trace.lit[i] > 0, ghost: next.lit[i] > 0 }));
+  const lift = glass.filter((g) => !g.lit && !g.ghost);
+  const keep = glass.filter((g) => g.lit || g.ghost);
+  const lit = keep.filter((g) => g.lit).length;
+  const ghostOnly = keep.filter((g) => !g.lit);
+  while (ghostOnly.length && lit / (lit + ghostOnly.length) < 0.7) lift.push(ghostOnly.pop());
+  // Each sold pane becomes a sandstone pillar on the same cell, so the maze the bot built stays.
+  return lift.flatMap((g) => {
+    const c = g.i % run.grid.cols;
+    const r = Math.floor(g.i / run.grid.cols);
+    const piece = run.grid.pieces[g.i];
+    swapped.push({ c, r, piece: piece.type, rot: piece.rot });
+    return [{ type: 'lift', c, r }, { type: 'place', piece: 'pillar', c, r, rot: 0 }];
+  });
+}
+
 export function makeDirector(K) {
   let wave = -1;
   let turned = null;
-  return (run) => {
+  const director = (run) => {
     const orders = [];
     const target = DIRECTED[run.waveIndex];
     if (target === undefined) return orders;
@@ -53,6 +80,15 @@ export function makeDirector(K) {
     orders.holdFlare = !!(turned && turned.length);
     return orders;
   };
+  // The panes swapped for pillars before the cover go back in at the next build phase.
+  const swapped = [];
+  // Off by default: no seed found yet where the pruned plan still wins (STAGE_PRUNE=1 to try).
+  if (process.env.STAGE_PRUNE === '1') director.afterBuild = (run) => pruneForCover(run, swapped);
+  director.beforeBuild = (run) => {
+    if (run.waveIndex !== COVER_WAVE + 1 || !swapped.length) return [];
+    return swapped.splice(0).flatMap((p) => [{ type: 'lift', c: p.c, r: p.r }, { type: 'place', piece: p.piece, c: p.c, r: p.r, rot: p.rot }]);
+  };
+  return director;
 }
 
 /** Plan one directed run headless and find the cover, draft and end ticks. */

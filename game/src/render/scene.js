@@ -65,7 +65,9 @@ export function drawFrame(ctx, frame) {
   drawCourtyard(ctx, run, time, !!frame.titleTraces);
   if (frame.showHud && (phase === 'build' || phase === 'wave')) drawMarchLines(ctx, run, time);
   const shadow = shadowVectorFor(run.aperture.wall);
-  drawPieces(ctx, run.grid, shadow, time);
+  const showPlan = frame.showHud && (phase === 'wave' || phase === 'build');
+  const next = showPlan && run.waveIndex + 1 < WAVE_COUNT ? nextSunTrace(run) : null;
+  drawPieces(ctx, run.grid, shadow, time, showPlan ? run.trace.lit : null, next && { lit: next.trace.lit, wall: next.wall });
   drawShrine(ctx, run, shadow, time, frame.shrineHurtAgo ?? 9);
   if (ui.ghost) {
     drawPiece(ctx, ui.ghost.piece, ui.ghost.c, ui.ghost.r, shadow, time, 0.55);

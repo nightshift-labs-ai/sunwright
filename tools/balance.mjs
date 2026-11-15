@@ -80,12 +80,14 @@ export function playRun(seed, difficulty, bot = 'greedy', onTick = null, directo
   };
   for (let guard = 0; guard < 60 * 60 * 40; guard++) {
     if (run.phase === 'build') {
+      if (director?.beforeBuild) for (const o of director.beforeBuild(run)) step([o]);
       if (careful) for (const o of reaimOrders(run)) step([o]);
       for (let k = 0; k < 20; k++) {
         const p = bestPlacement(run, careful);
         if (!p) break;
         step([{ type: 'place', piece: p.type, c: p.c, r: p.r, rot: p.rot }]);
       }
+      if (director?.afterBuild) for (const o of director.afterBuild(run)) step([o]);
       step([{ type: 'startWave' }]);
     } else if (run.phase === 'wave') {
       const lit = run.enemies.filter((e) => e.litPower > 0).length;

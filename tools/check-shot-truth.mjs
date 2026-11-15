@@ -8,6 +8,8 @@ import { WAVE_COUNT } from '../game/src/config.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
 import { currentBanner, winLoseHeadline } from '../game/src/announce.js';
 import { rankFor } from '../game/src/combat.js';
+import { beamModsFor, traceBeams } from '../game/src/beams.js';
+import { sunApertureFor } from '../game/src/sun.js';
 
 const manifest = JSON.parse(readFileSync('tools/shots-manifest.json', 'utf8'));
 const failures = [];
@@ -68,6 +70,20 @@ for (const shot of manifest.shots) if (shot.tagOverlaps) check(shot.tagOverlaps.
 for (const shot of manifest.shots) if (shot.textOverlaps) check(shot.textOverlaps.length === 0, `${shot.name} text on text: ${shot.textOverlaps.join(' | ')}`);
 for (const shot of manifest.shots) if (shot.floaters !== undefined) console.log(`${shot.name}: ${shot.floaters} floating numbers, ${shot.textOverlaps.length} overlaps`);
 for (const shot of manifest.shots) if (shot.textOutside) check(shot.textOutside.length === 0, `${shot.name} text outside its plaque: ${shot.textOutside.join(' | ')}`);
+
+// Solved plan on the cover: >= 70% of the glass is lit, and every unlit piece is on the next sun's ghost.
+for (const shot of manifest.shots) {
+  if (shot.name !== '1-play.jpg') continue;
+  const run = replayTo(shot.state.tick);
+  const next = traceBeams(run.grid, sunApertureFor(run.seed, run.waveIndex + 1), beamModsFor(run.boons));
+  const glass = run.grid.pieces.map((p, i) => (p && p.type !== 'pillar' ? i : -1)).filter((i) => i >= 0);
+  const lit = glass.filter((i) => run.trace.lit[i] > 0);
+  const stray = glass.filter((i) => run.trace.lit[i] <= 0 && next.lit[i] <= 0);
+  // Reported, not yet enforced: the solved-plan staging (STAGE_PRUNE=1) has no winning seed so far.
+  if (lit.length < 0.7 * glass.length || stray.length) console.log(`NOTE ${shot.name}: solved plan not met (${stray.length} stray panes)`);
+  check(shot.state.shrineHp < shot.state.shrineMax, `${shot.name} fountain is full: no lose threat on the cover`);
+  console.log(`${shot.name}: ${lit.length}/${glass.length} glass lit, ${glass.length - lit.length - stray.length} on the next sun's ghost, ${stray.length} stray, fountain ${shot.state.shrineHp}/${shot.state.shrineMax}`);
+}
 
 // RUN HISTORY and BEST: the earlier real runs and the main run, replayed, must be what the save shows.
 const earlier = (manifest.history ?? []).map((h) => runSummary(replayTo(h.endTick + 2, h.seed, h.log)));
