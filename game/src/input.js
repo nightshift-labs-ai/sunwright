@@ -3,7 +3,8 @@
 // the queue once per frame and turns intents into sim orders.
 import { VIEW_H, VIEW_W } from './render/layout.js';
 
-const BLOCKED_KEYS = new Set(['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab']);
+// Enter is ours too: a focused button must not also click itself (PLAY would start twice).
+const BLOCKED_KEYS = new Set(['Space', 'Enter', 'NumpadEnter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab']);
 
 export function createInput(stage, canvas) {
   const input = { intents: [], mouse: { x: -1, y: -1, inside: false } };

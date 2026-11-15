@@ -40,11 +40,24 @@ expect(music === 0.3, 'the music slider saves its setting');
 await page.click('#options-screen button[data-action="closeOptions"]');
 await frame();
 expect(await visible('title-screen'), 'Back returns to the title');
+// ENTER starts the selected difficulty; the arrow keys move the selection.
+await page.click('#difficulty-picker button[data-arg="scorched"]');
+await frame();
+await page.keyboard.press('Enter');
+await frame();
+let s = await state();
+expect(s.screen === 'play' && s.difficulty === 'SCORCHED', `ENTER on the title starts the selected difficulty (${s.difficulty})`);
+await page.evaluate(() => window.__test.ui('menu'));
+await frame();
+await page.keyboard.press('ArrowUp');
+await frame();
+const picked = await page.evaluate(() => document.querySelector('#difficulty-picker .diff.on')?.dataset.arg);
+expect(picked === 'normal', `ArrowUp on the title moves the selection to Normal (${picked})`);
 await page.click('#difficulty-picker button[data-arg="gentle"]');
 await frame();
 await page.click('#play-button');
 await frame();
-let s = await state();
+s = await state();
 expect(s.screen === 'play' && s.phase === 'build' && s.difficulty === 'GENTLE', 'Play starts a Gentle run in the build phase');
 
 const quartzBefore = s.quartz;

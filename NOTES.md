@@ -165,6 +165,13 @@
   the save via announce.historyChip. check-shot-truth rebuilds the chips from the replayed runs and
   checks the label size, the caption size, and that a won results screen has no other lose title.
 
+- Benchmark 5 item 3: title says CLICK PLAY OR PRESS ENTER (34 px) under PLAY; ENTER starts the selected
+  difficulty, Up/Down move the selection, Enter no longer also clicks a focused button. Title relaid:
+  wordmark 160 px unsqueezed, hook 46 px, a full-width rules row, a 600 px card (PLAY, hint, picker,
+  HOW TO PLAY / OPTIONS), the demo courtyard (scale 0.58, clipped to its walls) right of it, and the
+  keycaps as one band along the bottom (26 px, no squeeze). Playtest asserts ENTER -> SCORCHED run
+  and ArrowUp -> Normal.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

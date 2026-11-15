@@ -10,26 +10,28 @@ button:disabled { opacity: 0.45; cursor: default; }
 button.big { font-size: 30px; padding: 14px 40px; background: #b0307a; }
 button.big:hover { background: #cf3f93; }
 
-/* Title: the stained-glass wordmark with the scope line, the hook, a lapis menu card on the left,
-   the live courtyard (three suns) on the right. */
+/* Title: the stained-glass wordmark with the scope line, the hook, the rules, a lapis menu card on the
+   left (PLAY, how to start, difficulty), the live courtyard (three suns) on the right, keys along the bottom. */
 #title-screen { display: block; background: none; }
-.banner { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); width: 1180px; display: flex; flex-direction: column; align-items: center; padding: 0 0 6px; background: linear-gradient(#fff8e2, #f3dcaa); border: 6px solid #2d5bd0; outline: 4px solid #f2c14e; border-radius: 22px; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.45); }
-#wordmark { margin: -10px 0 -22px; white-space: nowrap; transform: scaleX(0.84); font: 900 196px system-ui, sans-serif; letter-spacing: 0; color: transparent;
-  background-image: repeating-linear-gradient(118deg, transparent 0 46px, rgba(42, 22, 8, 0.85) 46px 50px), linear-gradient(100deg, #2d5bd0 0 14%, #f2c14e 14% 27%, #d63c6a 27% 40%, #34c38f 40% 52%, #ffb02e 52% 64%, #59b8ff 64% 77%, #ff6a3d 77% 88%, #7a3bd0 88%);
+.banner { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); width: 1180px; display: flex; flex-direction: column; align-items: center; padding: 0 0 4px; background: linear-gradient(#fff8e2, #f3dcaa); border: 6px solid #2d5bd0; outline: 4px solid #f2c14e; border-radius: 22px; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.45); }
+#wordmark { margin: -8px 0 -22px; white-space: nowrap; font: 900 160px system-ui, sans-serif; letter-spacing: 0; color: transparent;
+  background-image: repeating-linear-gradient(118deg, transparent 0 40px, rgba(42, 22, 8, 0.85) 40px 44px), linear-gradient(100deg, #2d5bd0 0 14%, #f2c14e 14% 27%, #d63c6a 27% 40%, #34c38f 40% 52%, #ffb02e 52% 64%, #59b8ff 64% 77%, #ff6a3d 77% 88%, #7a3bd0 88%);
   -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 5px #2a1608; filter: drop-shadow(0 6px 0 rgba(91, 58, 30, 0.6)); }
 .scope { margin: 0; font: 900 30px system-ui, sans-serif; color: #3b1247; white-space: nowrap; letter-spacing: -0.5px; }
-.hook { position: absolute; left: 50%; top: 258px; transform: translateX(-50%); margin: 0; padding: 2px 30px 6px; white-space: nowrap; font: 900 50px system-ui, sans-serif; color: #ffe27a; background: #2d5bd0; border: 4px solid #f2c14e; border-radius: 14px; -webkit-text-stroke: 2px #3b1247; paint-order: stroke fill; }
-.title-card { position: absolute; left: 24px; top: 336px; bottom: 16px; width: 560px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 18px; }
+.hook { position: absolute; left: 50%; top: 214px; transform: translateX(-50%); margin: 0; padding: 0 30px 4px; white-space: nowrap; font: 900 46px system-ui, sans-serif; color: #ffe27a; background: #2d5bd0; border: 4px solid #f2c14e; border-radius: 14px; -webkit-text-stroke: 2px #3b1247; paint-order: stroke fill; }
+.rules { position: absolute; left: 24px; right: 24px; top: 286px; display: flex; flex-direction: column; align-items: center; }
+.rules p { margin: 0; font: 900 34px system-ui, sans-serif; line-height: 1.15; white-space: nowrap; color: #fff6df; -webkit-text-stroke: 6px #3b1247; paint-order: stroke fill; filter: drop-shadow(0 3px 0 rgba(91, 58, 30, 0.6)); }
+.title-card { position: absolute; left: 24px; top: 376px; bottom: 66px; width: 600px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 18px; }
 #play-button { font-size: 52px; padding: 0 80px; }
+.start-hint { margin: 0; font: 900 34px system-ui, sans-serif; color: #ffe27a; white-space: nowrap; letter-spacing: 0; }
 .picker { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-.diff { display: flex; justify-content: space-between; align-items: baseline; width: 100%; padding: 2px 16px; background: #2d5bd0; border-radius: 26px; }
+.diff { display: flex; justify-content: space-between; align-items: baseline; width: 100%; padding: 0 16px; background: #2d5bd0; border-radius: 26px; }
 .diff b { font-size: 34px; }
 .diff small { font-weight: 800; font-size: 30px; }
 .diff.on { background: #f2c14e; color: #3b1247; border-color: #fff6df; }
-.keycaps { display: grid; grid-template-columns: auto auto auto; gap: 6px 12px; font: 900 30px system-ui, sans-serif; color: #fff6df; transform: scaleX(0.82); }
+.keycaps { position: absolute; left: 24px; right: 24px; bottom: 12px; display: flex; justify-content: center; gap: 22px; padding: 4px 0; font: 900 26px system-ui, sans-serif; color: #fff6df; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 16px; }
 .keycaps span { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 28px system-ui, sans-serif; text-align: center; color: #3b1247; background: #fff6df; border: 2px solid #f2c14e; border-bottom-width: 5px; border-radius: 8px; }
-#rule-lose { margin: 0; font: 900 30px system-ui, sans-serif; line-height: 1.1; text-align: center; color: #ffb0b0; }
+kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 24px system-ui, sans-serif; text-align: center; color: #3b1247; background: #fff6df; border: 2px solid #f2c14e; border-bottom-width: 5px; border-radius: 8px; }
 .row { display: flex; gap: 12px; }
 .row button { font-size: 30px; padding: 2px 18px; }
 .options label { display: grid; grid-template-columns: 220px 200px; justify-items: start; align-items: center; gap: 16px; font-weight: 800; font-size: 20px; }

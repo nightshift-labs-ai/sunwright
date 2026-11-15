@@ -1,6 +1,6 @@
 // Boot and the main loop: a fixed 60 Hz sim step separate from rendering, the screen state
 // (title / how to play / play + pause), and turning queued input intents into sim orders.
-import { DIFFICULTIES, DT, PIECES, PIECE_ORDER } from './config.js';
+import { DIFFICULTIES, DIFFICULTY_ORDER, DT, PIECES, PIECE_ORDER } from './config.js';
 import { createRun, pieceCost, pieceUnlocked, runSummary, stepSim } from './sim.js';
 import { playSfx, playSizzle, setBeamHum, setVolume, unlockAudio, updateMusic } from './audio.js';
 import { loadBest, loadHistory, loadSettings, recordRun, saveSettings } from './save.js';
@@ -214,7 +214,13 @@ function handleIntent(it) {
     else if (it.kind === 'click') handleClickInPlay(it);
     else if (it.kind === 'wheel' && !app.paused) rotateAtHover(it.dir);
   } else if (it.kind === 'key') {
-    if (it.code === 'Enter' || it.code === 'Space') startRun();
+    // Title: ENTER (or SPACE) starts the selected difficulty; the arrows move the selection.
+    if (it.code === 'Enter' || it.code === 'NumpadEnter' || it.code === 'Space') startRun();
+    else if ((it.code === 'ArrowUp' || it.code === 'ArrowDown') && app.screen === 'title') {
+      const i = DIFFICULTY_ORDER.indexOf(app.settings.difficulty);
+      const step = it.code === 'ArrowDown' ? 1 : DIFFICULTY_ORDER.length - 1;
+      handleUiAction('difficulty', DIFFICULTY_ORDER[(i + step) % DIFFICULTY_ORDER.length]);
+    }
     else if (it.code === 'Escape') {
       app.showOptions = false;
       app.screen = 'title';

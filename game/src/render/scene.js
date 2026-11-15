@@ -28,8 +28,8 @@ function drawCellCursor(ctx, cell, ok) {
   }
 }
 
-/** Where the title's demo courtyard sits: centred right of the menu card, below the hook. */
-const TITLE_DEMO = { x: 935, y: 562, scale: 0.7 };
+/** Where the title's demo courtyard sits: right of the menu card, between the rules and the key band. */
+const TITLE_DEMO = { x: 942, y: 550, scale: 0.58 };
 
 const nextCache = { run: null, version: -1, value: null };
 
@@ -61,6 +61,10 @@ export function drawFrame(ctx, frame) {
     ctx.translate(TITLE_DEMO.x, TITLE_DEMO.y);
     ctx.scale(TITLE_DEMO.scale, TITLE_DEMO.scale);
     ctx.translate(-VIEW_W / 2, -390);
+    // Only the walled courtyard: its sand and props would show their edges at this scale.
+    ctx.beginPath();
+    ctx.rect(BOARD_X - WALL - 3, BOARD_Y - WALL_FRONT - WALL - 3, BOARD_W + WALL * 2 + 6, BOARD_H + WALL_FRONT + WALL * 2 + 14);
+    ctx.clip();
   }
   drawCourtyard(ctx, run, time, !!frame.titleTraces);
   if (frame.showHud && (phase === 'build' || phase === 'wave')) drawMarchLines(ctx, run, time);
