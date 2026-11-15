@@ -3,7 +3,7 @@
 // style loops can call planRun over many seeds without a browser.
 import { layoutValue, playRun } from './balance.mjs';
 import { createFx, floaterConflicts, fxFromEvent, updateFx } from '../game/src/render/fx.js';
-import { DT } from '../game/src/config.js';
+import { DT, WAVE_COUNT } from '../game/src/config.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
 
@@ -62,12 +62,25 @@ function pruneForCover(run, swapped) {
   });
 }
 
-export function makeDirector(K) {
+/**
+ * Where the director acts this sun: sun 4 down to 8/10; with scars (STAGE_V4) also the cover sun
+ * after the cover tick and the last sun, each down to 6/10 as shown (Sunstone heals 1 after a sun).
+ */
+function planFor(run, scars) {
+  if (DIRECTED[run.waveIndex]) return DIRECTED[run.waveIndex];
+  if (!scars) return undefined;
+  const shown = 6 - (run.boons.includes('sunstone') ? 1 : 0);
+  if (run.waveIndex === COVER_WAVE && run.tick > scars.coverTick) return { start: 10, after: 0, to: shown };
+  if (run.waveIndex === WAVE_COUNT - 1 && process.env.STAGE_V4_LAST !== '0') return { start: 10, after: 0.5, to: shown };
+  return undefined;
+}
+
+export function makeDirector(K, scars = null) {
   let wave = -1;
   let turned = null;
   const director = (run) => {
     const orders = [];
-    const plan = DIRECTED[run.waveIndex];
+    const plan = planFor(run, scars);
     if (plan === undefined) return orders;
     const target = plan.to;
     if (wave !== run.waveIndex) {
@@ -98,7 +111,7 @@ export function makeDirector(K) {
 }
 
 /** Plan one directed run headless and find the cover, draft and end ticks. */
-export function planRun(seed, K, difficulty = DIFF, bot = BOT) {
+export function planRun(seed, K, difficulty = DIFF, bot = BOT, scars = null) {
   let cover = { tick: -1, score: -1 };
   let draftTick = -1;
   let draftHp = -1;
@@ -111,7 +124,7 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT) {
       if (ev.type === 'bite') bites.push(run.time);
     }
     updateFx(fx, run, DT);
-    if (run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0) {
+    if (!scars && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0) {
       const opaque = floaterConflicts(fx, run) === 0 ? fx.texts.filter((t) => t.life / t.max > 0.3).length : 0;
       const freshBite = bites.some((t) => run.time - t < 0.9);
       const s = run.grid.shrine;
@@ -127,7 +140,10 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT) {
       draftHp = run.shrineHp;
     }
     if ((run.phase === 'won' || run.phase === 'lost') && endTick < 0) endTick = run.tick;
-  }, makeDirector(K));
+  }, makeDirector(K, scars));
+  if (scars) return { result, log, cover: scars.cover, draftTick, draftHp, endTick };
+  // STAGE_V4: replay the same run, now scarring the fountain after the cover and in the last sun.
+  if (process.env.STAGE_V4 === '1') return planRun(seed, K, difficulty, bot, { coverTick: cover.tick, cover });
   return { result, log, cover, draftTick, draftHp, endTick };
 }
 

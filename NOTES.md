@@ -156,6 +156,9 @@
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).
   Tried: director v3 (STAGE_V3=1: extra bite on the cover sun, no healing charms) gives 6/10 draft
   but a dead cover - reverted to the default. Solved-plan prune (STAGE_PRUNE=1) has no winning seed.
+  Director v4 (STAGE_V4=1, two passes: identical cover, then scars after the cover tick and in the
+  last sun, aiming at a 6/10 draft and win; STAGE_V4_LAST=0 skips the last-sun scar): seed 2013
+  then loses on day 3; 2003/2010 win with 6/10 or 5/10 drafts but have sparse covers. Off by default.
 - Benchmark 2 item 12 (Glassback on the cover): tried one scout Glassback in sun 5 (+ draft chip
   showing nextSunPreview). Best winning seed 2090 gave 19 beetles / 4 types but weak beams, fading
   floaters and a floater-on-beam truth failure, Glassback not deflecting - reverted.
