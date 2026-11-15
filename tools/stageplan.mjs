@@ -7,7 +7,8 @@ import { DT, WAVE_COUNT } from '../game/src/config.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
 
-export const COVER_WAVE = 4;
+/** The sun the cover shows (index; 4 = sun 5, Day 2 noon). STAGE_COVER_WAVE overrides it for experiments. */
+export const COVER_WAVE = Number(process.env.STAGE_COVER_WAVE ?? 4);
 const DIFF = 'normal';
 const BOT = 'greedy';
 

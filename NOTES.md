@@ -254,6 +254,9 @@
   at, kept 2013 (floaters, fuller beams). That shot showed the pill hiding the FOUNTAIN tag: fixed
   (the tag's adaptive spot avoids the pill; boardTagOverlaps counts tag-under-pill for the planner
   and check-shot-truth).
+  STAGE_COVER_WAVE=5 (cover on sun 6, Day 2 evening, Glassbacks out): seed 2046 wins with 21 beetles
+  of 4 kinds on the cover, 2015 with 3 lit; but the next sun is then east (the pill docks at the E gate,
+  against Bench5-10's W gate) and the draft after sun 6 has no NEW: GLASSBACK chip (Bench1-9). Kept sun 5.
 
 ## Known bugs
 - Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.
