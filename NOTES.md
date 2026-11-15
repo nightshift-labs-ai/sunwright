@@ -228,6 +228,10 @@
 - HUD: a difficulty with no finished run shows NO BEST YET under SCORE instead of BEST 0 (Bench4-3).
 
 ## Next
+- Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
+  Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.
+- Idea not yet tried: a director that builds (not turns) one mirror line across the swarm's path
+  before the cover sun, so >= 4 beetles burn while floaters stay off moving beams.
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).
   Tried: director v3 (STAGE_V3=1: extra bite on the cover sun, no healing charms) gives 6/10 draft
@@ -263,8 +267,8 @@
   against Bench5-10's W gate) and the draft after sun 6 has no NEW: GLASSBACK chip (Bench1-9). Kept sun 5.
 
 ## Known bugs
-- Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.
-- Source is 196 KB > 160 KiB dossier text cap: the last 6 files (34 KB) are cut from the dossier text
+- Cover has 2 floaters (benchmark 1 asks >= 3), 17 beetles (asks >= 18), 0 beetles lit: staging.
+- Source is ~205 KB > 160 KiB dossier text cap: the last 6 files (34 KB) are cut from the dossier text
   (the judge's outline only reaches ~17 headings anyway). Dead exports/CSS removed; JPEG q74 keeps
   every shot under 210 KB and the dossier at 1.07 MB (gate 1.5 MiB).
 - Staging: K=1 and K=2 give identical runs on every seed (director turns 1 piece either way?): check.
