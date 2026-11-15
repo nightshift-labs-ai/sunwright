@@ -5,19 +5,17 @@ import { setPiece } from './grid.js';
 import { buildFlowField } from './pathing.js';
 import { createRun, refreshLight, stepSim } from './sim.js';
 
-const DEMO_SEED = 5150;
+const DEMO_SEED = 1717;
 const SUN_HOP_SECONDS = 4.5;
-/** [type, c, r, rot] */
+/** [type, c, r, rot]: every sun of this seed's first day bounces down a beetle path. */
 const DEMO_LAYOUT = [
-  ['mirror', 1, 1, 1],
-  ['mirror', 11, 1, 0],
-  ['splitter', 4, 6, 0],
-  ['mirror', 8, 6, 1],
-  ['lens', 6, 5, 1],
-  ['pillar', 5, 3, 0],
-  ['pillar', 7, 3, 0],
-  ['mirror', 2, 4, 0],
-  ['mirror', 10, 4, 1],
+  ['mirror', 10, 4, 0],
+  ['mirror', 9, 6, 0],
+  ['splitter', 2, 6, 1],
+  ['mirror', 2, 2, 0],
+  ['pillar', 5, 5, 0],
+  ['pillar', 7, 5, 0],
+  ['pillar', 4, 7, 0],
 ];
 
 export function createTitleDemo() {

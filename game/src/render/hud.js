@@ -129,12 +129,12 @@ function drawSunDial(ctx, run) {
   text(ctx, 'N', cx, cy - R - 20, 13, INK, 'center');
   text(ctx, 'W', cx - R - 2, cy + 32, 13, INK, 'center');
   const phase = run.aperture.phase;
-  text(ctx, `NOW: ${phase.name} - ${phase.wallName}`, cx, 182, 15, INK, 'center');
+  text(ctx, `NOW: ${phase.name} - ${phase.wallName}`, cx, 178, 14, INK, 'center');
   if (next) {
     const nap = sunApertureFor(run.seed, run.waveIndex + 1);
-    text(ctx, `NEXT: ${nap.phase.name} - ${nap.phase.wallName}`, cx, 210, 19, GOLD, 'center', 800);
+    text(ctx, `NEXT: ${nap.phase.name} - ${nap.phase.wallName}`, cx, 206, 16, GOLD, 'center', 900);
   } else {
-    text(ctx, 'LAST LIGHT', cx, 210, 19, GOLD, 'center', 800);
+    text(ctx, 'LAST LIGHT', cx, 206, 16, GOLD, 'center', 900);
   }
 }
 
@@ -225,10 +225,10 @@ function drawRightPanel(ctx, run) {
   }
   roster.forEach((row, k) => {
     const y = 306 + k * 44;
-    drawEnemyIcon(ctx, row.type, x0 + 34, y, row.type === 'matriarch' ? 0.6 : 0.9);
-    text(ctx, ENEMIES[row.type].name.replace('Umbral ', ''), x0 + 62, y + 5, 15, INK, 'left', 700);
-    text(ctx, inWave ? `${left.get(row.type) ?? 0}` : `x${row.count}`, x0 + PANEL_W - 12, y + 6, 18, '#FFE14D', 'right', 800);
-    if (row.isNew && !inWave) text(ctx, 'NEW', x0 + 62, y + 22, 11, '#FF8AD0', 'left', 800);
+    drawEnemyIcon(ctx, row.type, x0 + 28, y, row.type === 'matriarch' ? 0.55 : 0.8);
+    text(ctx, ENEMIES[row.type].name.replace('Umbral ', ''), x0 + 52, y + 5, 14, INK, 'left', 700);
+    text(ctx, inWave ? `${left.get(row.type) ?? 0}` : `x${row.count}`, x0 + PANEL_W - 10, y + 6, 18, '#FFE14D', 'right', 900);
+    if (row.isNew && !inWave) text(ctx, 'NEW', x0 + 52, y + 22, 11, '#FF8AD0', 'left', 800);
   });
 
   panel(ctx, x0, 486, PANEL_W, 200);
@@ -263,7 +263,7 @@ export function drawBoonMedallion(ctx, boon, x, y, r) {
   ctx.stroke();
 }
 
-function drawTopBanner(ctx, run) {
+function drawTopBanner(ctx, run, ui) {
   const { day, phase } = run.aperture;
   text(ctx, `DAY ${day} - ${phase.name} - WAVE ${run.waveIndex + 1}/${WAVE_COUNT}`, 640, 40, 30, INK, 'center', 900);
   if (run.phase === 'wave') {
@@ -278,7 +278,7 @@ function drawTopBanner(ctx, run) {
     ctx.strokeRect(460, 56, 360, 12);
     text(ctx, `${left} beetles left`, 830, 67, 14, INK, 'left', 700);
   } else if (run.phase === 'build') {
-    text(ctx, 'BUILD: place glass to bend the light onto the beetle path', 640, 70, 16, '#FFF2A8', 'center', 700);
+    text(ctx, ui.hint || 'BUILD: place glass to bend the light onto the beetle path', 640, 70, 16, ui.hint ? (ui.hintBad ? '#FF8A8A' : INK) : '#FFF2A8', 'center', 700);
   }
 }
 
@@ -326,16 +326,16 @@ function drawHotbar(ctx, run, ui) {
       ctx.lineWidth = 4;
       ctx.strokeRect(x - 2, HOTBAR.y - 2, HOTBAR.w + 4, HOTBAR.h + 4);
     }
-    drawPieceIcon(ctx, type, x + 30, HOTBAR.y + 38);
-    text(ctx, String(i + 1), x + 10, HOTBAR.y + 20, 15, GOLD, 'left', 900);
-    text(ctx, PIECES[type].name, x + 56, HOTBAR.y + 30, 14, INK, 'left', 700);
-    text(ctx, `${cost}`, x + 74, HOTBAR.y + 60, 20, afford ? '#BDF4FF' : '#FF8A8A', 'center', 900);
+    drawPieceIcon(ctx, type, x + 36, HOTBAR.y + 36);
+    text(ctx, String(i + 1), x + 9, HOTBAR.y + 19, 15, GOLD, 'left', 900);
+    text(ctx, PIECES[type].name, x + HOTBAR.w / 2, HOTBAR.y + 70, 13, INK, 'center', 700);
+    text(ctx, `${cost}`, x + 82, HOTBAR.y + 40, 24, afford ? '#BDF4FF' : '#FF8A8A', 'center', 900);
     ctx.fillStyle = '#7FE8FF';
     ctx.beginPath();
-    ctx.moveTo(x + 94, HOTBAR.y + 44);
-    ctx.lineTo(x + 100, HOTBAR.y + 52);
-    ctx.lineTo(x + 94, HOTBAR.y + 62);
-    ctx.lineTo(x + 88, HOTBAR.y + 52);
+    ctx.moveTo(x + 100, HOTBAR.y + 22);
+    ctx.lineTo(x + 105, HOTBAR.y + 29);
+    ctx.lineTo(x + 100, HOTBAR.y + 37);
+    ctx.lineTo(x + 95, HOTBAR.y + 29);
     ctx.closePath();
     ctx.fill();
     ctx.globalAlpha = 1;
@@ -368,22 +368,15 @@ function drawHotbar(ctx, run, ui) {
     text(ctx, 'ENTER', bx + 95, HOTBAR.y + 30, 15, GOLD, 'center', 900);
     text(ctx, 'START WAVE', bx + 95, HOTBAR.y + 56, 20, INK, 'center', 900);
   } else if (run.phase === 'wave') {
-    text(ctx, 'Q/E or wheel: turn glass live', fx + 160, HOTBAR.y + 34, 14, INK, 'left', 600);
-    text(ctx, 'ESC pause', fx + 160, HOTBAR.y + 58, 14, 'rgba(255,246,223,0.75)', 'left', 600);
+    text(ctx, ui.hint ? ui.hint.slice(0, 44) : 'Q/E or wheel: turn glass live', fx + 156, HOTBAR.y + 34, 14, INK, 'left', 600);
+    text(ctx, 'ESC pause  -  M mute', fx + 156, HOTBAR.y + 58, 14, 'rgba(255,246,223,0.75)', 'left', 600);
   }
 }
 
-/** Tooltip line under the banner for what the mouse is over. */
-function drawHoverHint(ctx, ui) {
-  if (!ui.hint) return;
-  text(ctx, ui.hint, 640, 98, 15, ui.hintBad ? '#FF8A8A' : INK, 'center', 700);
-}
-
 export function drawHud(ctx, run, ui) {
-  drawTopBanner(ctx, run);
+  drawTopBanner(ctx, run, ui);
   drawLeftPanel(ctx, run);
   drawRightPanel(ctx, run);
   drawHotbar(ctx, run, ui);
-  drawHoverHint(ctx, ui);
   if (run.phase === 'wave' && run.flareLeft > 0) text(ctx, 'FLARE!', 640, VIEW_H - 98, 24, '#FFFFFF', 'center', 900);
 }
