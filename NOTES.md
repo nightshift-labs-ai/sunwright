@@ -50,6 +50,9 @@
   hovered-piece tooltip with ghost icon and keys (Q/E turn, X sell +n; X sells in build and wave),
   3-line log, key line, FLARE READY/USED/BURNING. Truth check covers banner, log, suns held.
 
+- Floating numbers restyled (benchmark 2 item 5) + red -n FOUNTAIN floater; red march chevrons along
+  each swarm route and a basin-of-water fountain sprite with its HP ring (item 3).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

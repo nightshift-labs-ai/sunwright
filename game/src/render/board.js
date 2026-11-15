@@ -1,7 +1,7 @@
 // The courtyard diorama: sandstone floor, lapis walls with gold trim and star tiles, the sun
 // windows for the day, beetle burrows, oblique glass pieces on plinths with shadows cast away
 // from the sun, and the jade Sun Fountain.
-import { BOARD } from '../config.js';
+import { BOARD, DX, DY } from '../config.js';
 import { sunApertureFor } from '../sun.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL, WALL_FRONT } from './layout.js';
 
@@ -397,58 +397,106 @@ export function drawPieces(ctx, grid, shadow, time) {
   }
 }
 
-/** The Sun Fountain: a jade crystal on a round plinth, with its health ring. */
+/** The Sun Fountain: a sandstone basin of turquoise water around a jade spout, ringed by its HP. */
 export function drawShrine(ctx, run, shadow, time, hurtAgo) {
   const s = run.grid.shrine;
   const x = BOARD_X + s.c * CELL + CELL / 2;
-  const y = BOARD_Y + s.r * CELL + CELL / 2;
+  const y = BOARD_Y + s.r * CELL + CELL / 2 + 6;
   ctx.fillStyle = PALETTE.shadow;
   ctx.beginPath();
-  ctx.ellipse(x + shadow.x * 22, y + 14 + shadow.y * 16, 26, 14, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + shadow.x * 22, y + 8 + shadow.y * 16, 30, 16, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = '#B47E48';
+  // Basin: darker front rim, lit top rim, water inside.
+  ctx.fillStyle = '#A8723F';
   ctx.beginPath();
-  ctx.ellipse(x, y + 14, 27, 13, 0, 0, Math.PI * 2);
+  ctx.ellipse(x, y + 6, 30, 17, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = '#EBC68C';
+  ctx.fillStyle = '#F0CF97';
   ctx.beginPath();
-  ctx.ellipse(x, y + 9, 27, 13, 0, 0, Math.PI * 2);
+  ctx.ellipse(x, y, 30, 17, 0, 0, Math.PI * 2);
+  ctx.fill();
+  const hurt = hurtAgo < 0.3 ? 1 - hurtAgo / 0.3 : 0;
+  const water = ctx.createRadialGradient(x - 6, y - 4, 2, x, y, 24);
+  water.addColorStop(0, hurt > 0 ? '#FF9A9A' : '#B6FFF6');
+  water.addColorStop(1, hurt > 0 ? '#C0303A' : '#22A99E');
+  ctx.fillStyle = water;
+  ctx.beginPath();
+  ctx.ellipse(x, y, 23, 12, 0, 0, Math.PI * 2);
   ctx.fill();
   const pulse = 0.5 + Math.sin(time * 2.4) * 0.5;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
-  const glow = ctx.createRadialGradient(x, y - 8, 2, x, y - 8, 46);
-  glow.addColorStop(0, `rgba(80,255,180,${0.45 + pulse * 0.2})`);
-  glow.addColorStop(1, 'rgba(80,255,180,0)');
+  const glow = ctx.createRadialGradient(x, y - 14, 2, x, y - 14, 44);
+  glow.addColorStop(0, `rgba(80,255,200,${0.35 + pulse * 0.2})`);
+  glow.addColorStop(1, 'rgba(80,255,200,0)');
   ctx.fillStyle = glow;
-  ctx.fillRect(x - 50, y - 58, 100, 100);
+  ctx.fillRect(x - 48, y - 62, 96, 96);
   ctx.restore();
-  const hurt = hurtAgo < 0.3 ? 1 - hurtAgo / 0.3 : 0;
-  ctx.fillStyle = hurt > 0 ? `rgb(${52 + 200 * hurt},${195 - 100 * hurt},${143 - 80 * hurt})` : PALETTE.jade;
+  // Jade spout and arcing droplets.
+  ctx.fillStyle = PALETTE.jade;
   ctx.beginPath();
-  ctx.moveTo(x, y - 34);
-  ctx.lineTo(x + 14, y - 8);
-  ctx.lineTo(x, y + 10);
-  ctx.lineTo(x - 14, y - 8);
+  ctx.moveTo(x, y - 30);
+  ctx.lineTo(x + 9, y - 12);
+  ctx.lineTo(x, y + 2);
+  ctx.lineTo(x - 9, y - 12);
   ctx.closePath();
   ctx.fill();
-  ctx.fillStyle = '#B8FFE0';
-  ctx.beginPath();
-  ctx.moveTo(x, y - 34);
-  ctx.lineTo(x + 5, y - 10);
-  ctx.lineTo(x, y + 6);
-  ctx.lineTo(x - 6, y - 10);
-  ctx.closePath();
-  ctx.fill();
-  // Health ring: one arc per Sun Fountain HP.
+  ctx.fillStyle = '#D8FFF0';
+  ctx.fillRect(x - 2, y - 26, 3, 18);
+  ctx.fillStyle = '#C8FFF8';
+  for (let k = 0; k < 6; k++) {
+    const t = (time * 0.9 + k / 6) % 1;
+    const side = k % 2 ? 1 : -1;
+    ctx.beginPath();
+    ctx.arc(x + side * t * 18, y - 30 + t * 34 - Math.sin(t * Math.PI) * 10, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // Health ring around the basin: one arc per fountain HP.
   const n = run.shrineMax;
   for (let k = 0; k < n; k++) {
-    const a0 = -Math.PI / 2 + (k / n) * Math.PI * 2 + 0.06;
-    const a1 = -Math.PI / 2 + ((k + 1) / n) * Math.PI * 2 - 0.06;
-    ctx.strokeStyle = k < run.shrineHp ? '#4DFFB0' : 'rgba(60,30,40,0.45)';
-    ctx.lineWidth = 4;
+    const a0 = -Math.PI / 2 + (k / n) * Math.PI * 2 + 0.07;
+    const a1 = -Math.PI / 2 + ((k + 1) / n) * Math.PI * 2 - 0.07;
+    ctx.strokeStyle = k < run.shrineHp ? '#4DFFB0' : `rgba(255,60,60,${0.5 + pulse * 0.4})`;
+    ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.arc(x, y - 4, 30, a0, a1);
+    ctx.ellipse(x, y - 6, 36, 30, 0, a0, a1);
     ctx.stroke();
   }
+}
+
+/**
+ * March lines: thin red chevrons along each swarm's walking route from its burrow to the
+ * fountain, sliding slowly towards the fountain.
+ */
+export function drawMarchLines(ctx, run, time) {
+  const { grid, flow } = run;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(200,28,28,0.72)';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  const shift = (time * 0.6) % 1;
+  for (const g of grid.gates) {
+    let c = g.c;
+    let r = g.r;
+    for (let step = 0; step < grid.cols * grid.rows; step++) {
+      const d = flow.next[r * grid.cols + c];
+      if (d < 0) break;
+      const nc = c + DX[d];
+      const nr = r + DY[d];
+      if (nc === grid.shrine.c && nr === grid.shrine.r) break;
+      const t = shift;
+      const x = BOARD_X + (c + 0.5 + DX[d] * t) * CELL;
+      const y = BOARD_Y + (r + 0.5 + DY[d] * t) * CELL;
+      const ax = DX[d] * 9;
+      const ay = DY[d] * 9;
+      ctx.beginPath();
+      ctx.moveTo(x - ax - ay, y - ay + ax);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x - ax + ay, y - ay - ax);
+      ctx.stroke();
+      c = nc;
+      r = nr;
+    }
+  }
+  ctx.restore();
 }

@@ -4,7 +4,7 @@
 import { shadowVectorFor } from '../sun.js';
 import { drawBeamGhost, drawBeams, drawFx, drawScreenFx, shakeOffset } from './fx.js';
 import { routeCells } from '../pathing.js';
-import { drawCourtyard, drawPiece, drawPieces, drawShrine } from './board.js';
+import { drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawShrine } from './board.js';
 import { drawEnemies } from './beetles.js';
 import { drawHud } from './hud.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL, WALL_FRONT } from './layout.js';
@@ -49,6 +49,7 @@ export function drawFrame(ctx, frame) {
   const s = frame.shake ? shakeOffset(fx, time) : { x: 0, y: 0 };
   ctx.translate(s.x, s.y);
   drawCourtyard(ctx, run, time);
+  if (frame.showHud && (phase === 'build' || phase === 'wave')) drawMarchLines(ctx, run, time);
   const shadow = shadowVectorFor(run.aperture.wall);
   drawPieces(ctx, run.grid, shadow, time);
   drawShrine(ctx, run, shadow, time, frame.shrineHurtAgo ?? 9);
