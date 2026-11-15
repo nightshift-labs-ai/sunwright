@@ -227,6 +227,13 @@
 
 - HUD: a difficulty with no finished run shows NO BEST YET under SCORE instead of BEST 0 (Bench4-3).
 
+- Benchmark 6 item 1: title rules table (announce.titleRules, numbers from config) replaces the hook
+  and the rules band: GOAL / BUILD / SUN / SEAR (as the sim scores it: kills within 1s, up to x5) /
+  TITAN / WIN / LOSE, each with a 36 px icon (render/ruleicons.js, the game's own glyphs), a gold tag
+  and a 28 px line. Below it a compact card (PLAY, ENTER hint, the three difficulty pills in a row);
+  the demo courtyard is whole on the right (scale 0.649) with HOW TO PLAY / OPTIONS under it.
+  check-shot-truth compares the rows and sizes.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.

@@ -98,16 +98,15 @@ for (const shot of manifest.shots) {
 // Props: no palm or urn box touches text on any shot.
 for (const shot of manifest.shots) if (shot.propOverlaps) check(shot.propOverlaps.length === 0, `${shot.name} prop touches text: ${shot.propOverlaps.join(' | ')}`);
 
-// Title: the rule lines are announce.titleRules() (suns from config), each at least 34 px and unclipped.
+// Title: the rules table rows are announce.titleRules() (numbers from config), lines >= 28 px and unclipped.
 for (const shot of manifest.shots) {
   if (!shot.titleText) continue;
-  const rules = titleRules();
-  const want = { 'rule-verb': rules.verb, 'rule-winlose': rules.winLose, 'start-hint': 'CLICK PLAY OR PRESS ENTER' };
-  for (const t of shot.titleText) {
-    check(t.text === want[t.id], `${shot.name} ${t.id}: shown "${t.text}" vs "${want[t.id]}"`);
-    check(t.px >= 34 && t.inside, `${shot.name} ${t.id}: ${t.px}px, inside ${t.inside}`);
-  }
-  console.log(`${shot.name}: ${shot.titleText.map((t) => `${t.text} (${t.px}px)`).join(' | ')}`);
+  const t = shot.titleText;
+  const want = titleRules().map((r) => ({ tag: r.tag, line: r.line }));
+  check(JSON.stringify(t.rows.map((r) => ({ tag: r.tag, line: r.line }))) === JSON.stringify(want), `${shot.name} rules table: shown ${JSON.stringify(t.rows)} vs ${JSON.stringify(want)}`);
+  for (const r of t.rows) check(r.px >= 28 && r.inside, `${shot.name} rule ${r.tag}: ${r.px}px, inside ${r.inside}`);
+  check(t.hint === 'CLICK PLAY OR PRESS ENTER' && t.hintPx >= 34, `${shot.name} start hint: ${t.hint} (${t.hintPx}px)`);
+  console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.tag} ${r.line}`).join(' | ')}; ${t.hint}`);
 }
 
 // Draft: each roundel's effect line is its charm's line from config, the pick hint counts the offer,

@@ -1,6 +1,6 @@
 // The courtyard's voice: turns notable sim events into the three-line event log and the big
 // banner over the board. Pure sim state (no DOM), so screenshots can be checked against it.
-import { NAMES, WAVE_COUNT } from './config.js';
+import { NAMES, SCORING, WAVE_COUNT } from './config.js';
 import { sunApertureFor } from './sun.js';
 
 const LOG_LINES = 3;
@@ -49,12 +49,21 @@ export function announceEvents(run, events) {
   }
 }
 
-/** The title's two rule lines: the core verb, then the win and lose conditions (suns counted from config). */
+/**
+ * The title's rules table, one row per rule (icon, gold tag, line), numbers from config: what the
+ * beetles want, the verb, the moving sun, the SEAR combo as the sim scores it, the boss, win, lose.
+ */
 export function titleRules() {
-  return {
-    verb: 'Place glass to bend sunlight onto beetles',
-    winLose: `WIN: survive ${WAVE_COUNT} ${NAMES.suns.toLowerCase()} - LOSE: the ${NAMES.fountainShort.toLowerCase()} runs dry`,
-  };
+  const fountain = NAMES.fountainShort;
+  return [
+    { icon: 'goal', tag: 'GOAL', line: `Beetles drink the ${fountain}` },
+    { icon: 'build', tag: 'BUILD', line: 'Glass bends sunlight onto them' },
+    { icon: 'sun', tag: NAMES.sun, line: `New gate each ${NAMES.sun.toLowerCase()} - re-aim` },
+    { icon: 'sear', tag: NAMES.combo, line: `Kills within ${SCORING.chainWindow}s: points up to x${SCORING.chainMaxMult}` },
+    { icon: 'titan', tag: 'TITAN', line: `${NAMES.sun[0]}${NAMES.sun.slice(1).toLowerCase()} ${WAVE_COUNT} boss: the Hornback Titan` },
+    { icon: 'win', tag: 'WIN', line: `survive ${WAVE_COUNT} ${NAMES.suns.toLowerCase()}` },
+    { icon: 'lose', tag: 'LOSE', line: `the ${fountain.toLowerCase()} runs dry` },
+  ];
 }
 
 /** The run's win and lose conditions with the real count of suns still to hold (current included). */

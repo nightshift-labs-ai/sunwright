@@ -9,6 +9,7 @@ import { rankFor } from '../combat.js';
 import { draftContext, draftHint, historyChip, titleRules } from '../announce.js';
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
+import { drawRuleIcon } from '../render/ruleicons.js';
 import { MIN_SQUEEZE, fitScale } from '../render/fit.js';
 
 
@@ -50,7 +51,7 @@ export function renderOptions(settings) {
   el('opt-patterns').checked = !!settings.patterns;
 }
 
-/** Difficulty buttons with each difficulty's best score, the scope line and the rule lines. */
+/** Difficulty buttons with each difficulty's best score, the scope line and the rules table. */
 export function showTitle(menus, bestFor, selected) {
   el('difficulty-picker').innerHTML = DIFFICULTY_ORDER.map((id) => {
     const best = bestFor(id);
@@ -58,9 +59,11 @@ export function showTitle(menus, bestFor, selected) {
       <b>${DIFFICULTIES[id].name}</b><small>${best.played ? `best ${best.score.toLocaleString('en-US')}` : 'not played yet'}</small></button>`;
   }).join('');
   el('rule-scope').textContent = SCOPE_LINE;
-  const rules = titleRules();
-  el('rule-verb').textContent = rules.verb;
-  el('rule-winlose').textContent = rules.winLose;
+  // The rules table: icon, gold tag, one line per rule (announce.titleRules, numbers from config).
+  el('title-rules').innerHTML = titleRules()
+    .map((r) => `<div class="rule rule-${r.icon}"><canvas width="36" height="36" data-icon="${r.icon}"></canvas><b>${escapeHtml(r.tag)}</b><span>${escapeHtml(r.line)}</span></div>`)
+    .join('');
+  for (const c of el('title-rules').querySelectorAll('canvas')) drawRuleIcon(c.getContext('2d'), c.dataset.icon, 36);
 }
 
 /** The draft: a huge "SUN MOVES WEST - PICK 1", three roundels each with its one-line effect, NEW chip, reroll and how to pick. */

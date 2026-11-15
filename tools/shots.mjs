@@ -56,13 +56,16 @@ for (const h of history) {
 await page.evaluate(() => window.__test.ui('menu'));
 await page.waitForTimeout(150);
 await capture('2-title.jpg', await page.evaluate(() => window.__test.advance(240)));
-manifest.shots.at(-1).titleText = await page.evaluate(() =>
-  ['rule-verb', 'rule-winlose', 'start-hint'].map((id) => {
-    const n = document.getElementById(id);
-    const r = n.getBoundingClientRect();
-    return { id, text: n.textContent.trim(), px: parseFloat(getComputedStyle(n).fontSize), inside: r.left >= 0 && r.right <= 1280 && r.width <= n.parentElement.getBoundingClientRect().width + 0.5 };
-  }),
-);
+manifest.shots.at(-1).titleText = await page.evaluate(() => {
+  const table = document.getElementById('title-rules').getBoundingClientRect();
+  const rows = [...document.querySelectorAll('#title-rules .rule')].map((row) => {
+    const line = row.querySelector('span');
+    const r = line.getBoundingClientRect();
+    return { tag: row.querySelector('b').textContent.trim(), line: line.textContent.trim(), px: parseFloat(getComputedStyle(line).fontSize), inside: r.right <= table.right - 4 && r.bottom <= table.bottom };
+  });
+  const hint = document.getElementById('start-hint');
+  return { rows, hint: hint.textContent.trim(), hintPx: parseFloat(getComputedStyle(hint).fontSize) };
+});
 await page.evaluate(([seed, diff]) => window.__test.start(seed, diff), [SEED, DIFF]);
 await page.evaluate(() => window.__test.pointAt(-1, -1));
 await capture('1-play.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, cover.tick]));

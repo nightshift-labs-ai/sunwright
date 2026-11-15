@@ -452,7 +452,7 @@ function drawEventBanner(ctx, run, ui) {
 }
 
 /** The hotbar's piece icons, in the same identity colours as the board's glass. */
-function drawPieceIcon(ctx, type, x, y) {
+export function drawPieceIcon(ctx, type, x, y) {
   ctx.save();
   ctx.translate(x, y);
   ctx.strokeStyle = '#2A1608';
