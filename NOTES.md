@@ -239,6 +239,11 @@
   so cover 7/10 -> draft 8/10 adds up. check-shot-truth: in tick order score, burned and suns only
   grow, charms extend the earlier picks, fountain <= earlier + shown heal.
 
+- Benchmark 6 item 3: the title demo runs 5740 ticks before the title shows (seeded, ~0.1 s), so 4 s
+  later (the staged title) 6 beetles march, 2 sear (a Shellback shows ARMOUR 12) and a +20 floats; the
+  demo drops its fountain bites (no -1 FOUNTAIN or red flash on the title). Ticks found with a
+  headless scan of the demo + fx.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.

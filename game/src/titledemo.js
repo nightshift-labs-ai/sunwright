@@ -9,6 +9,8 @@ import { sunApertureFor } from './sun.js';
 
 const DEMO_SEED = 1717;
 const SUN_HOP_SECONDS = 4.5;
+/** Ticks run before the title shows: 4 s later the courtyard has 4 beetles marching, 2 searing and a number up. */
+const PREWARM_TICKS = 5740;
 /** [type, c, r, rot]: every sun of this seed's first day bounces down a beetle path. */
 const DEMO_LAYOUT = [
   ['mirror', 10, 4, 0],
@@ -28,13 +30,18 @@ export function createTitleDemo() {
   stepSim(run, [{ type: 'startWave' }]);
   // All three suns of the day at once, for the title's light show.
   const traces = [0, 1, 2].map((w) => traceBeams(run.grid, sunApertureFor(DEMO_SEED, w), beamModsFor([])));
-  return { run, clock: 0, traces };
+  const demo = { run, clock: 0, traces };
+  for (let k = 0; k < PREWARM_TICKS; k++) stepTitleDemo(demo);
+  run.events.length = 0;
+  return demo;
 }
 
 export function stepTitleDemo(demo) {
   const run = demo.run;
   stepSim(run, null);
+  // The demo fountain never empties: drop its bites (no -1 FOUNTAIN, no red flash on the title).
   run.shrineHp = run.shrineMax;
+  run.events = run.events.filter((ev) => ev.type !== 'bite');
   demo.clock += DT;
   if (run.phase !== 'wave') {
     run.phase = 'build';
