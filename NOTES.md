@@ -221,6 +221,8 @@
   the cover's fx in Node and compares every floater, its spawn distance and its anchor. Cover now has
   +30 and +90 SEAR x3.
 
+- HUD: a difficulty with no finished run shows NO BEST YET under SCORE instead of BEST 0 (Bench4-3).
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

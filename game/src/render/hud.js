@@ -377,7 +377,8 @@ function drawRightPanel(ctx, run, ui) {
   panel(ctx, x0, 8, PANEL_W, 128);
   text(ctx, 'SCORE', x0 + 12, 30, 15, INK, 'left', 900);
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 32, '#FFF2A8', 'right', 900);
-  text(ctx, `BEST ${ui.best.toLocaleString('en-US')}`, x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
+  // No "BEST 0": a difficulty never finished says so (its first run sets the best).
+  text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
   drawComboLine(ctx, run, x0, 120);
   panel(ctx, x0, 142, PANEL_W, 62);
   text(ctx, NAMES.currency, x0 + 12, 170, 15, INK, 'left', 900);
