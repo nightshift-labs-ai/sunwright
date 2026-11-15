@@ -209,6 +209,38 @@ export function drawBeamGhost(ctx, trace, pathCellsLit, time) {
   ctx.restore();
 }
 
+/** The next sun's light through today's glass: a faint white dashed line labelled at its window. */
+export function drawNextSunGhost(ctx, trace, label, time) {
+  if (!trace.legs.length) return;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.setLineDash([12, 12]);
+  ctx.lineDashOffset = -time * 30;
+  for (const [width, stroke] of [[7, 'rgba(60,30,10,0.35)'], [4, 'rgba(255,255,255,0.8)']]) {
+    ctx.lineWidth = width;
+    ctx.strokeStyle = stroke;
+    for (const leg of trace.legs) {
+      ctx.beginPath();
+      ctx.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));
+      ctx.lineTo(toScreenX(leg.x1), toScreenY(leg.y1));
+      ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+  const start = trace.legs[0];
+  const x = toScreenX(start.x0) + (start.x1 > start.x0 ? 12 : start.x1 < start.x0 ? -12 : 0);
+  const y = toScreenY(start.y0) + (start.y1 > start.y0 ? 40 : -16);
+  ctx.font = '900 20px system-ui, sans-serif';
+  ctx.textAlign = start.x1 < start.x0 ? 'right' : start.x1 > start.x0 ? 'left' : 'center';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = '#3A1A08';
+  ctx.strokeText(label, x, y);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(label, x, y);
+  ctx.restore();
+}
+
 /** Particles and floating text, drawn above the board. */
 export function drawFx(ctx, fx) {
   for (const p of fx.particles) {

@@ -1,8 +1,10 @@
 // One frame of the game: courtyard, glass, shrine, beetles, light, effects, then the HUD.
 // The draft dims the board so the new opening's beam (through the current layout) stands out;
 // a win floods the courtyard with sunrise, a defeat drains the light.
-import { shadowVectorFor } from '../sun.js';
-import { drawBeamGhost, drawBeams, drawFx, drawScreenFx, shakeOffset } from './fx.js';
+import { shadowVectorFor, sunApertureFor } from '../sun.js';
+import { drawBeamGhost, drawBeams, drawFx, drawNextSunGhost, drawScreenFx, shakeOffset } from './fx.js';
+import { beamModsFor, traceBeams } from '../beams.js';
+import { NAMES, WAVE_COUNT } from '../config.js';
 import { routeCells } from '../pathing.js';
 import { drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawShrine } from './board.js';
 import { drawEnemies } from './beetles.js';
@@ -23,6 +25,19 @@ function drawCellCursor(ctx, cell, ok) {
     ctx.lineTo(x + 16, y + CELL - 16);
     ctx.stroke();
   }
+}
+
+const nextCache = { run: null, version: -1, value: null };
+
+/** The next sun's beam through the current glass, re-traced only when the layout changes. */
+function nextSunTrace(run) {
+  if (nextCache.run !== run || nextCache.version !== run.layoutVersion) {
+    const ap = sunApertureFor(run.seed, run.waveIndex + 1);
+    nextCache.value = { trace: traceBeams(run.grid, ap, beamModsFor(run.boons)), wall: ap.phase.wallName[0] };
+    nextCache.run = run;
+    nextCache.version = run.layoutVersion;
+  }
+  return nextCache.value;
 }
 
 function drawSunrise(ctx, time, since) {
@@ -68,6 +83,10 @@ export function drawFrame(ctx, frame) {
     const onPath = new Set(routeCells(run.grid, run.flow).filter((i) => run.trace.lit[i] > 0)).size;
     drawBeamGhost(ctx, run.trace, onPath, time);
   } else if (phase !== 'lost') {
+    if (frame.showHud && (phase === 'wave' || phase === 'build') && run.waveIndex + 1 < WAVE_COUNT) {
+      const next = nextSunTrace(run);
+      drawNextSunGhost(ctx, next.trace, `NEXT ${NAMES.sun} (${next.wall})`, time);
+    }
     const alpha = phase === 'wave' || phase === 'won' ? 1 : phase === 'build' ? 0.8 : 0.95;
     drawBeams(ctx, ui.ghostTrace ?? run.trace, { alpha, flare: run.flareLeft > 0 ? 1 : 0, time });
   }
