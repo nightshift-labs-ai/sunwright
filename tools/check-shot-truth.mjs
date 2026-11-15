@@ -39,6 +39,7 @@ function hudFacts(run) {
     headline: winLoseHeadline(run),
     log: run.log.join(' | '),
     sunsHeld: run.stats.wavesCleared,
+    offersSeen: run.stats.offersSeen,
   };
 }
 

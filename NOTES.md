@@ -102,6 +102,9 @@
   / X SELL / R RESTART / ESC PAUSE, lose rule, HOW TO PLAY / OPTIONS), the three-sun courtyard on the
   right at 0.7 with every board label uncovered. Loop pictograms removed (render/pictos.js deleted).
 
+- Benchmark 4 items 3, 4: unplayed difficulties read "not played yet"; results YOUR BUILD panel
+  (charm glyph + name, xN repeats, "P picked from O offers" with the sim's offersSeen, truth-checked).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

@@ -114,6 +114,40 @@ function caption(ctx, str, x, y, size, color) {
   ctx.fillText(str, x, y);
 }
 
+/** Draw text no wider than maxW, squeezing it horizontally when it would not fit. */
+export function fitText(ctx, str, x, y, maxW) {
+  const width = ctx.measureText(str).width;
+  const squeeze = Math.min(1, maxW / width);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(squeeze, 1);
+  ctx.fillText(str, 0, 0);
+  ctx.restore();
+}
+
+/** YOUR BUILD: each glass charm taken (glyph, name, xN for repeats) and how many were offered. */
+function drawYourBuild(ctx, run) {
+  ctx.textAlign = 'left';
+  ctx.font = '900 30px system-ui, sans-serif';
+  ctx.fillStyle = '#FFE27A';
+  ctx.fillText('YOUR BUILD', 40, 570);
+  const counts = new Map();
+  for (const id of run.boons) counts.set(id, (counts.get(id) ?? 0) + 1);
+  [...counts].slice(0, 8).forEach(([id, n], k) => {
+    const x = 40 + (k % 2) * 164;
+    const y = 604 + Math.floor(k / 2) * 38;
+    const boon = boonById(id);
+    drawCharmBadge(ctx, boon, x + 15, y, 15);
+    ctx.font = '800 20px system-ui, sans-serif';
+    ctx.fillStyle = '#FFF6DF';
+    ctx.textAlign = 'left';
+    fitText(ctx, n > 1 ? `${boon.name} x${n}` : boon.name, x + 36, y + 7, 120);
+  });
+  ctx.font = '800 22px system-ui, sans-serif';
+  ctx.fillStyle = '#FFE27A';
+  fitText(ctx, `${run.boons.length} picked from ${run.stats.offersSeen} offers`, 40, 762, 300);
+}
+
 function clock(seconds) {
   const s = Math.max(0, Math.round(seconds));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -148,6 +182,5 @@ export function drawResultsHero(ctx, run, time) {
   ctx.strokeStyle = '#F2C14E';
   ctx.lineWidth = 3;
   ctx.stroke();
-  run.boons.slice(0, 8).forEach((id, k) => drawCharmBadge(ctx, boonById(id), 66 + (k % 4) * 84, 600 + Math.floor(k / 4) * 84, 30));
-  if (run.boons.length === 0) caption(ctx, `${run.stats.wavesCleared}/${WAVE_COUNT}`, 192, 660, 34, '#FFF6DF');
+  drawYourBuild(ctx, run);
 }

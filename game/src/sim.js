@@ -45,7 +45,7 @@ export function createRun(seed, difficultyId = 'normal') {
     flareLeft: 0,
     chain: { count: 0, timer: 0, best: 0 },
     feedback: { searAt: -9, biteAt: -9, biteHarm: 0, quartzAt: -9 },
-    stats: { kills: 0, leaked: 0, wavesCleared: 0 },
+    stats: { kills: 0, leaked: 0, wavesCleared: 0, offersSeen: 0 },
     events: [],
     endedAt: 0,
     layoutVersion: 0,
@@ -181,6 +181,7 @@ function finishWave(run) {
   run.waveIndex++;
   run.phase = 'draft';
   run.offer = offerBoons(run);
+  run.stats.offersSeen += run.offer.length;
   refreshLight(run);
   for (const type of Object.keys(PIECES)) if (PIECES[type].unlockWave === run.waveIndex) emit(run, { type: 'unlock', piece: type });
 }

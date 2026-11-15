@@ -30,6 +30,7 @@ export function rerollOffer(run) {
   run.quartz -= cost;
   run.rerolls++;
   run.offer = offerBoons(run);
+  run.stats.offersSeen += run.offer.length;
   return true;
 }
 

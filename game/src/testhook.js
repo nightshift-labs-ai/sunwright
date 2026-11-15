@@ -68,6 +68,7 @@ export function installTestHook(app, api) {
         headline: winLoseHeadline(run),
         log: run.log.join(' | '),
         sunsHeld: run.stats.wavesCleared,
+        offersSeen: run.stats.offersSeen,
         best: app.ui.best,
         history: loadHistory().slice(-3),
         tick: run.tick,
