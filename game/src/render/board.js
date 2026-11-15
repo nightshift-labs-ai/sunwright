@@ -152,6 +152,15 @@ function buildWallTexture() {
   return cv;
 }
 
+/** Plain warm sand behind everything (the title shows the courtyard smaller, off to the right). */
+export function drawSandSurround(ctx) {
+  const bg = ctx.createLinearGradient(0, 0, 0, VIEW_H);
+  bg.addColorStop(0, '#D39A62');
+  bg.addColorStop(1, '#B67A46');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+}
+
 /** Where a sun window sits in its wall (screen pixels). */
 function windowRect(ap) {
   if (ap.wall === 'east') return { x: BOARD_X + BOARD_W, y: BOARD_Y + ap.r * CELL + 8, w: WALL, h: CELL - 16 };

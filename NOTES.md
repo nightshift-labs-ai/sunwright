@@ -97,6 +97,11 @@
   meta line (difficulty, seed, run clock, +N over the previous best from recordRun), compact RUN
   HISTORY (red RESULT_LOSE_TITLE caption + chips), NEXT GOAL under RUN AGAIN; TITAN BURNED IN on canvas.
 
+- Benchmark 4 items 10 + 2: title = wordmark plaque with SCOPE_LINE as subtitle, hook band, 80% lapis
+  menu card on the left (PLAY, stacked difficulty pills, keycap rows 1-5 GLASS / Q/E TURN / SPACE FLARE
+  / X SELL / R RESTART / ESC PAUSE, lose rule, HOW TO PLAY / OPTIONS), the three-sun courtyard on the
+  right at 0.7 with every board label uncovered. Loop pictograms removed (render/pictos.js deleted).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

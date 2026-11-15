@@ -3,7 +3,7 @@
 // a win floods the courtyard with sunrise, a defeat drains the light.
 import { drawBeamGhost, drawBeams, drawFx, drawNextSunGhost, drawScreenFx, shakeOffset } from './fx.js';
 import { drawHud } from './hud.js';
-import { drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawShrine } from './board.js';
+import { drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawSandSurround, drawShrine } from './board.js';
 import { drawEnemies } from './beetles.js';
 import { drawResultsHero } from './results.js';
 import { shadowVectorFor, sunApertureFor } from '../sun.js';
@@ -27,6 +27,9 @@ function drawCellCursor(ctx, cell, ok) {
     ctx.stroke();
   }
 }
+
+/** Where the title's demo courtyard sits: centred right of the menu card, below the hook. */
+const TITLE_DEMO = { x: 935, y: 562, scale: 0.7 };
 
 const nextCache = { run: null, version: -1, value: null };
 
@@ -53,10 +56,11 @@ export function drawFrame(ctx, frame) {
   const s = frame.shake ? shakeOffset(fx, time) : { x: 0, y: 0 };
   ctx.translate(s.x, s.y);
   if (frame.titleTraces) {
-    // Title: the courtyard fills the frame and bleeds past it, every sun window ablaze.
-    ctx.translate(VIEW_W / 2, VIEW_H / 2 + 20);
-    ctx.scale(1.2, 1.2);
-    ctx.translate(-VIEW_W / 2, -VIEW_H / 2);
+    // Title: the courtyard sits to the right of the menu card, every sun window ablaze.
+    drawSandSurround(ctx);
+    ctx.translate(TITLE_DEMO.x, TITLE_DEMO.y);
+    ctx.scale(TITLE_DEMO.scale, TITLE_DEMO.scale);
+    ctx.translate(-VIEW_W / 2, -390);
   }
   drawCourtyard(ctx, run, time, !!frame.titleTraces);
   if (frame.showHud && (phase === 'build' || phase === 'wave')) drawMarchLines(ctx, run, time);
