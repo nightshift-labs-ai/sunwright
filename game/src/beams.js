@@ -1,7 +1,7 @@
 // Light routing: trace the sunbeam cell by cell from the opening through mirrors, splitters,
 // lenses, prisms and pillars. Produces the power and tint on every cell (what burns beetles),
 // the beam legs to draw, and the bounce points that get a starburst. Glassback shells stop
-// any light but gold. Loops are cut by remembering (cell, direction).
+// any light but gold. Loops are cut by tracking visited (cell, direction) pairs.
 import { BEAM, DX, DY } from './config.js';
 import { cellIndex, inBounds, isShrineCell, pieceAt } from './grid.js';
 

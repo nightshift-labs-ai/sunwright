@@ -1,5 +1,5 @@
 // The live courtyard behind the title screen: a real sim run with a fixed glass layout, a
-// trickle of beetles, and the sun hopping dawn -> noon -> dusk every few seconds.
+// trickle of beetles, and the sun hopping morning -> noon -> evening every few seconds.
 import { DT } from './config.js';
 import { setPiece } from './grid.js';
 import { buildFlowField } from './pathing.js';

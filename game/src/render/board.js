@@ -1,6 +1,6 @@
 // The courtyard diorama: sandstone floor, lapis walls with gold trim and star tiles, the sun
 // windows for the day, beetle burrows, oblique glass pieces on plinths with shadows cast away
-// from the sun, and the jade Sunseed shrine.
+// from the sun, and the jade Sun Fountain.
 import { BOARD } from '../config.js';
 import { sunApertureFor } from '../sun.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL } from './layout.js';
@@ -337,7 +337,7 @@ export function drawPieces(ctx, grid, shadow, time) {
   }
 }
 
-/** The Sunseed: a jade crystal on a round plinth, with its health ring. */
+/** The Sun Fountain: a jade crystal on a round plinth, with its health ring. */
 export function drawShrine(ctx, run, shadow, time, hurtAgo) {
   const s = run.grid.shrine;
   const x = BOARD_X + s.c * CELL + CELL / 2;
@@ -380,7 +380,7 @@ export function drawShrine(ctx, run, shadow, time, hurtAgo) {
   ctx.lineTo(x - 6, y - 10);
   ctx.closePath();
   ctx.fill();
-  // Health ring: one arc per Sunseed HP.
+  // Health ring: one arc per Sun Fountain HP.
   const n = run.shrineMax;
   for (let k = 0; k < n; k++) {
     const a0 = -Math.PI / 2 + (k / n) * Math.PI * 2 + 0.06;

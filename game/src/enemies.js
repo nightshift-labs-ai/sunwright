@@ -1,7 +1,7 @@
-// Beetle behaviour: Scuttlers and Shellbacks walk the flow field around pieces, Lampmoths fly
+// Beetle behaviour: Scuttlers and Shellbacks walk the flow field around pieces, Veerwings fly
 // over everything towards the shrine but veer into the brightest light nearby, and the Umbral
-// Matriarch walks slowly with a carapace that only opens part of the time.
-import { BOARD, DX, DY, ENEMIES, MATRIARCH_CARAPACE, MOTH_DAZZLE, MOTH_LURE, TINT_EFFECTS } from './config.js';
+// Titan walks slowly with a carapace that only opens part of the time.
+import { BOARD, DX, DY, ENEMIES, TITAN_CARAPACE, VEER_DAZZLE, VEER_LURE, TINT_EFFECTS } from './config.js';
 import { flowDirectionAt } from './pathing.js';
 
 export function spawnEnemy(run, type, gateIndex) {
@@ -30,14 +30,14 @@ export function spawnEnemy(run, type, gateIndex) {
   return enemy;
 }
 
-/** Current armour: the Matriarch's drops to 0 while her carapace is open. */
+/** Current armour: the Titan's drops to 0 while her carapace is open. */
 export function armourOf(enemy) {
   if (!enemy.def.boss) return enemy.def.armour;
   return carapaceOpen(enemy) ? 0 : enemy.def.armour;
 }
 
 export function carapaceOpen(enemy) {
-  return enemy.age % MATRIARCH_CARAPACE.cycle > MATRIARCH_CARAPACE.cycle - MATRIARCH_CARAPACE.open;
+  return enemy.age % TITAN_CARAPACE.cycle > TITAN_CARAPACE.cycle - TITAN_CARAPACE.open;
 }
 
 function slowFactor(e) {
@@ -71,7 +71,7 @@ function stepWalker(run, e, dt) {
 }
 
 /**
- * Lampmoths: fly at the shrine, pulled hard towards the brightest lit cell within 2.5 cells,
+ * Veerwings: fly at the shrine, pulled hard towards the brightest lit cell within 2.5 cells,
  * and dazzled (slowed) while they flutter in the light.
  */
 function stepFlyer(run, e, dt) {
@@ -87,12 +87,12 @@ function stepFlyer(run, e, dt) {
     const lx = lure.x - e.x;
     const ly = lure.y - e.y;
     const ll = Math.hypot(lx, ly) || 1;
-    vx += (lx / ll) * MOTH_LURE;
-    vy += (ly / ll) * MOTH_LURE;
+    vx += (lx / ll) * VEER_LURE;
+    vy += (ly / ll) * VEER_LURE;
   }
   vx += Math.cos(e.age * 3 + e.wobble) * 0.35;
   const vl = Math.hypot(vx, vy) || 1;
-  const speed = e.def.speed * slowFactor(e) * (e.litPower > 0 ? MOTH_DAZZLE : 1);
+  const speed = e.def.speed * slowFactor(e) * (e.litPower > 0 ? VEER_DAZZLE : 1);
   e.x += (vx / vl) * speed * dt;
   e.y += (vy / vl) * speed * dt;
   e.heading = Math.abs(vx) > Math.abs(vy) ? (vx > 0 ? 0 : 2) : vy > 0 ? 1 : 3;

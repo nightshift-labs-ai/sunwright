@@ -1,13 +1,11 @@
 // DOM overlays above the canvas: title (with difficulty picker and best scores), how to play,
 // pause, the draft's stained-glass roundels, and the results screen. Buttons only queue
 // { kind: 'ui', action, arg } intents; main.js decides what they do.
-import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, PIECES, PIECE_ORDER, WAVE_COUNT } from '../config.js';
+import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, NAMES, PIECES, PIECE_ORDER, RESULT_LOSE_TITLE, RESULT_WIN_TITLE, WAVE_COUNT } from '../config.js';
 import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 
-const RESULT_TITLES = { won: 'DAWN OF DAY FOUR - THE SUNSEED ENDURES', lost: 'THE SUNSEED DIMS' };
-const PHASE_ARRIVAL = { dawn: 'DAWN BREAKS', noon: 'NOON BLAZES', dusk: 'DUSK APPROACHES' };
 
 const SCREENS = ['title', 'howto', 'pause', 'draft', 'results'];
 
@@ -50,15 +48,15 @@ export function renderTitle(bestFor, selected) {
 
 /** The draft: banner for the coming sun, three roundels, reroll, next-wave preview, owned boons. */
 export function renderDraft(menus, run) {
-  const key = `${run.waveIndex}|${run.offer.join(',')}|${run.shards}`;
+  const key = `${run.waveIndex}|${run.offer.join(',')}|${run.quartz}`;
   if (key === menus.draftKey) return;
   menus.draftKey = key;
   const ap = sunApertureFor(run.seed, run.waveIndex);
-  el('draft-banner').textContent = `${PHASE_ARRIVAL[ap.phase.id]} - THE SUN ENTERS FROM THE ${ap.phase.wallName}`;
+  el('draft-banner').textContent = `${NAMES.sun} MOVES ${ap.phase.wallName} - PICK 1`;
   const unlocked = PIECE_ORDER.find((type) => PIECES[type].unlockWave === run.waveIndex);
   el('draft-sub').textContent = unlocked
     ? `NEW GLASS: ${PIECES[unlocked].name.toUpperCase()} (key ${PIECE_ORDER.indexOf(unlocked) + 1}) - ${PIECES[unlocked].blurb}`
-    : `Wave ${run.waveIndex} cleared. Choose a boon for Day ${ap.day}, wave ${run.waveIndex + 1}/${WAVE_COUNT}.`;
+    : `${NAMES.sun} ${run.waveIndex} held. Pick a glass charm for Day ${ap.day} ${ap.phase.name}, ${NAMES.sun.toLowerCase()} ${run.waveIndex + 1}/${WAVE_COUNT}.`;
   el('draft-roundels').innerHTML = run.offer
     .map((id, i) => {
       const b = boonById(id);
@@ -69,14 +67,14 @@ export function renderDraft(menus, run) {
     .join('');
   const cost = rerollCost(run);
   const reroll = el('draft-reroll');
-  reroll.textContent = `R - Reroll (${cost} shards)`;
-  reroll.disabled = run.shards < cost;
+  reroll.textContent = `X - reroll (${cost} quartz)`;
+  reroll.disabled = run.quartz < cost;
   el('draft-next').innerHTML =
-    '<span class="label">NEXT WAVE</span>' +
+    `<span class="label">NEXT ${NAMES.sun}</span>` +
     waveRoster(run.waveIndex, run.diff)
       .map((r) => `<span class="foe">${escapeHtml(ENEMIES[r.type].name)} x${r.count}${r.isNew ? ' <em>NEW</em>' : ''}</span>`)
       .join('');
-  el('draft-owned').innerHTML = run.boons.length ? run.boons.map(boonChip).join('') : '<span class="none">No boons yet</span>';
+  el('draft-owned').innerHTML = run.boons.length ? run.boons.map(boonChip).join('') : '<span class="none">No charms yet</span>';
 }
 
 /** Results: win or defeat title, score with NEW BEST, stats, boons, seed and the restart keys. */
@@ -86,19 +84,19 @@ export function renderResults(menus, run, isBest) {
   menus.resultsKey = key;
   const won = run.phase === 'won';
   el('results-screen').classList.toggle('lost', !won);
-  el('results-title').textContent = RESULT_TITLES[won ? 'won' : 'lost'];
+  el('results-title').textContent = won ? RESULT_WIN_TITLE : RESULT_LOSE_TITLE;
   el('results-sub').textContent = won
-    ? 'The Umbral Matriarch is ash and the courtyard wakes to a new sun.'
-    : `The swarm reached the shrine on Day ${run.aperture.day}, ${run.aperture.phase.name.toLowerCase()}.`;
+    ? `The ${ENEMIES.titan.name} is ash and the courtyard still blazes at noon.`
+    : `The swarm reached the fountain on Day ${run.aperture.day}, ${run.aperture.phase.name.toLowerCase()}.`;
   el('results-score').innerHTML = `${run.score.toLocaleString('en-US')}${isBest ? '<em>NEW BEST</em>' : ''}`;
   el('results-stats').innerHTML = [
-    ['Beetles burned', run.stats.kills],
-    ['Longest chain', `x${run.chain.best}`],
-    ['Waves cleared', `${run.stats.wavesCleared}/${WAVE_COUNT}`],
-    ['Sunseed', `${run.shrineHp}/${run.shrineMax}`],
+    ['BEETLES BURNED', run.stats.kills],
+    [`LONGEST ${NAMES.combo}`, `x${run.chain.best}`],
+    [NAMES.suns, `${run.stats.wavesCleared}/${WAVE_COUNT}`],
+    [NAMES.fountainShort, `${run.shrineHp}/${run.shrineMax}`],
   ]
     .map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`)
     .join('');
-  el('results-boons').innerHTML = run.boons.length ? run.boons.map(boonChip).join('') : '<span class="none">No boons taken</span>';
+  el('results-charms').innerHTML = run.boons.length ? run.boons.map(boonChip).join('') : '<span class="none">No charms taken</span>';
   el('results-seed').textContent = `${run.diff.name} - seed ${run.seed}`;
 }

@@ -1,5 +1,5 @@
-// Beetle sprites drawn in code: magenta Scuttlers with walking legs, violet Lampmoths with
-// beating wings, armour-plated Shellbacks, and the Umbral Matriarch with her opening carapace.
+// Beetle sprites drawn in code: magenta Scuttlers with walking legs, violet Veerwings with
+// beating wings, armour-plated Shellbacks, and the Hornback Titan with her opening carapace.
 import { carapaceOpen } from '../enemies.js';
 import { CELL, toScreenX, toScreenY } from './layout.js';
 
@@ -104,7 +104,7 @@ export function drawEnemy(ctx, e, time) {
   drawBurnGlow(ctx, e.litPower, size);
   ctx.rotate(HEADING_ANGLE[e.heading]);
   const phase = time * 18 + e.id;
-  if (e.type === 'lampmoth') {
+  if (e.type === 'veerwing') {
     const flap = 0.55 + Math.abs(Math.sin(phase * 0.9)) * 0.6;
     ctx.fillStyle = 'rgba(214,120,255,0.85)';
     for (const side of [-1, 1]) {
@@ -144,7 +144,7 @@ export function drawEnemy(ctx, e, time) {
     ctx.ellipse(0, 0, size, size * 0.72, 0, 0, Math.PI * 2);
     ctx.stroke();
     drawHead(ctx, size * 0.8, '#FFE14D');
-  } else if (e.type === 'matriarch') {
+  } else if (e.type === 'titan') {
     const open = carapaceOpen(e);
     drawLegs(ctx, size * 1.2, phase * 0.4);
     if (open) {

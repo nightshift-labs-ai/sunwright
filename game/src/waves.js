@@ -6,7 +6,7 @@ import { ENEMY_ORDER, WAVES } from './config.js';
 export function buildWaveSchedule(waveIndex, diff) {
   const spawns = [];
   for (const [type, count, gate, first, interval] of WAVES[waveIndex]) {
-    const n = type === 'matriarch' ? count : Math.max(1, Math.round(count * diff.countMul));
+    const n = type === 'titan' ? count : Math.max(1, Math.round(count * diff.countMul));
     const gap = interval * (count / n);
     for (let k = 0; k < n; k++) spawns.push({ t: first + k * gap, type, gate: gate === 2 ? k % 2 : gate });
   }

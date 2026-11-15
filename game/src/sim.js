@@ -12,7 +12,7 @@ import { buildWaveSchedule } from './waves.js';
 import { applyBeamDamage, resolveFallenAndBiters, tickChain, waveClearBonus } from './combat.js';
 import { applyBoon, offerBoons, rerollOffer } from './draft.js';
 
-export function createRun(seed, difficultyId = 'keeper') {
+export function createRun(seed, difficultyId = 'normal') {
   const diff = DIFFICULTIES[difficultyId];
   const grid = createGrid();
   const run = {
@@ -28,7 +28,7 @@ export function createRun(seed, difficultyId = 'keeper') {
     flow: buildFlowField(grid),
     trace: null,
     aperture: null,
-    shards: diff.startShards,
+    quartz: diff.startQuartz,
     score: 0,
     shrineHp: diff.shrineHp,
     shrineMax: diff.shrineHp,
@@ -72,7 +72,7 @@ export function pieceCost(run, type) {
   return Math.max(1, PIECES[type].cost - discount);
 }
 
-/** Shards returned when lifting a piece: all of it if placed this build phase, else half. */
+/** Quartz returned when lifting a piece: all of it if placed this build phase, else half. */
 export function liftRefund(run, piece) {
   return piece.placedWave === run.waveIndex ? piece.paid : Math.floor(piece.paid * ECONOMY.oldPieceRefund);
 }
@@ -91,11 +91,11 @@ function applyOrder(run, order) {
       const check = placementCheck(run.grid, order.c, order.r);
       const cost = pieceCost(run, order.piece);
       if (!pieceUnlocked(run, order.piece)) check.ok = false;
-      if (!check.ok || run.shards < cost) {
-        emit(run, { type: 'denied', c: order.c, r: order.r, reason: !pieceUnlocked(run, order.piece) ? 'Unlocks on day 2' : check.ok ? 'Not enough shards' : check.reason });
+      if (!check.ok || run.quartz < cost) {
+        emit(run, { type: 'denied', c: order.c, r: order.r, reason: !pieceUnlocked(run, order.piece) ? 'Unlocks on day 2' : check.ok ? 'Not enough quartz' : check.reason });
         return;
       }
-      run.shards -= cost;
+      run.quartz -= cost;
       setPiece(run.grid, order.c, order.r, { type: order.piece, rot: order.rot & 3, prevRot: order.rot & 3, turnedAt: -1, placedAt: run.time, placedWave: run.waveIndex, paid: cost });
       run.flow = buildFlowField(run.grid);
       refreshLight(run);
@@ -115,7 +115,7 @@ function applyOrder(run, order) {
     case 'lift': {
       const piece = pieceAt(run.grid, order.c, order.r);
       if (!piece || !building) return;
-      run.shards += liftRefund(run, piece);
+      run.quartz += liftRefund(run, piece);
       setPiece(run.grid, order.c, order.r, null);
       run.flow = buildFlowField(run.grid);
       refreshLight(run);
@@ -139,11 +139,11 @@ function applyOrder(run, order) {
         run.offer = [];
         run.phase = 'build';
         refreshLight(run);
-        emit(run, { type: 'boon', id });
+        emit(run, { type: 'charm', id });
       }
       return;
     case 'reroll':
-      if (run.phase === 'draft') emit(run, rerollOffer(run) ? { type: 'reroll' } : { type: 'denied', reason: 'Not enough shards' });
+      if (run.phase === 'draft') emit(run, rerollOffer(run) ? { type: 'reroll' } : { type: 'denied', reason: 'Not enough quartz' });
       return;
   }
 }
@@ -162,7 +162,7 @@ function startWave(run) {
 function finishWave(run) {
   const bonus = waveClearBonus(run);
   run.score += bonus;
-  run.shards += ECONOMY.waveShards + ECONOMY.waveShardsPerWave * run.waveIndex;
+  run.quartz += ECONOMY.waveQuartz + ECONOMY.waveQuartzPerWave * run.waveIndex;
   run.stats.wavesCleared++;
   run.chain.count = 0;
   run.chain.timer = 0;
@@ -190,7 +190,7 @@ function stepWave(run) {
   while (run.spawnCursor < run.schedule.length && run.schedule[run.spawnCursor].t <= run.waveTime) {
     const s = run.schedule[run.spawnCursor++];
     spawnEnemy(run, s.type, s.gate);
-    if (s.type === 'matriarch') emit(run, { type: 'boss' });
+    if (s.type === 'titan') emit(run, { type: 'boss' });
   }
   moveEnemies(run, DT);
   if (shellBlockers(run).key !== run.shellKey) refreshLight(run);

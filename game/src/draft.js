@@ -1,5 +1,5 @@
 // The between-wave draft: offer three different boons (weighted, owned ones removed unless
-// repeatable), reroll for shards, and apply the chosen boon to the run.
+// repeatable), reroll for quartz, and apply the chosen boon to the run.
 import { BOONS, ECONOMY } from './config.js';
 import { pickWeighted } from './rng.js';
 
@@ -23,11 +23,11 @@ export function rerollCost(run) {
   return ECONOMY.rerollCost + run.rerolls;
 }
 
-/** Spend shards for a new offer; false if the run cannot afford it. */
+/** Spend quartz for a new offer; false if the run cannot afford it. */
 export function rerollOffer(run) {
   const cost = rerollCost(run);
-  if (run.shards < cost) return false;
-  run.shards -= cost;
+  if (run.quartz < cost) return false;
+  run.quartz -= cost;
   run.rerolls++;
   run.offer = offerBoons(run);
   return true;

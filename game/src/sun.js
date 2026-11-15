@@ -1,5 +1,5 @@
-// The moving sun: which wall the light enters through each wave (dawn east, noon north,
-// dusk west), the seeded spot on that wall for each day, and which way shadows fall.
+// The moving sun: which wall the light enters through each wave (morning east, noon north,
+// evening west), the seeded spot on that wall for each day, and which way shadows fall.
 import { BOARD, OPENING_COLS, OPENING_ROWS, SUN_PHASES } from './config.js';
 import { createRng, randomInt } from './rng.js';
 

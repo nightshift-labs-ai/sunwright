@@ -24,7 +24,7 @@ function hudFacts(run) {
     wall: run.aperture.phase.wallName,
     wave: run.waveIndex + 1,
     waves: WAVE_COUNT,
-    shards: run.shards,
+    quartz: run.quartz,
     score: run.score,
     shrineHp: run.shrineHp,
     shrineMax: run.shrineMax,
@@ -53,7 +53,7 @@ for (const shot of manifest.shots) {
   const truth = hudFacts(replayTo(shot.state.tick));
   const shown = { ...shot.state, boons: shot.state.boons.join(',') };
   for (const [key, value] of Object.entries(truth)) check(shown[key] === value, `${shot.name} ${key}: shown ${shown[key]} vs sim ${value}`);
-  console.log(`${shot.name}: tick ${shot.state.tick} ${truth.phase} day ${truth.day} ${truth.sun} wave ${truth.wave}/${truth.waves} score ${truth.score} shards ${truth.shards} hp ${truth.shrineHp}/${truth.shrineMax}`);
+  console.log(`${shot.name}: tick ${shot.state.tick} ${truth.phase} day ${truth.day} ${truth.sun} wave ${truth.wave}/${truth.waves} score ${truth.score} quartz ${truth.quartz} hp ${truth.shrineHp}/${truth.shrineMax}`);
 }
 
 /** JPEG size from its SOF marker. */

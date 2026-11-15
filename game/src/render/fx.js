@@ -1,7 +1,8 @@
 // Light and juice: additive sunbeams with starbursts at bounces, sparks on burning beetles,
-// smoke and flipped husks on kills, shards that fly to the HUD counter, floating CHAIN text,
+// smoke and flipped husks on kills, quartz that fly to the HUD counter, floating CHAIN text,
 // screen shake, the Flare flash and the red hurt vignette. Effects advance with sim time.
-import { SHARD_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
+import { NAMES } from '../config.js';
+import { QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
 
 export function createFx() {
   return { particles: [], texts: [], shake: 0, flash: 0, hurt: 0, seed: 12345, waveBanner: 0 };
@@ -28,10 +29,10 @@ export function fxFromEvent(fx, ev) {
     burst(fx, x, y, 10, 'smoke', 'rgba(110,80,70,', 40, 0.9, 9);
     burst(fx, x, y, 14, 'spark', '#FFD34D', 160, 0.45, 3);
     fx.particles.push({ kind: 'husk', x, y, vx: 0, vy: 0, life: 1.4, max: 1.4, size: ev.boss ? 34 : 18, color: ev.enemy });
-    for (let k = 0; k < ev.shards; k++) {
-      fx.particles.push({ kind: 'shard', x: x + k * 6, y, sx: x + k * 6, sy: y, vx: 0, vy: 0, life: 0.75 + k * 0.08, max: 0.75 + k * 0.08, size: 6, color: '#7FE8FF' });
+    for (let k = 0; k < ev.quartz; k++) {
+      fx.particles.push({ kind: 'quartz', x: x + k * 6, y, sx: x + k * 6, sy: y, vx: 0, vy: 0, life: 0.75 + k * 0.08, max: 0.75 + k * 0.08, size: 6, color: '#7FE8FF' });
     }
-    const label = ev.mult > 1 ? `+${ev.points}  CHAIN x${ev.mult}` : `+${ev.points}`;
+    const label = ev.mult > 1 ? `+${ev.points}  ${NAMES.combo} x${ev.mult}` : `+${ev.points}`;
     fx.texts.push({ x, y: y - 18, text: label, life: 1.1, max: 1.1, color: ev.mult > 1 ? '#FFF2A8' : '#FFFFFF', size: ev.mult > 1 ? 22 : 17 });
   } else if (ev.type === 'bite') {
     fx.shake = Math.min(14, fx.shake + 6 + ev.harm * 2);
@@ -50,7 +51,7 @@ export function fxFromEvent(fx, ev) {
   }
 }
 
-/** Sparks and embers rising from every burning beetle. */
+/** Sparks rising from every burning beetle. */
 function emitBurnSparks(fx, run, dt) {
   for (const e of run.enemies) {
     if (e.litPower <= 0 || e.shielded) continue;
@@ -66,7 +67,7 @@ export function updateFx(fx, run, dt) {
   if (run) emitBurnSparks(fx, run, dt);
   for (const p of fx.particles) {
     p.life -= dt;
-    if (p.kind === 'shard') continue;
+    if (p.kind === 'quartz') continue;
     p.x += p.vx * dt;
     p.y += p.vy * dt;
     p.vx *= 1 - dt * 2.5;
@@ -155,9 +156,9 @@ export function drawFx(ctx, fx) {
       ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
       ctx.globalAlpha = 1;
     } else if (p.kind === 'husk') {
-      // A beetle flipped on its back, legs in the air, fading out.
+      // A beetle flipped on its back, legs in the air, dimming.
       ctx.globalAlpha = Math.min(1, k * 1.5);
-      ctx.fillStyle = p.color === 'lampmoth' ? '#7A3B9A' : '#4A1A55';
+      ctx.fillStyle = p.color === 'veerwing' ? '#7A3B9A' : '#4A1A55';
       ctx.beginPath();
       ctx.ellipse(p.x, p.y, p.size, p.size * 0.7, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -170,13 +171,13 @@ export function drawFx(ctx, fx) {
       }
       ctx.stroke();
       ctx.globalAlpha = 1;
-    } else if (p.kind === 'shard') {
+    } else if (p.kind === 'quartz') {
       const t = 1 - k;
       const e = t * t;
-      const mx = (p.sx + SHARD_ANCHOR.x) / 2;
-      const my = Math.min(p.sy, SHARD_ANCHOR.y) - 140;
-      const x = (1 - e) * (1 - e) * p.sx + 2 * (1 - e) * e * mx + e * e * SHARD_ANCHOR.x;
-      const y = (1 - e) * (1 - e) * p.sy + 2 * (1 - e) * e * my + e * e * SHARD_ANCHOR.y;
+      const mx = (p.sx + QUARTZ_ANCHOR.x) / 2;
+      const my = Math.min(p.sy, QUARTZ_ANCHOR.y) - 140;
+      const x = (1 - e) * (1 - e) * p.sx + 2 * (1 - e) * e * mx + e * e * QUARTZ_ANCHOR.x;
+      const y = (1 - e) * (1 - e) * p.sy + 2 * (1 - e) * e * my + e * e * QUARTZ_ANCHOR.y;
       ctx.fillStyle = p.color;
       ctx.beginPath();
       ctx.moveTo(x, y - p.size);

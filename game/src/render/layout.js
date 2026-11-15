@@ -27,6 +27,6 @@ export function cellAtPixel(px, py) {
   return { c, r };
 }
 
-/** HUD anchors that effects fly towards (the shard counter) or burst from (the Sunseed pips). */
-export const SHARD_ANCHOR = { x: 1120, y: 196 };
+/** HUD anchors that effects fly towards (the quartz counter) or burst from (the Sun Fountain pips). */
+export const QUARTZ_ANCHOR = { x: 1120, y: 196 };
 export const SCORE_ANCHOR = { x: 1120, y: 92 };

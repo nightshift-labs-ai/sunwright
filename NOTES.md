@@ -19,6 +19,11 @@
   Glassback (mirror shell stops non-gold light; beam re-traced when shells change cell), Lampmoth
   dazzle (lured by light, slowed in it), 12 boons (+ Lens Grinder, True Prism).
 
+- Operator field benchmark items 3-4 applied: NAMES table in config.js (VEERWING, HORNBACK TITAN,
+  SUN FOUNTAIN, QUARTZ, SEAR, NORMAL, Quartz Pull, Spreading Burn, MORNING/NOON/EVENING, glass charms),
+  RESULT_WIN_TITLE / RESULT_LOSE_TITLE, "SUN n/9" everywhere, X rerolls; internal ids renamed too
+  (boon stays internal). tools/check-names.mjs scans every visible string for the banned words.
+
 ## Next
 - M2: tune difficulties apart (Gentle clearly easier, Scorched harder); careful bot should win sometimes.
 - M3 feel: generative pentatonic music + volume sliders/options, hit-stop on CHAIN steps, shrine pip

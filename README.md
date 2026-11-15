@@ -1,17 +1,18 @@
 # SUNWRIGHT: Mirrors of the Noon Courtyard
 
-A light-beam tower defense with a moving sun. You are a glasswright guarding the jade Sunseed
-shrine in a sun-baked courtyard. Place and turn mirrors, splitters, lenses and pillars so the
-sunlight bounces across the beetle swarm's path and burns it. The twist: the sun moves every wave
-(dawn from the east, noon from the north, dusk from the west), so a layout that worked at dawn
-misses at dusk. Survive 3 days (9 waves) and the Umbral Matriarch at dusk on day 3 to win.
+A light-beam tower defense with a moving sun. You are a glasswright guarding the jade Sun
+Fountain in a sun-baked courtyard. Place and turn mirrors, splitters, lenses, pillars and prisms so
+the sunlight bounces across the beetle swarm's path and burns it. The twist: the sun moves every
+wave (morning from the east, noon from the north, evening from the west), so a layout that worked
+in the morning misses in the evening. Hold the courtyard for 3 days (9 suns), the last one against
+the Hornback Titan, to win; the swarm breaking through to the fountain loses the run.
 
 ## Controls
 - **1-5** pick Mirror / Splitter / Lens / Pillar / Prism (from day 2), **click** to place, **right-click** to lift
 - **Q / E** or **mouse wheel**: turn the glass under the mouse (also live during a wave)
 - **Enter** (or Space in the build phase): start the wave
 - **Space** during a wave: Flare, double beam power for 3 s (one charge per wave)
-- **1-3** pick a boon in the draft, **R** reroll
+- **1-3** pick a glass charm in the draft, **X** reroll
 - **Esc** pause, **M** mute; on the results screen **R** run again, **S** same seed, **Esc** menu
 
 ## Run it

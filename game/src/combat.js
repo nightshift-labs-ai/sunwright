@@ -1,6 +1,6 @@
 // Burning and scoring: beam damage per tick with armour thresholds, the Flare, the CHAIN
-// multiplier for quick successive kills, shard drops, and beetles biting the Sunseed.
-import { BEAM, KINDLING, SCORING, TINT_EFFECTS } from './config.js';
+// multiplier for quick successive kills, quartz drops, and beetles biting the Sun Fountain.
+import { BEAM, SPREAD_BURN, SCORING, TINT_EFFECTS } from './config.js';
 import { TINT_BLUE, TINT_GOLD, TINT_RED } from './beams.js';
 import { armourOf, enemyCell, reachedShrine } from './enemies.js';
 
@@ -47,15 +47,15 @@ function registerKill(run, e) {
   chain.best = Math.max(chain.best, chain.count);
   const mult = chainMultiplier(chain.count);
   const points = e.def.score * mult;
-  const shards = e.def.shards + (run.boons.includes('magnet') ? 1 : 0);
+  const quartz = e.def.quartz + (run.boons.includes('magnet') ? 1 : 0);
   run.score += points;
-  run.shards += shards;
+  run.quartz += quartz;
   run.stats.kills++;
-  run.events.push({ t: run.time, type: 'kill', x: e.x, y: e.y, enemy: e.type, points, chain: chain.count, mult, shards, boss: !!e.def.boss });
-  if (run.boons.includes('kindling') && (e.litPower > 0 || e.burn > 0)) {
+  run.events.push({ t: run.time, type: 'kill', x: e.x, y: e.y, enemy: e.type, points, chain: chain.count, mult, quartz, boss: !!e.def.boss });
+  if (run.boons.includes('spreading') && (e.litPower > 0 || e.burn > 0)) {
     for (const other of run.enemies) {
-      if (other !== e && other.hp > 0 && Math.hypot(other.x - e.x, other.y - e.y) < KINDLING.radius) {
-        other.hp -= KINDLING.damage;
+      if (other !== e && other.hp > 0 && Math.hypot(other.x - e.x, other.y - e.y) < SPREAD_BURN.radius) {
+        other.hp -= SPREAD_BURN.damage;
         run.events.push({ t: run.time, type: 'scorch', x: other.x, y: other.y });
       }
     }
@@ -87,7 +87,7 @@ export function tickChain(run, dt) {
   }
 }
 
-/** End-of-wave bonus: points for every Sunseed HP left plus a clear bonus that grows each wave. */
+/** End-of-wave bonus: points for every Sun Fountain HP left plus a clear bonus that grows each wave. */
 export function waveClearBonus(run) {
   return run.shrineHp * SCORING.perShrineHp + SCORING.waveClear * (run.waveIndex + 1);
 }

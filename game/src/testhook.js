@@ -50,7 +50,7 @@ export function installTestHook(app, api) {
         wall: run.aperture.phase.wallName,
         wave: run.waveIndex + 1,
         waves: WAVE_COUNT,
-        shards: run.shards,
+        quartz: run.quartz,
         score: run.score,
         shrineHp: run.shrineHp,
         shrineMax: run.shrineMax,

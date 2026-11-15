@@ -1,9 +1,9 @@
 // Screenshot staging: plan ONE seeded bot run headless (tools/balance.mjs), pick the cover tick
 // (the busiest moment of wave 5, Day 2 noon), then replay the very same orders in the browser
 // through the real fixed-step loop, renderer and HUD, capturing in forward order:
-// title -> play (cover) -> draft (dusk approaches) -> results. Writes screenshots/*.jpg and
+// title -> play (cover) -> draft (evening approaches) -> results. Writes screenshots/*.jpg and
 // tools/shots-manifest.json (the HUD state at each capture, for check-shot-truth.mjs).
-//   node tools/shots.mjs [seed] [difficulty=keeper] [bot=greedy] [quality=80]
+//   node tools/shots.mjs [seed] [difficulty=normal] [bot=greedy] [quality=80]
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { playRun } from './balance.mjs';
@@ -11,7 +11,7 @@ const require = createRequire('/home/agent/tools/pw/node_modules/');
 const { chromium } = require('playwright');
 
 const SEED = Number(process.argv[2] ?? 1000);
-const DIFF = process.argv[3] ?? 'keeper';
+const DIFF = process.argv[3] ?? 'normal';
 const BOT = process.argv[4] ?? 'greedy';
 const QUALITY = Number(process.argv[5] ?? 80);
 const URL = 'http://127.0.0.1:8796/index.html?test=1';

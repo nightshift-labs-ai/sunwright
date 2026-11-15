@@ -9,7 +9,7 @@ import { buildFlowField, flowDirectionAt } from '../game/src/pathing.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 
 /** Boons the careful bot prefers, best first. */
-const BOON_TASTE = ['highsun', 'silvered', 'burning', 'kindling', 'sunstone', 'flare2', 'magnet', 'discount', 'longchain', 'mend'];
+const BOON_TASTE = ['highsun', 'silvered', 'burning', 'spreading', 'sunstone', 'flare2', 'magnet', 'discount', 'longchain', 'mend'];
 
 /** Cells walkers step through from each burrow to the shrine (counted once per burrow). */
 function routeCells(grid, flow) {
@@ -30,7 +30,7 @@ function routeCells(grid, flow) {
 
 /**
  * How much burning a layout does: beam power summed over the walking route cells, plus light
- * near the shrine for Lampmoths. The careful bot also values light that pierces armour (12+).
+ * near the shrine for Veerwings. The careful bot also values light that pierces armour (12+).
  */
 function layoutValue(run, grid, careful) {
   const flow = buildFlowField(grid);
@@ -48,7 +48,7 @@ function bestPlacement(run, careful) {
   const base = layoutValue(run, grid, careful);
   for (const type of PIECE_ORDER) {
     const cost = pieceCost(run, type);
-    if (cost > run.shards || !pieceUnlocked(run, type)) continue;
+    if (cost > run.quartz || !pieceUnlocked(run, type)) continue;
     for (let r = 0; r < grid.rows; r++) {
       for (let c = 0; c < grid.cols; c++) {
         if (!placementCheck(grid, c, r).ok) continue;

@@ -1,14 +1,14 @@
 // The heads-up display, drawn on the canvas so screenshots show exactly what the player sees:
-// sun dial with NOW / NEXT openings, day-phase-wave banner with the remaining bar, Sunseed HP
-// pips, Flare and CHAIN, score and shards, the INCOMING roster, boons taken, and the hotbar.
-import { BEAM, ENEMIES, PIECES, PIECE_ORDER, WAVE_COUNT } from '../config.js';
+// sun dial with NOW / NEXT openings, day-phase-wave banner with the remaining bar, Sun Fountain HP
+// pips, Flare and CHAIN, score and quartz, the INCOMING roster, boons taken, and the hotbar.
+import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, WAVE_COUNT } from '../config.js';
 import { boonById } from '../draft.js';
 import { chainMultiplier, chainWindow } from '../combat.js';
 import { enemiesRemaining, pieceCost, pieceUnlocked } from '../sim.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
-import { BOARD_X, BOARD_Y, CELL, SHARD_ANCHOR, VIEW_H, VIEW_W } from './layout.js';
+import { BOARD_X, BOARD_Y, CELL, QUARTZ_ANCHOR, VIEW_H, VIEW_W } from './layout.js';
 
 const INK = '#FFF6DF';
 const GOLD = '#F2C14E';
@@ -129,28 +129,34 @@ function drawSunDial(ctx, run) {
   text(ctx, 'N', cx, cy - R - 20, 13, INK, 'center');
   text(ctx, 'W', cx - R - 2, cy + 32, 13, INK, 'center');
   const phase = run.aperture.phase;
-  text(ctx, `NOW: ${phase.name} - ${phase.wallName}`, cx, 178, 14, INK, 'center');
+  text(ctx, `NOW: ${phase.name} (${phase.wallName[0]})`, cx, 178, 14, INK, 'center');
   if (next) {
     const nap = sunApertureFor(run.seed, run.waveIndex + 1);
-    text(ctx, `NEXT: ${nap.phase.name} - ${nap.phase.wallName}`, cx, 206, 16, GOLD, 'center', 900);
+    text(ctx, `NEXT: ${nap.phase.name} (${nap.phase.wallName[0]})`, cx, 206, 16, GOLD, 'center', 900);
   } else {
-    text(ctx, 'LAST LIGHT', cx, 206, 16, GOLD, 'center', 900);
+    text(ctx, 'FINAL SUN', cx, 206, 16, GOLD, 'center', 900);
   }
 }
 
-function drawSunseedPips(ctx, run, y) {
-  text(ctx, 'SUNSEED', 16, y, 15, INK);
+/** One water droplet pip: pointed top, round bottom. */
+function droplet(ctx, x, y, r) {
+  ctx.beginPath();
+  ctx.moveTo(x, y - r * 1.5);
+  ctx.bezierCurveTo(x + r * 0.4, y - r * 0.6, x + r, y - r * 0.2, x + r, y + r * 0.3);
+  ctx.arc(x, y + r * 0.3, r, 0, Math.PI);
+  ctx.bezierCurveTo(x - r, y - r * 0.2, x - r * 0.4, y - r * 0.6, x, y - r * 1.5);
+  ctx.closePath();
+}
+
+/** FOUNTAIN n/max with one droplet pip per HP. */
+function drawFountainPips(ctx, run, y) {
+  text(ctx, NAMES.fountainShort, 16, y, 15, INK);
   text(ctx, `${run.shrineHp}/${run.shrineMax}`, PANEL_W - 8, y, 15, '#7DFFC4', 'right');
   for (let k = 0; k < run.shrineMax; k++) {
     const x = 24 + (k % 6) * 27;
-    const yy = y + 22 + Math.floor(k / 6) * 28;
-    ctx.fillStyle = k < run.shrineHp ? '#34C38F' : 'rgba(40,20,50,0.55)';
-    ctx.beginPath();
-    ctx.moveTo(x, yy - 11);
-    ctx.lineTo(x + 9, yy);
-    ctx.lineTo(x, yy + 11);
-    ctx.lineTo(x - 9, yy);
-    ctx.closePath();
+    const yy = y + 24 + Math.floor(k / 6) * 28;
+    ctx.fillStyle = k < run.shrineHp ? '#3FD6C8' : 'rgba(40,20,50,0.55)';
+    droplet(ctx, x, yy, 8);
     ctx.fill();
     ctx.strokeStyle = k < run.shrineHp ? '#B8FFE0' : 'rgba(255,255,255,0.2)';
     ctx.lineWidth = 1.5;
@@ -161,7 +167,7 @@ function drawSunseedPips(ctx, run, y) {
 function drawChainMeter(ctx, run, y) {
   const mult = chainMultiplier(run.chain.count);
   const active = run.chain.count >= 2;
-  text(ctx, 'CHAIN', 16, y, 15, INK);
+  text(ctx, NAMES.combo, 16, y, 15, INK);
   text(ctx, active ? `x${mult}` : 'x1', PANEL_W - 8, y + 4, active ? 30 : 20, active ? '#FFF2A8' : 'rgba(255,246,223,0.6)', 'right', 900);
   ctx.fillStyle = 'rgba(30,20,60,0.5)';
   ctx.fillRect(16, y + 14, PANEL_W - 24, 6);
@@ -176,7 +182,7 @@ function drawLeftPanel(ctx, run) {
   panel(ctx, 6, 8, PANEL_W, 222);
   drawSunDial(ctx, run);
   panel(ctx, 6, 240, PANEL_W, 104);
-  drawSunseedPips(ctx, run, 266);
+  drawFountainPips(ctx, run, 266);
   panel(ctx, 6, 354, PANEL_W, 74);
   drawChainMeter(ctx, run, 380);
 }
@@ -200,23 +206,23 @@ function drawRightPanel(ctx, run) {
   panel(ctx, x0, 8, PANEL_W, 222);
   text(ctx, 'SCORE', x0 + 14, 36, 15, INK);
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 12, 82, 36, '#FFF2A8', 'right', 900);
-  text(ctx, 'SHARDS', x0 + 14, 132, 15, INK);
+  text(ctx, NAMES.currency, x0 + 14, 132, 15, INK);
   ctx.fillStyle = '#7FE8FF';
   ctx.beginPath();
-  ctx.moveTo(SHARD_ANCHOR.x, SHARD_ANCHOR.y - 18);
-  ctx.lineTo(SHARD_ANCHOR.x + 11, SHARD_ANCHOR.y - 4);
-  ctx.lineTo(SHARD_ANCHOR.x, SHARD_ANCHOR.y + 14);
-  ctx.lineTo(SHARD_ANCHOR.x - 11, SHARD_ANCHOR.y - 4);
+  ctx.moveTo(QUARTZ_ANCHOR.x, QUARTZ_ANCHOR.y - 18);
+  ctx.lineTo(QUARTZ_ANCHOR.x + 11, QUARTZ_ANCHOR.y - 4);
+  ctx.lineTo(QUARTZ_ANCHOR.x, QUARTZ_ANCHOR.y + 14);
+  ctx.lineTo(QUARTZ_ANCHOR.x - 11, QUARTZ_ANCHOR.y - 4);
   ctx.closePath();
   ctx.fill();
   ctx.strokeStyle = '#FFFFFF';
   ctx.lineWidth = 2;
   ctx.stroke();
-  text(ctx, String(run.shards), x0 + PANEL_W - 12, 210, 40, '#BDF4FF', 'right', 900);
+  text(ctx, String(run.quartz), x0 + PANEL_W - 12, 210, 40, '#BDF4FF', 'right', 900);
 
   panel(ctx, x0, 240, PANEL_W, 236);
   const inWave = run.phase === 'wave';
-  text(ctx, inWave ? 'INCOMING' : `WAVE ${run.waveIndex + 1} BRINGS`, x0 + 14, 266, 15, INK);
+  text(ctx, inWave ? 'INCOMING' : `${NAMES.sun} ${run.waveIndex + 1} BRINGS`, x0 + 14, 266, 15, INK);
   const roster = waveRoster(run.waveIndex, run.diff);
   const left = new Map();
   if (inWave) {
@@ -225,14 +231,14 @@ function drawRightPanel(ctx, run) {
   }
   roster.forEach((row, k) => {
     const y = 306 + k * 44;
-    drawEnemyIcon(ctx, row.type, x0 + 28, y, row.type === 'matriarch' ? 0.55 : 0.8);
-    text(ctx, ENEMIES[row.type].name.replace('Umbral ', ''), x0 + 52, y + 5, 14, INK, 'left', 700);
+    drawEnemyIcon(ctx, row.type, x0 + 28, y, row.type === 'titan' ? 0.55 : 0.8);
+    text(ctx, ENEMIES[row.type].name.replace('HORNBACK ', ''), x0 + 52, y + 5, 14, INK, 'left', 700);
     text(ctx, inWave ? `${left.get(row.type) ?? 0}` : `x${row.count}`, x0 + PANEL_W - 10, y + 6, 18, '#FFE14D', 'right', 900);
     if (row.isNew && !inWave) text(ctx, 'NEW', x0 + 52, y + 22, 11, '#FF8AD0', 'left', 800);
   });
 
   panel(ctx, x0, 486, PANEL_W, 200);
-  text(ctx, `BOONS (${run.boons.length})`, x0 + 14, 512, 15, INK);
+  text(ctx, `${NAMES.charmsShort} (${run.boons.length})`, x0 + 14, 512, 15, INK);
   run.boons.forEach((id, k) => {
     const b = boonById(id);
     const bx = x0 + 32 + (k % 4) * 42;
@@ -265,7 +271,7 @@ export function drawBoonMedallion(ctx, boon, x, y, r) {
 
 function drawTopBanner(ctx, run, ui) {
   const { day, phase } = run.aperture;
-  text(ctx, `DAY ${day} - ${phase.name} - WAVE ${run.waveIndex + 1}/${WAVE_COUNT}`, 640, 40, 30, INK, 'center', 900);
+  text(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, 640, 40, 30, INK, 'center', 900);
   if (run.phase === 'wave') {
     const total = run.schedule.length;
     const left = enemiesRemaining(run);
@@ -278,7 +284,7 @@ function drawTopBanner(ctx, run, ui) {
     ctx.strokeRect(460, 56, 360, 12);
     text(ctx, `${left} beetles left`, 830, 67, 14, INK, 'left', 700);
   } else if (run.phase === 'build') {
-    text(ctx, ui.hint || 'BUILD: place glass to bend the light onto the beetle path', 640, 70, 16, ui.hint ? (ui.hintBad ? '#FF8A8A' : INK) : '#FFF2A8', 'center', 700);
+    text(ctx, ui.hint || 'BUILD: bend the light onto the swarm path', 640, 70, 16, ui.hint ? (ui.hintBad ? '#FF8A8A' : INK) : '#FFF2A8', 'center', 700);
   }
 }
 
@@ -338,7 +344,7 @@ function drawHotbar(ctx, run, ui) {
     const x = HOTBAR_X + i * (HOTBAR.w + HOTBAR.gap);
     const cost = pieceCost(run, type);
     const unlocked = pieceUnlocked(run, type);
-    const afford = run.shards >= cost && unlocked;
+    const afford = run.quartz >= cost && unlocked;
     const selected = ui.selected === type;
     ctx.globalAlpha = afford ? 1 : 0.45;
     panel(ctx, x, HOTBAR.y, HOTBAR.w, HOTBAR.h);
@@ -387,7 +393,7 @@ function drawHotbar(ctx, run, ui) {
     ctx.lineWidth = 3;
     ctx.stroke();
     text(ctx, 'ENTER', bx + 95, HOTBAR.y + 30, 15, GOLD, 'center', 900);
-    text(ctx, 'START WAVE', bx + 95, HOTBAR.y + 56, 20, INK, 'center', 900);
+    text(ctx, `START ${NAMES.sun}`, bx + 95, HOTBAR.y + 56, 20, INK, 'center', 900);
   } else if (run.phase === 'wave') {
     text(ctx, ui.hint ? ui.hint.slice(0, 44) : 'Q/E or wheel: turn glass live', fx + 156, HOTBAR.y + 34, 14, INK, 'left', 600);
     text(ctx, 'ESC pause  -  M mute', fx + 156, HOTBAR.y + 58, 14, 'rgba(255,246,223,0.75)', 'left', 600);

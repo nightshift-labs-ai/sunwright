@@ -22,7 +22,7 @@ const ctx = canvas.getContext('2d');
 const input = createInput(stage, canvas);
 const menus = createMenus(input.intents);
 
-const EVENT_SOUNDS = { placed: 'place', rotated: 'rotate', lifted: 'lift', denied: 'deny', kill: 'kill', bite: 'bite', flare: 'flare', waveStart: 'wave', boss: 'boss', waveClear: 'clear', boon: 'pluck', reroll: 'pluck', won: 'won', lost: 'lost' };
+const EVENT_SOUNDS = { placed: 'place', rotated: 'rotate', lifted: 'lift', denied: 'deny', kill: 'kill', bite: 'bite', flare: 'flare', waveStart: 'wave', boss: 'boss', waveClear: 'clear', charm: 'pluck', reroll: 'pluck', won: 'won', lost: 'lost' };
 const RESULTS_DELAY = 1.2;
 
 const app = {
@@ -142,7 +142,7 @@ function handleKeyInPlay(code) {
   const digit = code.startsWith('Digit') ? Number(code.slice(5)) : 0;
   if (run.phase === 'draft') {
     if (digit >= 1 && digit <= 3) order({ type: 'pick', index: digit - 1 });
-    else if (code === 'KeyR') order({ type: 'reroll' });
+    else if (code === 'KeyX') order({ type: 'reroll' });
     return;
   }
   if (digit >= 1 && digit <= PIECE_ORDER.length) selectPiece(PIECE_ORDER[digit - 1]);
@@ -225,7 +225,7 @@ function updateHover() {
   const { x, y } = input.mouse;
   const hit = hotbarHit(x, y);
   if (hit && PIECES[hit]) {
-    ui.hint = `${PIECES[hit].name} (${pieceCost(run, hit)} shards): ${PIECES[hit].blurb}`;
+    ui.hint = `${PIECES[hit].name} (${pieceCost(run, hit)} quartz): ${PIECES[hit].blurb}`;
     return;
   }
   const cell = cellAtPixel(x, y);
@@ -238,19 +238,19 @@ function updateHover() {
   }
   if (run.phase !== 'build') return;
   const type = ui.selected;
-  const key = `${cell.c},${cell.r},${type},${ui.ghostRot},${run.layoutVersion},${run.shards}`;
+  const key = `${cell.c},${cell.r},${type},${ui.ghostRot},${run.layoutVersion},${run.quartz}`;
   if (key !== ui.ghostKey) {
     const probe = { ...run.grid, pieces: run.grid.pieces.slice() };
     const check = placementCheck(probe, cell.c, cell.r);
     if (!pieceUnlocked(run, type)) Object.assign(check, { ok: false, reason: `The ${PIECES[type].name} unlocks on day 2` });
-    const afford = run.shards >= pieceCost(run, type);
+    const afford = run.quartz >= pieceCost(run, type);
     let trace = null;
     if (check.ok) {
       setPiece(probe, cell.c, cell.r, { type, rot: ui.ghostRot });
       trace = traceBeams(probe, run.aperture, beamModsFor(run.boons));
     }
     ui.ghostKey = key;
-    ui.ghostCache = { ok: check.ok && afford, trace, hint: !check.ok ? check.reason : afford ? `Place ${PIECES[type].name} (${pieceCost(run, type)} shards) - Q/E turns it` : 'Not enough shards' };
+    ui.ghostCache = { ok: check.ok && afford, trace, hint: !check.ok ? check.reason : afford ? `Place ${PIECES[type].name} (${pieceCost(run, type)} quartz) - Q/E turns it` : 'Not enough quartz' };
   }
   ui.ghost = { piece: { type, rot: ui.ghostRot, prevRot: ui.ghostRot, turnedAt: -1 }, c: cell.c, r: cell.r, ok: ui.ghostCache.ok };
   ui.ghostTrace = ui.ghostCache.trace;
@@ -314,7 +314,7 @@ window.addEventListener('keydown', unlockAudio);
 setVolume(app.settings.volume, app.settings.muted);
 window.addEventListener('resize', fitStage);
 fitStage();
-if (!DIFFICULTIES[app.settings.difficulty]) app.settings.difficulty = 'keeper';
+if (!DIFFICULTIES[app.settings.difficulty]) app.settings.difficulty = 'normal';
 
 if (new URLSearchParams(location.search).has('test')) {
   installTestHook(app, {

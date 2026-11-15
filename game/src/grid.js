@@ -73,10 +73,10 @@ export function wouldSealShrine(grid, c, r) {
 /** { ok, reason } for placing any piece on (c, r). */
 export function placementCheck(grid, c, r) {
   if (!inBounds(grid, c, r)) return { ok: false, reason: 'Outside the courtyard' };
-  if (isShrineCell(grid, c, r)) return { ok: false, reason: 'That is the Sunseed' };
+  if (isShrineCell(grid, c, r)) return { ok: false, reason: 'That is the Sun Fountain' };
   if (isGateCell(grid, c, r)) return { ok: false, reason: 'Burrows must stay open' };
   if (pieceAt(grid, c, r)) return { ok: false, reason: 'Cell taken' };
-  if (wouldSealShrine(grid, c, r)) return { ok: false, reason: 'Would seal the shrine' };
+  if (wouldSealShrine(grid, c, r)) return { ok: false, reason: 'Would seal off the fountain' };
   return { ok: true, reason: '' };
 }
 
