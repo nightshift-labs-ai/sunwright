@@ -39,6 +39,7 @@ const errors = [];
 page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', (e) => errors.push(e.message));
 await page.goto(URL, { waitUntil: 'load' });
+await page.waitForFunction(() => window.__test, null, { timeout: 15000 });
 await page.waitForTimeout(200);
 const manifest = { seed: SEED, difficulty: DIFF, bot: BOT, shots: [] };
 async function capture(name, state) {

@@ -6,6 +6,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { WAVE_COUNT } from '../game/src/config.js';
 import { createRun, enemiesRemaining, stepSim } from '../game/src/sim.js';
+import { currentBanner } from '../game/src/announce.js';
 
 const manifest = JSON.parse(readFileSync('tools/shots-manifest.json', 'utf8'));
 const failures = [];
@@ -34,6 +35,9 @@ function hudFacts(run) {
     remaining: enemiesRemaining(run),
     boons: run.boons.join(','),
     kills: run.stats.kills,
+    banner: currentBanner(run),
+    log: run.log.join(' | '),
+    sunsHeld: run.stats.wavesCleared,
   };
 }
 

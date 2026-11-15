@@ -43,6 +43,13 @@
 - FOUNTAIN_MAX = 10 for every difficulty (Gentle/Scorched differ by enemy HP, count and quartz);
   Sunstone now heals 1 after every sun. Greedy 8 seeds: gentle 2/8 (6.4), normal 1/8 (5.4), scorched 0/8 (3.0).
 
+- Cover HUD (benchmark 1 item 5, part of 6; benchmark 2 items 2 and 4): announce.js (sim event log +
+  banner: rare events else "NEXT SUN: WEST - REAIM GLASS"), banner plaque at cap >= 44 px over the
+  courtyard, 9-sun track with Titan skull + HOLD n MORE SUNS, droplets pulsing red when empty +
+  EMPTY = RUN LOST, SCORE + BEST, INCOMING with remaining count and SUN 9: HORNBACK TITAN skull row,
+  hovered-piece tooltip with ghost icon and keys (Q/E turn, X sell +n; X sells in build and wave),
+  3-line log, key line, FLARE READY/USED/BURNING. Truth check covers banner, log, suns held.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

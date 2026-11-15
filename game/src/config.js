@@ -58,11 +58,11 @@ export const BOARD = {
 };
 
 export const PIECES = {
-  mirror: { name: NAMES.piece.mirror, cost: 3, blurb: 'Bounces light 90 degrees (-10% power)' },
-  splitter: { name: NAMES.piece.splitter, cost: 5, blurb: 'Halves the beam: half passes, half bounces' },
-  lens: { name: NAMES.piece.lens, cost: 7, blurb: 'x2.5 power for 3 cells, then the beam ends' },
-  pillar: { name: NAMES.piece.pillar, cost: 1, blurb: 'Blocks beetles and light' },
-  prism: { name: NAMES.piece.prism, cost: 8, blurb: 'Fans light: red burns, blue slows, gold pierces armour', unlockWave: 3 },
+  mirror: { name: NAMES.piece.mirror, cost: 3, blurb: 'Bounces light 90 degrees (-10% power)', short: 'bounces light 90 degrees' },
+  splitter: { name: NAMES.piece.splitter, cost: 5, blurb: 'Halves the beam: half passes, half bounces', short: 'halves the beam' },
+  lens: { name: NAMES.piece.lens, cost: 7, blurb: 'x2.5 power for 3 cells, then the beam ends', short: 'focuses x2.5 for 3 cells' },
+  pillar: { name: NAMES.piece.pillar, cost: 1, blurb: 'Blocks beetles and light', short: 'blocks beetles and light' },
+  prism: { name: NAMES.piece.prism, cost: 8, blurb: 'Fans light: red burns, blue slows, gold pierces armour', short: 'red burn, blue slow, gold pierce', unlockWave: 3 },
 };
 export const PIECE_ORDER = ['mirror', 'splitter', 'lens', 'pillar', 'prism'];
 

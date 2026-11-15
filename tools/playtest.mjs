@@ -21,6 +21,7 @@ const visible = (id) => page.evaluate((i) => !document.getElementById(i).classLi
 const cellCentre = (c, r) => ({ x: 250 + c * 60 + 30, y: 140 + r * 60 + 30 });
 
 await page.goto(`${base}?test=1`, { waitUntil: 'load' });
+await page.waitForFunction(() => window.__test, null, { timeout: 15000 });
 await frame();
 expect(await visible('title-screen'), 'title screen shows on load');
 await page.click('#howto-button');

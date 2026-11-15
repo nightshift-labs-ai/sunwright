@@ -11,6 +11,7 @@ import { moveEnemies, shellBlockers, spawnEnemy } from './enemies.js';
 import { buildWaveSchedule } from './waves.js';
 import { applyBeamDamage, resolveFallenAndBiters, tickChain, waveClearBonus } from './combat.js';
 import { applyBoon, offerBoons, rerollOffer } from './draft.js';
+import { announceEvents } from './announce.js';
 
 export function createRun(seed, difficultyId = 'normal') {
   const diff = DIFFICULTIES[difficultyId];
@@ -49,6 +50,9 @@ export function createRun(seed, difficultyId = 'normal') {
     endedAt: 0,
     layoutVersion: 0,
     shellKey: '',
+    log: [],
+    banner: null,
+    waveNotes: new Set(),
   };
   refreshLight(run);
   return run;
@@ -115,7 +119,7 @@ function applyOrder(run, order) {
     }
     case 'lift': {
       const piece = pieceAt(run.grid, order.c, order.r);
-      if (!piece || !building) return;
+      if (!piece || !(building || run.phase === 'wave')) return;
       run.quartz += liftRefund(run, piece);
       setPiece(run.grid, order.c, order.r, null);
       run.flow = buildFlowField(run.grid);
@@ -156,6 +160,7 @@ function startWave(run) {
   run.waveTime = 0;
   run.flareCharges = FLARE_CHARGES + (run.boons.includes('flare2') ? 1 : 0);
   run.flareLeft = 0;
+  run.waveNotes = new Set();
   refreshLight(run);
   emit(run, { type: 'waveStart', wave: run.waveIndex });
 }
@@ -206,10 +211,12 @@ function stepWave(run) {
 
 /** Advance one fixed tick after applying the queued orders. */
 export function stepSim(run, orders) {
+  const first = run.events.length;
   if (orders) for (const order of orders) applyOrder(run, order);
   run.tick++;
   run.time += DT;
   if (run.phase === 'wave') stepWave(run);
+  announceEvents(run, run.events.slice(Math.min(first, run.events.length)));
 }
 
 /** Waves still to spawn plus beetles on the board, for the HUD's remaining bar. */

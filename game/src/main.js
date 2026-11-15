@@ -33,7 +33,7 @@ const app = {
   demo: createTitleDemo(),
   settings: loadSettings(),
   fx: createFx(),
-  ui: { selected: 'mirror', ghostRot: 0, ghost: null, ghostTrace: null, ghostKey: '', hint: '', hintBad: false, hoverCell: null },
+  ui: { selected: 'mirror', ghostRot: 0, ghost: null, ghostTrace: null, ghostKey: '', hint: '', hintBad: false, hoverCell: null, hoverPiece: null, best: 0, fast: false },
   orders: [],
   isBest: false,
   shrineHurtAt: -9,
@@ -66,6 +66,7 @@ function startRun(seed = freshSeed(), difficulty = app.settings.difficulty) {
   app.shrineHurtAt = -9;
   app.ui.selected = 'mirror';
   app.ui.ghostRot = 0;
+  app.ui.best = loadBest(difficulty).score;
   app.ui.ghostKey = '';
 }
 
@@ -96,6 +97,12 @@ function rotateAtHover(dir) {
     app.ui.ghostRot = (app.ui.ghostRot + (dir > 0 ? 1 : 3)) & 3;
     playSfx('rotate');
   }
+}
+
+/** X: sell the piece under the mouse (refund shown in the tooltip). */
+function liftAtHover() {
+  const cell = app.ui.hoverCell;
+  if (cell && pieceAt(app.run.grid, cell.c, cell.r)) order({ type: 'lift', c: cell.c, r: cell.r });
 }
 
 function selectPiece(type) {
@@ -164,6 +171,7 @@ function handleKeyInPlay(code) {
     return;
   }
   if (digit >= 1 && digit <= PIECE_ORDER.length) selectPiece(PIECE_ORDER[digit - 1]);
+  else if (code === 'KeyX') liftAtHover();
   else if (code === 'KeyQ') rotateAtHover(-1);
   else if (code === 'KeyE') rotateAtHover(1);
   else if (code === 'Space') order({ type: run.phase === 'wave' ? 'flare' : 'startWave' });
@@ -239,6 +247,7 @@ function updateHover() {
   const run = app.run;
   ui.ghost = null;
   ui.ghostTrace = null;
+  ui.hoverPiece = null;
   ui.hint = '';
   ui.hintBad = false;
   ui.hoverCell = null;
@@ -253,6 +262,7 @@ function updateHover() {
   if (!cell || !(run.phase === 'build' || run.phase === 'wave')) return;
   ui.hoverCell = cell;
   const piece = pieceAt(run.grid, cell.c, cell.r);
+  ui.hoverPiece = piece;
   if (piece) {
     ui.hint = `${PIECES[piece.type].name}: ${PIECES[piece.type].blurb}${piece.type === 'pillar' ? '' : ' - click or Q/E to turn'}${run.phase === 'build' ? ' - right-click to lift' : ''}`;
     return;

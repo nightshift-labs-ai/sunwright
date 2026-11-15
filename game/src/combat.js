@@ -4,6 +4,13 @@ import { BEAM, SPREAD_BURN, SCORING, TINT_EFFECTS } from './config.js';
 import { TINT_BLUE, TINT_GOLD, TINT_RED } from './beams.js';
 import { armourOf, enemyCell, reachedShrine } from './enemies.js';
 
+/** Emit a teaching event the first time something happens in a sun (e.g. armour shrugging light off). */
+function noteOnce(run, type, e) {
+  if (run.waveNotes.has(type)) return;
+  run.waveNotes.add(type);
+  run.events.push({ t: run.time, type, x: e.x, y: e.y });
+}
+
 export function flareMultiplier(run) {
   return run.flareLeft > 0 ? BEAM.flareMult : 1;
 }
@@ -29,6 +36,8 @@ export function applyBeamDamage(run, dt) {
     const tint = i === null ? 0 : tints[i];
     e.litPower = power;
     e.shielded = power > 0 && power < armourOf(e) && !(tint & TINT_GOLD);
+    if (e.shielded && e.type === 'shellback') noteOnce(run, 'shrug', e);
+    if (power > 0 && e.def.blocksLight && !(tint & TINT_GOLD)) noteOnce(run, 'deflect', e);
     if (power > 0 && !e.shielded) e.hp -= power * dt;
     if (power > 0 && tint & TINT_RED) e.burn = TINT_EFFECTS.burnSeconds;
     if (power > 0 && tint & TINT_BLUE) e.slow = TINT_EFFECTS.slowSeconds;
