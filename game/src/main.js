@@ -6,7 +6,7 @@ import { playSfx, playSizzle, setBeamHum, setVolume, unlockAudio, updateMusic } 
 import { loadBest, loadHistory, loadSettings, recordRun, saveSettings } from './save.js';
 import { drawFrame } from './render/scene.js';
 import { createFx, fxFromEvent, updateFx } from './render/fx.js';
-import { hotbarHit } from './render/hud.js';
+import { hotbarHit, hudButtonHit } from './render/hud.js';
 import { createMenus, renderOptions, restartRun, showDraft, showResults, showScreen, showTitle } from './ui/menus.js';
 import { createTitleDemo, stepTitleDemo } from './titledemo.js';
 import { createInput, drainIntents } from './input.js';
@@ -189,6 +189,15 @@ function handleKeyInPlay(code) {
 function handleClickInPlay(it) {
   const run = app.run;
   if (app.paused || !(run.phase === 'build' || run.phase === 'wave')) return;
+  // The HUD's pause, speed and sound buttons (the same as Esc, F and M).
+  const button = hudButtonHit(it.x, it.y);
+  if (button) {
+    playSfx('click');
+    if (button === 'pause') app.paused = true;
+    else if (button === 'speed') app.fast = !app.fast;
+    else toggleMute();
+    return;
+  }
   const hit = hotbarHit(it.x, it.y);
   if (hit) {
     if (PIECES[hit]) selectPiece(hit);

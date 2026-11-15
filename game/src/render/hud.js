@@ -28,6 +28,15 @@ const RIGHT_X = VIEW_W - PANEL_W - 6;
 const HOTBAR = { y: 716, w: 104, h: 76, gap: 8 };
 const HOTBAR_X = 640 - (PIECE_ORDER.length * (HOTBAR.w + HOTBAR.gap) + 150 + 190) / 2;
 
+/** The pause, speed and sound buttons under the right panels: icons only (Esc / F / M on the keyboard). */
+const HUD_BUTTONS = ['pause', 'speed', 'mute'].map((id, k) => ({ id, x: RIGHT_X + 4 + k * 70, y: 650, w: 62, h: 50 }));
+
+/** Which HUD button (pause, speed, mute) is under the mouse, or null. */
+export function hudButtonHit(px, py) {
+  const b = HUD_BUTTONS.find((h) => px >= h.x && px <= h.x + h.w && py >= h.y && py <= h.y + h.h);
+  return b ? b.id : null;
+}
+
 /** Hotbar hit test for the mouse: a piece type, 'flare', 'start', or null. */
 export function hotbarHit(px, py) {
   if (py < HOTBAR.y || py > HOTBAR.y + HOTBAR.h) return null;
@@ -549,13 +558,48 @@ function drawSpeaker(ctx, x, y, muted, color) {
   ctx.restore();
 }
 
-/** Three short key lines beside the hotbar during a sun; the last one says whether sound is on. */
+/** Two short key lines beside the hotbar during a sun. */
 function drawKeyLine(ctx, x, ui) {
-  text(ctx, 'Click sand: place - Q/E turn - X sell', x, HOTBAR.y + 22, 15, INK, 'left', 800);
-  if (ui.restartArmed) text(ctx, 'PRESS R AGAIN TO RESTART', x, HOTBAR.y + 44, 15, '#FF8A8A', 'left', 900);
-  else text(ctx, `R restart - SPACE flare - ESC pause${ui.fast ? ' - x2' : ''}`, x, HOTBAR.y + 44, 15, INK, 'left', 800);
-  drawSpeaker(ctx, x + 1, HOTBAR.y + 61, ui.muted, ui.muted ? '#FF8A8A' : INK);
-  text(ctx, ui.muted ? 'M sound off' : 'M sound on', x + 26, HOTBAR.y + 66, 15, ui.muted ? '#FF8A8A' : INK, 'left', 800);
+  text(ctx, 'Click sand: place - Q/E turn - X sell', x, HOTBAR.y + 32, 15, INK, 'left', 800);
+  if (ui.restartArmed) text(ctx, 'PRESS R AGAIN TO RESTART', x, HOTBAR.y + 58, 15, '#FF8A8A', 'left', 900);
+  else text(ctx, 'R restart - SPACE flare - ESC pause', x, HOTBAR.y + 58, 15, INK, 'left', 800);
+}
+
+/** Pause (two bars), speed (two arrows, gold while x2 is on) and sound (speaker, red X when muted). */
+function drawHudButtons(ctx, ui) {
+  for (const b of HUD_BUTTONS) {
+    const on = (b.id === 'speed' && ui.fast) || (b.id === 'mute' && ui.muted);
+    ctx.fillStyle = on ? (b.id === 'mute' ? '#7A2A3A' : GOLD) : 'rgba(31,63,153,0.85)';
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(b.x, b.y, b.w, b.h, 12);
+    ctx.fill();
+    ctx.stroke();
+    const cx = b.x + b.w / 2;
+    const cy = b.y + b.h / 2;
+    const ink = on && b.id === 'speed' ? '#3B1247' : INK;
+    ctx.fillStyle = ink;
+    if (b.id === 'pause') {
+      ctx.fillRect(cx - 10, cy - 12, 7, 24);
+      ctx.fillRect(cx + 3, cy - 12, 7, 24);
+    } else if (b.id === 'speed') {
+      for (const dx of [-12, 2]) {
+        ctx.beginPath();
+        ctx.moveTo(cx + dx, cy - 11);
+        ctx.lineTo(cx + dx + 12, cy);
+        ctx.lineTo(cx + dx, cy + 11);
+        ctx.closePath();
+        ctx.fill();
+      }
+    } else {
+      ctx.save();
+      ctx.translate(cx - 15, cy);
+      ctx.scale(1.5, 1.5);
+      drawSpeaker(ctx, 0, 0, ui.muted, ui.muted ? '#FF8A8A' : INK);
+      ctx.restore();
+    }
+  }
 }
 
 function drawHotbar(ctx, run, ui) {
@@ -628,6 +672,7 @@ export function hudTextBoxes() {
     { text: 'frieze', x0: top, y0: 68, x1: top + BOARD_W + WALL * 2, y1: 106 },
     { text: 'right panels', x0: RIGHT_X, y0: 8, x1: RIGHT_X + PANEL_W, y1: 640 },
     { text: 'hotbar and keys', x0: HOTBAR_X, y0: HOTBAR.y, x1: 1200, y1: HOTBAR.y + HOTBAR.h },
+    { text: 'pause, speed, sound', x0: RIGHT_X, y0: 646, x1: RIGHT_X + PANEL_W, y1: 704 },
   ];
 }
 
@@ -638,4 +683,5 @@ export function drawHud(ctx, run, ui) {
   drawLeftPanel(ctx, run);
   drawRightPanel(ctx, run, ui);
   drawHotbar(ctx, run, ui);
+  drawHudButtons(ctx, ui);
 }

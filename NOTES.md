@@ -269,6 +269,11 @@
   verdict plaque moved up to y 166 (roundel keys touched it) and the draft collision check now
   includes that canvas plaque's band.
 
+- Benchmark 6 item 9: three icon buttons under the right panels (pause, speed x2, speaker with a red X
+  when muted; gold/red while on), clickable during build and sun, the same as Esc / F / M. The key
+  line drops its third line (M sound on) and the right urn made room. Playtest clicks all three
+  (speed on/off, mute saved on/off, pause then Esc). Cover text items 61 -> 60.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.

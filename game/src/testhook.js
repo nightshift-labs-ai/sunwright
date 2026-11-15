@@ -199,6 +199,9 @@ export function installTestHook(app, api) {
         rank: rankFor(run),
         nextSun: nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name),
         best: app.ui.best,
+        fast: app.fast,
+        muted: app.settings.muted,
+        paused: app.paused,
         history: loadHistory().slice(-3),
         tick: run.tick,
       };

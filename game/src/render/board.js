@@ -153,7 +153,6 @@ function drawUrn(g, x, y) {
 const PROPS = [
   { kind: 'palm', x: 92, y: 470 },
   { kind: 'urn', x: 150, y: 640 },
-  { kind: 'urn', x: 1234, y: 684 },
 ];
 
 /** Each prop's bounding box, shadow and fronds included. */

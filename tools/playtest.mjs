@@ -71,6 +71,28 @@ await page.waitForTimeout(400);
 audio = await page.evaluate(() => window.__test.audio());
 expect((await savedMuted()) === false && !audio.muted && (audio.gain === null || audio.gain > 0.3), `M again turns the sound back on (gain ${audio.gain})`);
 
+// The HUD buttons under the right panels: speed toggles x2, sound mutes (saved), pause opens the menu.
+const hudButton = (k) => ({ x: 1062 + 4 + k * 70 + 31, y: 675 });
+await page.mouse.click(hudButton(1).x, hudButton(1).y);
+await frame();
+expect((await state()).fast === true, 'the speed button turns x2 on');
+await page.mouse.click(hudButton(1).x, hudButton(1).y);
+await frame();
+expect((await state()).fast === false, 'the speed button turns x2 off');
+await page.mouse.click(hudButton(2).x, hudButton(2).y);
+await page.waitForTimeout(300);
+audio = await page.evaluate(() => window.__test.audio());
+expect((await savedMuted()) === true && audio.muted, 'the speaker button mutes the audio and saves it');
+await page.mouse.click(hudButton(2).x, hudButton(2).y);
+await frame();
+expect((await savedMuted()) === false, 'the speaker button turns the sound back on');
+await page.mouse.click(hudButton(0).x, hudButton(0).y);
+await frame();
+expect(await visible('pause-screen'), 'the pause button pauses');
+await page.keyboard.press('Escape');
+await frame();
+expect(!(await visible('pause-screen')), 'Esc resumes after the pause button');
+
 const quartzBefore = s.quartz;
 await page.keyboard.press('Digit1');
 const at = cellCentre(4, 4);
