@@ -10,6 +10,7 @@ import { currentBanner } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
+import { drawCharmBadge } from './charms.js';
 import { BOARD_W, BOARD_X, BOARD_Y, CELL, QUARTZ_ANCHOR, VIEW_W, WALL } from './layout.js';
 
 const INK = '#FFF6DF';
@@ -319,7 +320,7 @@ function drawCharmRow(ctx, run, y0) {
   text(ctx, `${NAMES.charmsShort} (${run.boons.length})`, RIGHT_X + 12, y0 + 20, 15, INK, 'left', 900);
   run.boons.forEach((id, k) => {
     const b = boonById(id);
-    drawBoonMedallion(ctx, b, RIGHT_X + 24 + (k % 6) * 33, y0 + 44 + Math.floor(k / 6) * 32, 14);
+    drawCharmBadge(ctx, b, RIGHT_X + 24 + (k % 6) * 33, y0 + 46 + Math.floor(k / 6) * 32, 15);
   });
 }
 
@@ -368,26 +369,6 @@ function drawRightPanel(ctx, run, ui) {
   text(ctx, '1-5 glass, Q/E turn, X sell', x0 + PANEL_W / 2, 702, 12, 'rgba(255,246,223,0.85)', 'center', 800);
 }
 
-/** A small stained-glass roundel for a charm. */
-export function drawBoonMedallion(ctx, boon, x, y, r) {
-  for (let k = 0; k < 6; k++) {
-    ctx.fillStyle = `hsl(${boon.hue + (k % 2) * 30}, 80%, ${k % 2 ? 48 : 62}%)`;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.arc(x, y, r, (k * Math.PI) / 3, ((k + 1) * Math.PI) / 3);
-    ctx.closePath();
-    ctx.fill();
-  }
-  ctx.fillStyle = '#FFF6DF';
-  ctx.beginPath();
-  ctx.arc(x, y, r * 0.32, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = GOLD;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.stroke();
-}
 
 /** The big banner over the courtyard: the latest event, or what the next sun asks of you. */
 function drawEventBanner(ctx, run) {

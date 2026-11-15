@@ -5,6 +5,7 @@ import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, NAMES, PIECES, PIECE_ORDER, RE
 import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
+import { drawCharmGlyph } from '../render/charms.js';
 
 
 const SCREENS = ['title', 'howto', 'options', 'pause', 'draft', 'results'];
@@ -69,9 +70,11 @@ export function renderDraft(menus, run) {
       const b = boonById(id);
       return `<button class="roundel ${b.weight <= 2 ? 'rare' : ''}" style="--hue:${b.hue}" data-action="pick" data-arg="${i}">
         <span class="glass"></span><span class="key">${i + 1}</span>
+        <canvas class="glyph" width="96" height="96" data-charm="${id}"></canvas>
         <b>${escapeHtml(b.name)}</b><span class="effect">${escapeHtml(b.text)}</span></button>`;
     })
     .join('');
+  for (const canvas of el('draft-roundels').querySelectorAll('canvas.glyph')) drawCharmGlyph(canvas.getContext('2d'), canvas.dataset.charm, 48, 48, 46);
   const cost = rerollCost(run);
   const reroll = el('draft-reroll');
   reroll.textContent = `X - reroll (${cost} ${NAMES.currency.toLowerCase()})`;

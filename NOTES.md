@@ -59,6 +59,10 @@
   (density, burning, fountain below max, fresh bite, beetle at the rim, 3+ opaque floaters).
   Seed 2013 K=1: cover 7/10 with 17 beetles, draft 8/10, win 8/10. shots.mjs replays it.
 
+- Charm icons (benchmark 2 item 9): render/charms.js draws a distinct pictogram per charm (flame,
+  lens, sun, magnifier, hourglass, droplet, mirror, twin suns, gem, tag, sun+arrow, prism); HUD badges
+  and a 96 px glyph in each draft roundel.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.
