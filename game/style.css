@@ -67,13 +67,13 @@ button.big:hover { background: #cf3f93; }
 .results-head { position: absolute; left: 20px; right: 20px; top: 16px; height: 140px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(#2d5bd0, #1f3f99); border: 5px solid #f2c14e; border-radius: 18px; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
 #results-title { margin: 0; width: max-content; white-space: nowrap; font: 900 112px system-ui, sans-serif; line-height: 1; letter-spacing: -1px; color: #ffe27a; -webkit-text-stroke: 3px #3b1247; paint-order: stroke fill; transform: scaleX(var(--fit, 1)); }
 .lost #results-title { color: #ff8a8a; }
-.sheet.results { position: absolute; right: 20px; top: 172px; width: 780px; margin: 0; padding: 18px 26px 22px; gap: 14px; background: linear-gradient(#2a56c8, #1f3f99); border: 5px solid #f2c14e; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
+.sheet.results { position: absolute; right: 20px; top: 172px; width: 780px; margin: 0; padding: 18px 26px 22px; gap: 14px; background: linear-gradient(#fdf0d0, #f0d39c); border: 5px solid #f2c14e; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
 .lost .sheet.results { border-color: #ff8a8a; }
-.results .sub { margin: 0; font-size: 34px; font-weight: 900; color: #fff6df; text-shadow: none; }
-.score { font: 900 84px system-ui, sans-serif; line-height: 1; color: #fff2a8; display: flex; align-items: center; gap: 18px; -webkit-text-stroke: 2px #3b1247; paint-order: stroke fill; }
+.results .sub { margin: 0; font-size: 34px; font-weight: 900; color: #3b1247; text-shadow: none; }
+.score { font: 900 84px system-ui, sans-serif; line-height: 1; color: #7a2e14; display: flex; align-items: center; gap: 18px; }
 .score em { font: 900 34px system-ui, sans-serif; font-style: normal; color: #3b1247; background: #7dffc4; border-radius: 10px; padding: 4px 14px; -webkit-text-stroke: 0; }
 .stats { display: flex; gap: 12px; }
-.stats div { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 220px; padding: 6px 10px; background: rgba(15, 30, 90, 0.7); border: 2px solid rgba(242, 193, 78, 0.8); border-radius: 12px; }
+.stats div { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 220px; padding: 6px 10px; background: #2d5bd0; border: 3px solid #f2c14e; border-radius: 12px; }
 .stats small { font-size: 30px; font-weight: 900; color: #ffe27a; line-height: 1.1; }
 .stats b { font-size: 40px; font-weight: 900; color: #fff6df; line-height: 1.1; }
 .history { display: flex; gap: 12px; }
