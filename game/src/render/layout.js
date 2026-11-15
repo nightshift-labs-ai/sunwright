@@ -1,15 +1,17 @@
 // Screen geometry shared by the renderer, the HUD and the mouse: a 1280 x 800 stage with the
-// 13 x 9 courtyard of 64 px cells in the middle, lapis walls around it.
+// 13 x 9 courtyard of 60 px cells in the middle, lapis walls around it (the north wall shows a
+// 48 px oblique front face, the south wall is a low curb).
 import { BOARD } from '../config.js';
 
 export const VIEW_W = 1280;
 export const VIEW_H = 800;
-export const CELL = 64;
+export const CELL = 60;
 export const BOARD_X = Math.round((VIEW_W - BOARD.cols * CELL) / 2);
-export const BOARD_Y = 106;
+export const BOARD_Y = 140;
 export const BOARD_W = BOARD.cols * CELL;
 export const BOARD_H = BOARD.rows * CELL;
-export const WALL = 26;
+export const WALL = 24;
+export const WALL_FRONT = 48;
 
 /** Cell-unit coordinates (cell centres at c + 0.5) to stage pixels. */
 export function toScreenX(x) {

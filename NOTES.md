@@ -28,6 +28,10 @@
   sparse between suns), master/music/effects buses, Options screen (3 sliders, shake, mute) from
   title and pause, F fast-forward x2 during a sun.
 
+- M4 (part): layout to 60 px cells (board at y 140) so the north wall shows a 48 px oblique lapis
+  front face with gold pilasters and an arched sun window; side-wall slots; low south curb with
+  burrow arches; SUN - E/N/W plaques; floor labels SWARM / FOUNTAIN; shadows >= 0.6 cell long.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

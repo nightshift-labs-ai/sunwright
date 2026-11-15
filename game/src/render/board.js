@@ -3,7 +3,7 @@
 // from the sun, and the jade Sun Fountain.
 import { BOARD } from '../config.js';
 import { sunApertureFor } from '../sun.js';
-import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL } from './layout.js';
+import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL, WALL_FRONT } from './layout.js';
 
 export const PALETTE = {
   sandA: '#D8A86A',
@@ -46,10 +46,11 @@ function buildFloorTexture() {
       if ((r * 7 + c * 3) % 4 === 0) {
         g.strokeStyle = 'rgba(160,100,50,0.25)';
         g.beginPath();
-        g.moveTo(c * CELL + 32, r * CELL + 22);
-        g.lineTo(c * CELL + 42, r * CELL + 32);
-        g.lineTo(c * CELL + 32, r * CELL + 42);
-        g.lineTo(c * CELL + 22, r * CELL + 32);
+        const h = CELL / 2;
+        g.moveTo(c * CELL + h, r * CELL + h - 10);
+        g.lineTo(c * CELL + h + 10, r * CELL + h);
+        g.lineTo(c * CELL + h, r * CELL + h + 10);
+        g.lineTo(c * CELL + h - 10, r * CELL + h);
         g.closePath();
         g.stroke();
       }
@@ -97,84 +98,143 @@ function drawStarTile(g, x, y, s) {
   g.fill();
 }
 
-/** The whole static frame: warm surround, lapis wall ring with tiles and trim. */
+/** The static frame: warm surround, lapis side walls, the north wall's oblique front, the low south wall. */
 function buildWallTexture() {
   const cv = makeCanvas(VIEW_W, VIEW_H);
   const g = cv.getContext('2d');
   const bg = g.createLinearGradient(0, 0, 0, VIEW_H);
-  bg.addColorStop(0, '#C98C57');
-  bg.addColorStop(1, '#A9693B');
+  bg.addColorStop(0, '#D39A62');
+  bg.addColorStop(1, '#B67A46');
   g.fillStyle = bg;
   g.fillRect(0, 0, VIEW_W, VIEW_H);
-  // Sand ripples on the surround.
-  g.strokeStyle = 'rgba(255,220,170,0.13)';
+  g.strokeStyle = 'rgba(255,225,180,0.16)';
   g.lineWidth = 2;
   for (let y = 10; y < VIEW_H; y += 22) {
     g.beginPath();
     for (let x = 0; x <= VIEW_W; x += 20) g.lineTo(x, y + Math.sin(x * 0.02 + y) * 4);
     g.stroke();
   }
-  const x0 = BOARD_X - WALL;
-  const y0 = BOARD_Y - WALL;
-  const w = BOARD_W + WALL * 2;
-  const h = BOARD_H + WALL * 2;
+  const left = BOARD_X - WALL;
+  const right = BOARD_X + BOARD_W + WALL;
+  const top = BOARD_Y - WALL_FRONT - WALL;
+  const front = BOARD_Y - WALL_FRONT;
+  const bottom = BOARD_Y + BOARD_H + WALL;
   g.fillStyle = 'rgba(91,58,30,0.35)';
-  g.fillRect(x0 + 8, y0 + 12, w, h);
-  const s = WALL;
-  for (let x = x0; x < x0 + w; x += s) {
-    drawStarTile(g, x, y0, s);
-    drawStarTile(g, x, y0 + h - s, s);
+  g.fillRect(left + 10, top + 14, right - left, bottom + 10 - top);
+  for (let y = top; y < bottom; y += WALL) {
+    drawStarTile(g, left, y, WALL);
+    drawStarTile(g, right - WALL, y, WALL);
   }
-  for (let y = y0 + s; y < y0 + h - s; y += s) {
-    drawStarTile(g, x0, y, s);
-    drawStarTile(g, x0 + w - s, y, s);
+  for (let x = left; x < right; x += WALL) {
+    drawStarTile(g, x, top, WALL);
+    drawStarTile(g, x, BOARD_Y + BOARD_H, WALL);
   }
+  // North wall front face: shaded lapis with a star frieze and gold-edged pilasters.
+  const face = g.createLinearGradient(0, front, 0, BOARD_Y);
+  face.addColorStop(0, '#2F5ED6');
+  face.addColorStop(1, '#173887');
+  g.fillStyle = face;
+  g.fillRect(BOARD_X, front, BOARD_W, WALL_FRONT);
+  for (let x = BOARD_X + 6; x < BOARD_X + BOARD_W - 18; x += 30) drawStarTile(g, x, front + 14, 18);
+  g.fillStyle = PALETTE.gold;
+  for (let c = 0; c <= BOARD.cols; c += 2) g.fillRect(BOARD_X + c * CELL - 2, front, 4, WALL_FRONT);
+  // Low south curb: a short front face below its top.
+  g.fillStyle = '#173887';
+  g.fillRect(left, bottom, right - left, 8);
   g.strokeStyle = PALETTE.gold;
   g.lineWidth = 3;
-  g.strokeRect(x0 + 1.5, y0 + 1.5, w - 3, h - 3);
+  g.strokeRect(left + 1.5, top + 1.5, right - left - 3, bottom - top - 3);
+  g.beginPath();
+  g.moveTo(BOARD_X, front);
+  g.lineTo(BOARD_X + BOARD_W, front);
+  g.stroke();
   g.strokeRect(BOARD_X - 1.5, BOARD_Y - 1.5, BOARD_W + 3, BOARD_H + 3);
   return cv;
 }
 
-function wallSlotRect(ap) {
+/** Where a sun window sits in its wall (screen pixels). */
+function windowRect(ap) {
   if (ap.wall === 'east') return { x: BOARD_X + BOARD_W, y: BOARD_Y + ap.r * CELL + 8, w: WALL, h: CELL - 16 };
   if (ap.wall === 'west') return { x: BOARD_X - WALL, y: BOARD_Y + ap.r * CELL + 8, w: WALL, h: CELL - 16 };
-  return { x: BOARD_X + ap.c * CELL + 8, y: BOARD_Y - WALL, w: CELL - 16, h: WALL };
+  return { x: BOARD_X + ap.c * CELL + 10, y: BOARD_Y - WALL_FRONT - WALL, w: CELL - 20, h: WALL + WALL_FRONT };
 }
 
-/** Floor, walls, the day's three sun windows (lit / next / shuttered) and the burrows. */
+/** A little lapis plaque reading SUN - E / N / W beside a window (rotated on the side walls). */
+function drawWindowLabel(ctx, ap, slot, lit) {
+  const label = `SUN - ${ap.phase.wallName[0]}`;
+  ctx.save();
+  if (ap.wall === 'north') ctx.translate(slot.x + slot.w + 36, slot.y + WALL / 2);
+  else {
+    ctx.translate(slot.x + slot.w / 2, slot.y - 34);
+    ctx.rotate(ap.wall === 'east' ? Math.PI / 2 : -Math.PI / 2);
+  }
+  ctx.font = '900 13px system-ui, sans-serif';
+  const w = ctx.measureText(label).width + 12;
+  ctx.fillStyle = lit ? PALETTE.gold : '#1F3F99';
+  ctx.fillRect(-w / 2, -9, w, 18);
+  ctx.strokeStyle = lit ? '#FFFFFF' : PALETTE.gold;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(-w / 2, -9, w, 18);
+  ctx.fillStyle = lit ? '#3B1247' : '#FFF6DF';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, 0, 5);
+  ctx.restore();
+}
+
+/** Words painted on the floor: SWARM at the burrows, FOUNTAIN under the shrine. */
+function drawFloorLabels(ctx, run) {
+  ctx.font = '900 15px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(120,62,24,0.6)';
+  for (const g of run.grid.gates) ctx.fillText('SWARM', BOARD_X + g.c * CELL + CELL / 2, BOARD_Y + BOARD_H - 6);
+  const s = run.grid.shrine;
+  ctx.fillText('FOUNTAIN', BOARD_X + s.c * CELL + CELL / 2, BOARD_Y + (s.r + 1) * CELL + 14);
+}
+
+/** Floor, walls, the day's three sun windows (lit / next / shuttered), labels and the burrows. */
 export function drawCourtyard(ctx, run, time) {
   floorCanvas ??= buildFloorTexture();
   wallCanvas ??= buildWallTexture();
   ctx.drawImage(wallCanvas, 0, 0);
   ctx.drawImage(floorCanvas, BOARD_X, BOARD_Y);
+  drawFloorLabels(ctx, run);
   const now = run.aperture;
   const dayStart = (now.day - 1) * 3;
   for (let k = 0; k < 3; k++) {
     const ap = sunApertureFor(run.seed, dayStart + k);
-    const slot = wallSlotRect(ap);
+    const slot = windowRect(ap);
     const lit = ap.wall === now.wall;
     const next = run.waveIndex + 1 === dayStart + k;
-    ctx.fillStyle = lit ? '#FFF4C8' : '#3A2A55';
-    ctx.fillRect(slot.x, slot.y, slot.w, slot.h);
+    ctx.fillStyle = lit ? '#FFF4C8' : '#4A3A6A';
+    ctx.beginPath();
+    if (ap.wall === 'north') {
+      // An arched window through the wall's front face.
+      ctx.moveTo(slot.x, slot.y + slot.h);
+      ctx.lineTo(slot.x, slot.y + 16);
+      ctx.arc(slot.x + slot.w / 2, slot.y + 16, slot.w / 2, Math.PI, 0);
+      ctx.lineTo(slot.x + slot.w, slot.y + slot.h);
+      ctx.closePath();
+    } else ctx.rect(slot.x, slot.y, slot.w, slot.h);
+    ctx.fill();
     if (lit) {
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
       ctx.fillStyle = `rgba(255,197,49,${0.35 + Math.sin(time * 3) * 0.08})`;
-      ctx.fillRect(slot.x - 6, slot.y - 6, slot.w + 12, slot.h + 12);
+      ctx.fill();
       ctx.restore();
     }
     ctx.strokeStyle = next ? '#FFFFFF' : PALETTE.gold;
     ctx.lineWidth = next ? 3 : 2;
-    ctx.strokeRect(slot.x + 1, slot.y + 1, slot.w - 2, slot.h - 2);
+    ctx.stroke();
+    drawWindowLabel(ctx, ap, slot, lit);
   }
-  // Burrows: violet arches in the south wall.
+  // Burrows: violet arches in the low south wall.
   for (const g of run.grid.gates) {
     const x = BOARD_X + g.c * CELL + CELL / 2;
-    const y = BOARD_Y + BOARD_H + WALL / 2;
+    const y = BOARD_Y + BOARD_H + WALL / 2 + 2;
     ctx.fillStyle = '#4A2350';
     ctx.beginPath();
-    ctx.ellipse(x, y, 24, 14, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, y, 22, 13, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = '#B0307A';
     ctx.lineWidth = 3;
@@ -200,7 +260,7 @@ function hull(points) {
 }
 
 export function drawBlockShadow(ctx, x, y, w, d, height, shadow) {
-  const len = height * 1.7;
+  const len = Math.max(CELL * 0.6, height * 1.7);
   const ox = shadow.x * len;
   const oy = shadow.y * len;
   const pts = hull([[x, y], [x + w, y], [x, y + d], [x + w, y + d], [x + ox, y + oy], [x + w + ox, y + oy], [x + ox, y + d + oy], [x + w + ox, y + d + oy]]);

@@ -18,7 +18,7 @@ const frame = () => page.waitForTimeout(60);
 const state = () => page.evaluate(() => window.__test.state());
 const advance = (n) => page.evaluate((k) => window.__test.advance(k), n);
 const visible = (id) => page.evaluate((i) => !document.getElementById(i).classList.contains('hidden'), id);
-const cellCentre = (c, r) => ({ x: 224 + c * 64 + 32, y: 106 + r * 64 + 32 });
+const cellCentre = (c, r) => ({ x: 250 + c * 60 + 30, y: 140 + r * 60 + 30 });
 
 await page.goto(`${base}?test=1`, { waitUntil: 'load' });
 await frame();

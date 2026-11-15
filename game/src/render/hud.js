@@ -284,20 +284,20 @@ export function drawBoonMedallion(ctx, boon, x, y, r) {
 
 function drawTopBanner(ctx, run, ui) {
   const { day, phase } = run.aperture;
-  text(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, 640, 40, 30, INK, 'center', 900);
+  text(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, 640, 32, 28, INK, 'center', 900);
   if (run.phase === 'wave') {
     const total = run.schedule.length;
     const left = enemiesRemaining(run);
     ctx.fillStyle = 'rgba(30,20,60,0.55)';
-    ctx.fillRect(460, 56, 360, 12);
+    ctx.fillRect(460, 44, 360, 12);
     ctx.fillStyle = '#B0307A';
-    ctx.fillRect(460, 56, 360 * (total ? left / total : 0), 12);
+    ctx.fillRect(460, 44, 360 * (total ? left / total : 0), 12);
     ctx.strokeStyle = GOLD;
     ctx.lineWidth = 2;
-    ctx.strokeRect(460, 56, 360, 12);
-    text(ctx, `${left} beetles left`, 830, 67, 14, INK, 'left', 700);
+    ctx.strokeRect(460, 44, 360, 12);
+    text(ctx, `${left} beetles left`, 830, 55, 14, INK, 'left', 700);
   } else if (run.phase === 'build') {
-    text(ctx, ui.hint || 'BUILD: bend the light onto the swarm path', 640, 70, 16, ui.hint ? (ui.hintBad ? '#FF8A8A' : INK) : '#FFF2A8', 'center', 700);
+    text(ctx, ui.hint || 'BUILD: bend the light onto the swarm path', 640, 58, 16, ui.hint ? (ui.hintBad ? '#FF8A8A' : INK) : '#FFF2A8', 'center', 700);
   }
 }
 
@@ -370,7 +370,7 @@ function drawHotbar(ctx, run, ui) {
     text(ctx, String(i + 1), x + 9, HOTBAR.y + 19, 15, GOLD, 'left', 900);
     text(ctx, PIECES[type].name, x + HOTBAR.w / 2, HOTBAR.y + 70, 13, INK, 'center', 700);
     text(ctx, unlocked ? `${cost}` : 'DAY 2', x + (unlocked ? 80 : 72), HOTBAR.y + 40, unlocked ? 24 : 14, afford ? '#BDF4FF' : '#FF8A8A', 'center', 900);
-    ctx.fillStyle = '#7FE8FF';
+    ctx.fillStyle = unlocked ? '#7FE8FF' : 'rgba(0,0,0,0)';
     ctx.beginPath();
     ctx.moveTo(x + 94, HOTBAR.y + 22);
     ctx.lineTo(x + 99, HOTBAR.y + 29);
