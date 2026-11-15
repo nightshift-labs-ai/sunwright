@@ -1,0 +1,215 @@
+// Light and juice: additive sunbeams with starbursts at bounces, sparks on burning beetles,
+// smoke and flipped husks on kills, shards that fly to the HUD counter, floating CHAIN text,
+// screen shake, the Flare flash and the red hurt vignette. Effects advance with sim time.
+import { SHARD_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
+
+export function createFx() {
+  return { particles: [], texts: [], shake: 0, flash: 0, hurt: 0, seed: 12345, waveBanner: 0 };
+}
+
+function fxRandom(fx) {
+  fx.seed = (fx.seed * 16807) % 2147483647;
+  return fx.seed / 2147483647;
+}
+
+function burst(fx, x, y, n, kind, color, speed, life, size) {
+  for (let k = 0; k < n; k++) {
+    const a = fxRandom(fx) * Math.PI * 2;
+    const v = speed * (0.4 + fxRandom(fx) * 0.8);
+    fx.particles.push({ kind, x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (kind === 'smoke' ? 20 : 0), life, max: life, size: size * (0.6 + fxRandom(fx) * 0.8), color });
+  }
+}
+
+/** Turn one sim event into effects. */
+export function fxFromEvent(fx, ev) {
+  if (ev.type === 'kill') {
+    const x = toScreenX(ev.x);
+    const y = toScreenY(ev.y);
+    burst(fx, x, y, 10, 'smoke', 'rgba(110,80,70,', 40, 0.9, 9);
+    burst(fx, x, y, 14, 'spark', '#FFD34D', 160, 0.45, 3);
+    fx.particles.push({ kind: 'husk', x, y, vx: 0, vy: 0, life: 1.4, max: 1.4, size: ev.boss ? 34 : 18, color: ev.enemy });
+    for (let k = 0; k < ev.shards; k++) {
+      fx.particles.push({ kind: 'shard', x: x + k * 6, y, sx: x + k * 6, sy: y, vx: 0, vy: 0, life: 0.75 + k * 0.08, max: 0.75 + k * 0.08, size: 6, color: '#7FE8FF' });
+    }
+    const label = ev.mult > 1 ? `+${ev.points}  CHAIN x${ev.mult}` : `+${ev.points}`;
+    fx.texts.push({ x, y: y - 18, text: label, life: 1.1, max: 1.1, color: ev.mult > 1 ? '#FFF2A8' : '#FFFFFF', size: ev.mult > 1 ? 22 : 17 });
+  } else if (ev.type === 'bite') {
+    fx.shake = Math.min(14, fx.shake + 6 + ev.harm * 2);
+    fx.hurt = 1;
+    burst(fx, toScreenX(ev.x), toScreenY(ev.y), 12, 'spark', '#FF5C5C', 120, 0.5, 3);
+  } else if (ev.type === 'placed' || ev.type === 'lifted') {
+    burst(fx, toScreenX(ev.c + 0.5), toScreenY(ev.r + 0.85), 12, 'smoke', 'rgba(232,196,140,', 50, 0.6, 7);
+  } else if (ev.type === 'flare') {
+    fx.flash = 1;
+  } else if (ev.type === 'scorch') {
+    burst(fx, toScreenX(ev.x), toScreenY(ev.y), 8, 'spark', '#FF7A2E', 110, 0.4, 3);
+  } else if (ev.type === 'waveStart') {
+    fx.waveBanner = 1;
+  } else if (ev.type === 'denied' && ev.c !== undefined) {
+    fx.texts.push({ x: toScreenX(ev.c + 0.5), y: toScreenY(ev.r + 0.2), text: ev.reason, life: 1.2, max: 1.2, color: '#FF6B6B', size: 16 });
+  }
+}
+
+/** Sparks and embers rising from every burning beetle. */
+function emitBurnSparks(fx, run, dt) {
+  for (const e of run.enemies) {
+    if (e.litPower <= 0 || e.shielded) continue;
+    if (fxRandom(fx) < dt * (6 + e.litPower * 0.4)) {
+      const x = toScreenX(e.x) + (fxRandom(fx) - 0.5) * 20;
+      const y = toScreenY(e.y) + (fxRandom(fx) - 0.5) * 14;
+      fx.particles.push({ kind: 'spark', x, y, vx: (fxRandom(fx) - 0.5) * 40, vy: -40 - fxRandom(fx) * 60, life: 0.5, max: 0.5, size: 2.5, color: fxRandom(fx) < 0.5 ? '#FFB02E' : '#FFF2A8' });
+    }
+  }
+}
+
+export function updateFx(fx, run, dt) {
+  if (run) emitBurnSparks(fx, run, dt);
+  for (const p of fx.particles) {
+    p.life -= dt;
+    if (p.kind === 'shard') continue;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vx *= 1 - dt * 2.5;
+    p.vy = p.vy * (1 - dt * 2.5) + (p.kind === 'spark' ? 60 * dt : 0);
+  }
+  fx.particles = fx.particles.filter((p) => p.life > 0);
+  for (const t of fx.texts) {
+    t.life -= dt;
+    t.y -= 30 * dt;
+  }
+  fx.texts = fx.texts.filter((t) => t.life > 0);
+  fx.shake = Math.max(0, fx.shake - dt * 30);
+  fx.flash = Math.max(0, fx.flash - dt * 2.2);
+  fx.hurt = Math.max(0, fx.hurt - dt * 1.6);
+  fx.waveBanner = Math.max(0, fx.waveBanner - dt * 0.7);
+}
+
+function drawStarburst(ctx, x, y, r, alpha) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, `rgba(255,251,230,${alpha})`);
+  g.addColorStop(0.35, `rgba(255,197,49,${alpha * 0.5})`);
+  g.addColorStop(1, 'rgba(255,197,49,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  ctx.strokeStyle = `rgba(255,251,230,${alpha * 0.9})`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (const [dx, dy] of [[1, 0], [0, 1], [0.6, 0.6], [0.6, -0.6]]) {
+    ctx.moveTo(x - dx * r, y - dy * r);
+    ctx.lineTo(x + dx * r, y + dy * r);
+  }
+  ctx.stroke();
+}
+
+/**
+ * Draw a traced beam additively. opts: { alpha, flare (0-1), time }.
+ * Width follows power so a split or bounced beam visibly thins.
+ */
+export function drawBeams(ctx, trace, opts) {
+  const alpha = opts.alpha ?? 1;
+  const surge = 1 + (opts.flare ?? 0) * 0.6;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineCap = 'round';
+  const passes = [
+    [30, 'rgba(255,197,49,', 0.2],
+    [14, 'rgba(255,214,90,', 0.42],
+    [5, 'rgba(255,251,230,', 0.95],
+  ];
+  for (const [width, color, a] of passes) {
+    for (const leg of trace.legs) {
+      const w = Math.min(2.6, Math.max(0.45, leg.power / 10)) * surge * (leg.focused ? 1.25 : 1);
+      ctx.strokeStyle = leg.focused && width > 5 ? `rgba(255,140,60,${a * alpha})` : `${color}${a * alpha})`;
+      ctx.lineWidth = width * w;
+      ctx.beginPath();
+      ctx.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));
+      ctx.lineTo(toScreenX(leg.x1), toScreenY(leg.y1));
+      ctx.stroke();
+    }
+  }
+  const twinkle = 0.85 + Math.sin((opts.time ?? 0) * 7) * 0.15;
+  for (const b of trace.bursts) drawStarburst(ctx, toScreenX(b.x), toScreenY(b.y), 26 * Math.min(1.8, Math.max(0.6, b.power / 10)) * twinkle, 0.9 * alpha);
+  ctx.restore();
+}
+
+/** Particles and floating text, drawn above the board. */
+export function drawFx(ctx, fx) {
+  for (const p of fx.particles) {
+    const k = p.life / p.max;
+    if (p.kind === 'smoke') {
+      ctx.fillStyle = `${p.color}${0.45 * k})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * (1.6 - k * 0.6), 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.kind === 'spark') {
+      ctx.globalAlpha = k;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+      ctx.globalAlpha = 1;
+    } else if (p.kind === 'husk') {
+      // A beetle flipped on its back, legs in the air, fading out.
+      ctx.globalAlpha = Math.min(1, k * 1.5);
+      ctx.fillStyle = p.color === 'lampmoth' ? '#7A3B9A' : '#4A1A55';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, p.size, p.size * 0.7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#2A0E30';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let j = -1; j <= 1; j++) {
+        ctx.moveTo(p.x + j * p.size * 0.5, p.y - p.size * 0.4);
+        ctx.lineTo(p.x + j * p.size * 0.7, p.y - p.size * 1.1);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    } else if (p.kind === 'shard') {
+      const t = 1 - k;
+      const e = t * t;
+      const mx = (p.sx + SHARD_ANCHOR.x) / 2;
+      const my = Math.min(p.sy, SHARD_ANCHOR.y) - 140;
+      const x = (1 - e) * (1 - e) * p.sx + 2 * (1 - e) * e * mx + e * e * SHARD_ANCHOR.x;
+      const y = (1 - e) * (1 - e) * p.sy + 2 * (1 - e) * e * my + e * e * SHARD_ANCHOR.y;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.moveTo(x, y - p.size);
+      ctx.lineTo(x + p.size * 0.6, y);
+      ctx.lineTo(x, y + p.size);
+      ctx.lineTo(x - p.size * 0.6, y);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+  ctx.textAlign = 'center';
+  for (const t of fx.texts) {
+    ctx.globalAlpha = Math.min(1, (t.life / t.max) * 2);
+    ctx.font = `800 ${t.size}px system-ui, sans-serif`;
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'rgba(60,20,40,0.85)';
+    ctx.strokeText(t.text, t.x, t.y);
+    ctx.fillStyle = t.color;
+    ctx.fillText(t.text, t.x, t.y);
+  }
+  ctx.globalAlpha = 1;
+}
+
+/** Full-screen overlays: the Flare's white flash and the red hurt vignette. */
+export function drawScreenFx(ctx, fx) {
+  if (fx.flash > 0) {
+    ctx.fillStyle = `rgba(255,250,225,${fx.flash * 0.5})`;
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  }
+  if (fx.hurt > 0) {
+    const g = ctx.createRadialGradient(VIEW_W / 2, VIEW_H / 2, VIEW_H * 0.35, VIEW_W / 2, VIEW_H / 2, VIEW_H * 0.8);
+    g.addColorStop(0, 'rgba(200,20,40,0)');
+    g.addColorStop(1, `rgba(200,20,40,${fx.hurt * 0.5})`);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+  }
+}
+
+/** Pixel offset for screen shake this frame. */
+export function shakeOffset(fx, time) {
+  if (fx.shake <= 0) return { x: 0, y: 0 };
+  return { x: Math.sin(time * 91) * fx.shake, y: Math.cos(time * 77) * fx.shake * 0.7 };
+}
+
