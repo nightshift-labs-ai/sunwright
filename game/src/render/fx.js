@@ -101,6 +101,17 @@ function drawStarburst(ctx, x, y, r, alpha) {
   ctx.stroke();
 }
 
+/** Glow, halo and core widths and alphas of a beam. */
+const BEAM_PASSES = [[26, 0.18], [12, 0.4], [5, 0.95]];
+/** Glow / halo / core colours per tint: sunlight, red (1), blue (2), gold (4). */
+const TINT_COLORS = {
+  0: ['rgba(255,197,49,', 'rgba(255,214,90,', 'rgba(255,251,230,'],
+  1: ['rgba(255,77,61,', 'rgba(255,110,80,', 'rgba(255,215,200,'],
+  2: ['rgba(89,184,255,', 'rgba(120,200,255,', 'rgba(225,245,255,'],
+  4: ['rgba(255,170,20,', 'rgba(255,200,40,', 'rgba(255,246,190,'],
+};
+const FOCUS_COLORS = ['rgba(255,120,40,', 'rgba(255,160,60,', 'rgba(255,251,230,'];
+
 /**
  * Draw a traced beam additively. opts: { alpha, flare (0-1), time }.
  * Width follows power so a split or bounced beam visibly thins.
@@ -111,15 +122,12 @@ export function drawBeams(ctx, trace, opts) {
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.lineCap = 'round';
-  const passes = [
-    [26, 'rgba(255,197,49,', 0.18],
-    [12, 'rgba(255,214,90,', 0.4],
-    [5, 'rgba(255,251,230,', 0.95],
-  ];
-  for (const [width, color, a] of passes) {
+  for (let pass = 0; pass < 3; pass++) {
+    const [width, a] = BEAM_PASSES[pass];
     for (const leg of trace.legs) {
       const w = Math.min(1.7, Math.max(0.5, Math.sqrt(leg.power / 10))) * surge;
-      ctx.strokeStyle = leg.focused && width > 5 ? `rgba(255,140,60,${a * alpha})` : `${color}${a * alpha})`;
+      const colors = leg.focused && pass < 2 ? FOCUS_COLORS : TINT_COLORS[leg.tint] ?? TINT_COLORS[0];
+      ctx.strokeStyle = `${colors[pass]}${a * alpha})`;
       ctx.lineWidth = width * w;
       ctx.beginPath();
       ctx.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));

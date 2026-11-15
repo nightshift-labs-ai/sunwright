@@ -1,7 +1,7 @@
 // Beetle behaviour: Scuttlers and Shellbacks walk the flow field around pieces, Lampmoths fly
 // over everything towards the shrine but veer into the brightest light nearby, and the Umbral
 // Matriarch walks slowly with a carapace that only opens part of the time.
-import { BOARD, DX, DY, ENEMIES, MATRIARCH_CARAPACE, MOTH_DAZZLE, MOTH_LURE } from './config.js';
+import { BOARD, DX, DY, ENEMIES, MATRIARCH_CARAPACE, MOTH_DAZZLE, MOTH_LURE, TINT_EFFECTS } from './config.js';
 import { flowDirectionAt } from './pathing.js';
 
 export function spawnEnemy(run, type, gateIndex) {
@@ -21,6 +21,8 @@ export function spawnEnemy(run, type, gateIndex) {
     heading: 3,
     litPower: 0,
     shielded: false,
+    burn: 0,
+    slow: 0,
     age: 0,
     wobble: (run.nextEnemyId * 1.7) % 6.28,
   };
@@ -38,8 +40,12 @@ export function carapaceOpen(enemy) {
   return enemy.age % MATRIARCH_CARAPACE.cycle > MATRIARCH_CARAPACE.cycle - MATRIARCH_CARAPACE.open;
 }
 
+function slowFactor(e) {
+  return e.slow > 0 ? TINT_EFFECTS.slowFactor : 1;
+}
+
 function stepWalker(run, e, dt) {
-  let budget = e.def.speed * dt;
+  let budget = e.def.speed * slowFactor(e) * dt;
   while (budget > 0) {
     const tx = e.tc + 0.5;
     const ty = e.tr + 0.5;
@@ -86,7 +92,7 @@ function stepFlyer(run, e, dt) {
   }
   vx += Math.cos(e.age * 3 + e.wobble) * 0.35;
   const vl = Math.hypot(vx, vy) || 1;
-  const speed = e.def.speed * (e.litPower > 0 ? MOTH_DAZZLE : 1);
+  const speed = e.def.speed * slowFactor(e) * (e.litPower > 0 ? MOTH_DAZZLE : 1);
   e.x += (vx / vl) * speed * dt;
   e.y += (vy / vl) * speed * dt;
   e.heading = Math.abs(vx) > Math.abs(vy) ? (vx > 0 ? 0 : 2) : vy > 0 ? 1 : 3;
@@ -121,6 +127,20 @@ export function moveEnemies(run, dt) {
 /** Beetles close enough to the shrine to bite it. */
 export function reachedShrine(run, e) {
   return Math.hypot(e.x - (run.grid.shrine.c + 0.5), e.y - (run.grid.shrine.r + 0.5)) < 0.42;
+}
+
+/** Cells holding a Glassback, whose mirror shell stops non-gold light; '' key when none. */
+export function shellBlockers(run) {
+  let key = '';
+  const cells = new Set();
+  for (const e of run.enemies) {
+    if (!e.def.blocksLight) continue;
+    const i = enemyCell(run, e);
+    if (i === null || cells.has(i)) continue;
+    cells.add(i);
+    key += `${i},`;
+  }
+  return { cells, key };
 }
 
 /** The board cell a beetle stands on (or null while still in its burrow). */

@@ -4,7 +4,7 @@
 import { BEAM, ENEMIES, PIECES, PIECE_ORDER, WAVE_COUNT } from '../config.js';
 import { boonById } from '../draft.js';
 import { chainMultiplier, chainWindow } from '../combat.js';
-import { enemiesRemaining, pieceCost } from '../sim.js';
+import { enemiesRemaining, pieceCost, pieceUnlocked } from '../sim.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
@@ -15,7 +15,7 @@ const GOLD = '#F2C14E';
 const FONT = 'system-ui, "Segoe UI", sans-serif';
 const PANEL_W = 188;
 
-const HOTBAR = { y: 716, w: 112, h: 76, gap: 10 };
+const HOTBAR = { y: 716, w: 104, h: 76, gap: 8 };
 const HOTBAR_X = 640 - (PIECE_ORDER.length * (HOTBAR.w + HOTBAR.gap) + 150 + 190) / 2;
 
 /** Hotbar hit test for the mouse: a piece type, 'flare', 'start', or null. */
@@ -296,6 +296,26 @@ function drawPieceIcon(ctx, type, x, y) {
     ctx.strokeStyle = type === 'mirror' ? GOLD : '#E8FFFF';
     ctx.lineWidth = 2;
     ctx.strokeRect(-17, -4, 34, 8);
+  } else if (type === 'prism') {
+    const faces = ['#FF4D3D', '#59B8FF', '#FFC531'];
+    const tri = [[0, -18], [14, 8], [-14, 8]];
+    for (let k = 0; k < 3; k++) {
+      ctx.fillStyle = faces[k];
+      ctx.beginPath();
+      ctx.moveTo(0, -3);
+      ctx.lineTo(...tri[k]);
+      ctx.lineTo(...tri[(k + 1) % 3]);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(...tri[0]);
+    ctx.lineTo(...tri[1]);
+    ctx.lineTo(...tri[2]);
+    ctx.closePath();
+    ctx.stroke();
   } else if (type === 'lens') {
     ctx.fillStyle = '#77D7E8';
     ctx.beginPath();
@@ -317,7 +337,8 @@ function drawHotbar(ctx, run, ui) {
   PIECE_ORDER.forEach((type, i) => {
     const x = HOTBAR_X + i * (HOTBAR.w + HOTBAR.gap);
     const cost = pieceCost(run, type);
-    const afford = run.shards >= cost;
+    const unlocked = pieceUnlocked(run, type);
+    const afford = run.shards >= cost && unlocked;
     const selected = ui.selected === type;
     ctx.globalAlpha = afford ? 1 : 0.45;
     panel(ctx, x, HOTBAR.y, HOTBAR.w, HOTBAR.h);
@@ -326,16 +347,16 @@ function drawHotbar(ctx, run, ui) {
       ctx.lineWidth = 4;
       ctx.strokeRect(x - 2, HOTBAR.y - 2, HOTBAR.w + 4, HOTBAR.h + 4);
     }
-    drawPieceIcon(ctx, type, x + 36, HOTBAR.y + 36);
+    drawPieceIcon(ctx, type, x + 32, HOTBAR.y + 36);
     text(ctx, String(i + 1), x + 9, HOTBAR.y + 19, 15, GOLD, 'left', 900);
     text(ctx, PIECES[type].name, x + HOTBAR.w / 2, HOTBAR.y + 70, 13, INK, 'center', 700);
-    text(ctx, `${cost}`, x + 82, HOTBAR.y + 40, 24, afford ? '#BDF4FF' : '#FF8A8A', 'center', 900);
+    text(ctx, unlocked ? `${cost}` : 'DAY 2', x + (unlocked ? 80 : 72), HOTBAR.y + 40, unlocked ? 24 : 14, afford ? '#BDF4FF' : '#FF8A8A', 'center', 900);
     ctx.fillStyle = '#7FE8FF';
     ctx.beginPath();
-    ctx.moveTo(x + 100, HOTBAR.y + 22);
-    ctx.lineTo(x + 105, HOTBAR.y + 29);
-    ctx.lineTo(x + 100, HOTBAR.y + 37);
-    ctx.lineTo(x + 95, HOTBAR.y + 29);
+    ctx.moveTo(x + 94, HOTBAR.y + 22);
+    ctx.lineTo(x + 99, HOTBAR.y + 29);
+    ctx.lineTo(x + 94, HOTBAR.y + 37);
+    ctx.lineTo(x + 89, HOTBAR.y + 29);
     ctx.closePath();
     ctx.fill();
     ctx.globalAlpha = 1;

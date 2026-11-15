@@ -1,7 +1,7 @@
 // DOM overlays above the canvas: title (with difficulty picker and best scores), how to play,
 // pause, the draft's stained-glass roundels, and the results screen. Buttons only queue
 // { kind: 'ui', action, arg } intents; main.js decides what they do.
-import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, WAVE_COUNT } from '../config.js';
+import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, PIECES, PIECE_ORDER, WAVE_COUNT } from '../config.js';
 import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
@@ -55,7 +55,10 @@ export function renderDraft(menus, run) {
   menus.draftKey = key;
   const ap = sunApertureFor(run.seed, run.waveIndex);
   el('draft-banner').textContent = `${PHASE_ARRIVAL[ap.phase.id]} - THE SUN ENTERS FROM THE ${ap.phase.wallName}`;
-  el('draft-sub').textContent = `Wave ${run.waveIndex} cleared. Choose a boon for Day ${ap.day}, wave ${run.waveIndex + 1}/${WAVE_COUNT}.`;
+  const unlocked = PIECE_ORDER.find((type) => PIECES[type].unlockWave === run.waveIndex);
+  el('draft-sub').textContent = unlocked
+    ? `NEW GLASS: ${PIECES[unlocked].name.toUpperCase()} (key ${PIECE_ORDER.indexOf(unlocked) + 1}) - ${PIECES[unlocked].blurb}`
+    : `Wave ${run.waveIndex} cleared. Choose a boon for Day ${ap.day}, wave ${run.waveIndex + 1}/${WAVE_COUNT}.`;
   el('draft-roundels').innerHTML = run.offer
     .map((id, i) => {
       const b = boonById(id);

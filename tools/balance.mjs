@@ -3,7 +3,7 @@
 // was applied on, so tools/shots.mjs can replay the exact run in the browser.
 //   node tools/balance.mjs [runsPerDifficulty=8] [bot=greedy|careful]
 import { DIFFICULTY_ORDER, DX, DY, PIECE_ORDER, WAVE_COUNT } from '../game/src/config.js';
-import { createRun, pieceCost, stepSim } from '../game/src/sim.js';
+import { createRun, pieceCost, pieceUnlocked, stepSim } from '../game/src/sim.js';
 import { placementCheck, setPiece } from '../game/src/grid.js';
 import { buildFlowField, flowDirectionAt } from '../game/src/pathing.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
@@ -48,11 +48,12 @@ function bestPlacement(run, careful) {
   const base = layoutValue(run, grid, careful);
   for (const type of PIECE_ORDER) {
     const cost = pieceCost(run, type);
-    if (cost > run.shards) continue;
+    if (cost > run.shards || !pieceUnlocked(run, type)) continue;
     for (let r = 0; r < grid.rows; r++) {
       for (let c = 0; c < grid.cols; c++) {
         if (!placementCheck(grid, c, r).ok) continue;
         for (const rot of type === 'pillar' ? [0] : [0, 1]) {
+          // (prism rot 0/1 swaps its red and blue sides)
           setPiece(grid, c, r, { type, rot });
           const v = layoutValue(run, grid, careful);
           setPiece(grid, c, r, null);

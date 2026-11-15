@@ -7,7 +7,7 @@ import { createGrid, pieceAt, placementCheck, setPiece } from './grid.js';
 import { buildFlowField } from './pathing.js';
 import { beamModsFor, traceBeams } from './beams.js';
 import { sunApertureFor } from './sun.js';
-import { moveEnemies, spawnEnemy } from './enemies.js';
+import { moveEnemies, shellBlockers, spawnEnemy } from './enemies.js';
 import { buildWaveSchedule } from './waves.js';
 import { applyBeamDamage, resolveFallenAndBiters, tickChain, waveClearBonus } from './combat.js';
 import { applyBoon, offerBoons, rerollOffer } from './draft.js';
@@ -47,6 +47,7 @@ export function createRun(seed, difficultyId = 'keeper') {
     events: [],
     endedAt: 0,
     layoutVersion: 0,
+    shellKey: '',
   };
   refreshLight(run);
   return run;
@@ -56,7 +57,14 @@ export function createRun(seed, difficultyId = 'keeper') {
 export function refreshLight(run) {
   run.layoutVersion++;
   run.aperture = sunApertureFor(run.seed, run.waveIndex);
-  run.trace = traceBeams(run.grid, run.aperture, beamModsFor(run.boons));
+  const shells = shellBlockers(run);
+  run.shellKey = shells.key;
+  run.trace = traceBeams(run.grid, run.aperture, beamModsFor(run.boons), shells.cells.size ? shells.cells : null);
+}
+
+/** Pieces unlock as the days pass (the Prism on day 2). */
+export function pieceUnlocked(run, type) {
+  return run.waveIndex >= (PIECES[type].unlockWave ?? 0);
 }
 
 export function pieceCost(run, type) {
@@ -82,8 +90,9 @@ function applyOrder(run, order) {
       if (!building) return;
       const check = placementCheck(run.grid, order.c, order.r);
       const cost = pieceCost(run, order.piece);
+      if (!pieceUnlocked(run, order.piece)) check.ok = false;
       if (!check.ok || run.shards < cost) {
-        emit(run, { type: 'denied', c: order.c, r: order.r, reason: check.ok ? 'Not enough shards' : check.reason });
+        emit(run, { type: 'denied', c: order.c, r: order.r, reason: !pieceUnlocked(run, order.piece) ? 'Unlocks on day 2' : check.ok ? 'Not enough shards' : check.reason });
         return;
       }
       run.shards -= cost;
@@ -166,6 +175,7 @@ function finishWave(run) {
   run.phase = 'draft';
   run.offer = offerBoons(run);
   refreshLight(run);
+  for (const type of Object.keys(PIECES)) if (PIECES[type].unlockWave === run.waveIndex) emit(run, { type: 'unlock', piece: type });
 }
 
 function endRun(run, outcome) {
@@ -183,6 +193,7 @@ function stepWave(run) {
     if (s.type === 'matriarch') emit(run, { type: 'boss' });
   }
   moveEnemies(run, DT);
+  if (shellBlockers(run).key !== run.shellKey) refreshLight(run);
   applyBeamDamage(run, DT);
   resolveFallenAndBiters(run);
   tickChain(run, DT);

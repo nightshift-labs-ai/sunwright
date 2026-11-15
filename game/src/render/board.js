@@ -281,6 +281,35 @@ export function drawPiece(ctx, piece, c, r, shadow, time, alpha = 1) {
       ctx.fillRect(-30, -6, 5, 12);
       ctx.fillRect(25, -6, 5, 12);
     }
+  } else if (piece.type === 'prism') {
+    // A triangular prism pointing the way its gold beam leaves; rainbow faces.
+    ctx.rotate(angle);
+    const tri = [[0, -20], [18, 13], [-18, 13]];
+    const faces = ['#FF4D3D', '#59B8FF', '#FFC531'];
+    for (let k = 0; k < 3; k++) {
+      ctx.fillStyle = faces[k];
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(...tri[k]);
+      ctx.lineTo(...tri[(k + 1) % 3]);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(0, -12);
+    ctx.lineTo(6, 2);
+    ctx.lineTo(-6, 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = PALETTE.gold;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(...tri[0]);
+    ctx.lineTo(...tri[1]);
+    ctx.lineTo(...tri[2]);
+    ctx.closePath();
+    ctx.stroke();
   } else if (piece.type === 'lens') {
     // The lens disc stands across its axis: rot 0 passes east-west light.
     ctx.rotate(angle);

@@ -7,7 +7,7 @@ sunlight bounces across the beetle swarm's path and burns it. The twist: the sun
 misses at dusk. Survive 3 days (9 waves) and the Umbral Matriarch at dusk on day 3 to win.
 
 ## Controls
-- **1-4** pick Mirror / Splitter / Lens / Pillar, **click** to place, **right-click** to lift
+- **1-5** pick Mirror / Splitter / Lens / Pillar / Prism (from day 2), **click** to place, **right-click** to lift
 - **Q / E** or **mouse wheel**: turn the glass under the mouse (also live during a wave)
 - **Enter** (or Space in the build phase): start the wave
 - **Space** during a wave: Flare, double beam power for 3 s (one charge per wave)

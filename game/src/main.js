@@ -1,7 +1,7 @@
 // Boot and the main loop: a fixed 60 Hz sim step separate from rendering, the screen state
 // (title / how to play / play + pause), and turning queued input intents into sim orders.
 import { DIFFICULTIES, DT, PIECES, PIECE_ORDER } from './config.js';
-import { createRun, pieceCost, stepSim } from './sim.js';
+import { createRun, pieceCost, pieceUnlocked, stepSim } from './sim.js';
 import { pieceAt, placementCheck, setPiece } from './grid.js';
 import { beamModsFor, litLength, traceBeams } from './beams.js';
 import { freshSeed } from './rng.js';
@@ -242,6 +242,7 @@ function updateHover() {
   if (key !== ui.ghostKey) {
     const probe = { ...run.grid, pieces: run.grid.pieces.slice() };
     const check = placementCheck(probe, cell.c, cell.r);
+    if (!pieceUnlocked(run, type)) Object.assign(check, { ok: false, reason: `The ${PIECES[type].name} unlocks on day 2` });
     const afford = run.shards >= pieceCost(run, type);
     let trace = null;
     if (check.ok) {

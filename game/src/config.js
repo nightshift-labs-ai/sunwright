@@ -22,8 +22,9 @@ export const PIECES = {
   splitter: { name: 'Splitter', cost: 5, blurb: 'Half the light passes, half bounces' },
   lens: { name: 'Lens', cost: 7, blurb: 'x2.5 power for 3 cells, then the beam ends' },
   pillar: { name: 'Pillar', cost: 1, blurb: 'Blocks beetles and light' },
+  prism: { name: 'Prism', cost: 8, blurb: 'Fans light: red burns, blue slows, gold pierces armour', unlockWave: 3 },
 };
-export const PIECE_ORDER = ['mirror', 'splitter', 'lens', 'pillar'];
+export const PIECE_ORDER = ['mirror', 'splitter', 'lens', 'pillar', 'prism'];
 
 export const BEAM = {
   power: 10,
@@ -34,13 +35,17 @@ export const BEAM = {
   maxSteps: 480,
   flareMult: 2,
   flareSeconds: 3,
+  prismShare: 0.6,
 };
+/** Prism light effects: red sets beetles burning, blue slows them, gold ignores armour and shells. */
+export const TINT_EFFECTS = { burnDps: 4, burnSeconds: 3, slowFactor: 0.55, slowSeconds: 0.8 };
 
 /** hp, speed in cells/s, armour = minimum beam power that hurts it, harm = Sunseed HP it costs. */
 export const ENEMIES = {
   scuttler: { name: 'Scuttler', hp: 18, speed: 1.15, armour: 0, flies: false, harm: 1, shards: 1, score: 20, size: 0.34 },
   lampmoth: { name: 'Lampmoth', hp: 11, speed: 1.45, armour: 0, flies: true, harm: 1, shards: 1, score: 30, size: 0.3 },
   shellback: { name: 'Shellback', hp: 60, speed: 0.72, armour: 12, flies: false, harm: 2, shards: 3, score: 60, size: 0.42 },
+  glassback: { name: 'Glassback', hp: 40, speed: 0.95, armour: 0, flies: false, harm: 2, shards: 2, score: 50, size: 0.4, blocksLight: true },
   matriarch: { name: 'Umbral Matriarch', hp: 1100, speed: 0.36, armour: 30, flies: false, harm: 5, shards: 0, score: 1500, size: 0.62, boss: true },
 };
 /** The Matriarch's carapace opens (armour 0) for `open` seconds out of every `cycle`. */
@@ -51,7 +56,7 @@ export const MOTH_LURE = 1.4;
 export const MOTH_DAZZLE = 0.5;
 
 /** The order enemies first appear in, used for the NEW tag in the draft preview. */
-export const ENEMY_ORDER = ['scuttler', 'lampmoth', 'shellback', 'matriarch'];
+export const ENEMY_ORDER = ['scuttler', 'lampmoth', 'shellback', 'glassback', 'matriarch'];
 
 export const SUN_PHASES = [
   { id: 'dawn', name: 'DAWN', wall: 'east', wallName: 'EAST' },
@@ -74,10 +79,10 @@ export const WAVES = [
   [['scuttler', 10, 0, 1, 1.1], ['shellback', 2, 0, 9, 7], ['lampmoth', 3, 0, 14, 2]],
   [['scuttler', 14, 2, 1, 0.9], ['lampmoth', 5, 1, 8, 1.8]],
   [['scuttler', 14, 2, 1, 0.8], ['shellback', 3, 2, 6, 5], ['lampmoth', 6, 2, 12, 1.4]],
-  [['scuttler', 18, 2, 1, 0.7], ['shellback', 4, 2, 4, 4.5], ['lampmoth', 6, 2, 10, 1.3]],
-  [['scuttler', 20, 2, 1, 0.6], ['lampmoth', 10, 2, 5, 1.1], ['shellback', 4, 2, 9, 4]],
-  [['scuttler', 22, 2, 1, 0.55], ['shellback', 6, 2, 3, 3.5], ['lampmoth', 8, 2, 12, 1]],
-  [['matriarch', 1, 0, 2, 1], ['scuttler', 24, 2, 3, 0.8], ['shellback', 5, 1, 8, 5], ['lampmoth', 10, 2, 14, 1.2]],
+  [['scuttler', 18, 2, 1, 0.7], ['glassback', 3, 2, 3, 4], ['shellback', 3, 2, 6, 4.5], ['lampmoth', 6, 2, 10, 1.3]],
+  [['scuttler', 20, 2, 1, 0.6], ['glassback', 4, 2, 4, 3.5], ['lampmoth', 10, 2, 5, 1.1], ['shellback', 4, 2, 9, 4]],
+  [['scuttler', 22, 2, 1, 0.55], ['shellback', 6, 2, 3, 3.5], ['glassback', 4, 2, 6, 3], ['lampmoth', 8, 2, 12, 1]],
+  [['matriarch', 1, 0, 2, 1], ['scuttler', 24, 2, 3, 0.8], ['glassback', 4, 2, 6, 4], ['shellback', 5, 1, 8, 5], ['lampmoth', 10, 2, 14, 1.2]],
 ];
 
 export const DIFFICULTIES = {
@@ -103,5 +108,7 @@ export const BOONS = [
   { id: 'kindling', name: 'Kindling', text: 'Beetles burned to death scorch their neighbours', weight: 2, hue: 8 },
   { id: 'highsun', name: 'High Sun', text: 'Every beam +20% power', weight: 2, hue: 52 },
   { id: 'longchain', name: 'Long Chain', text: 'CHAIN window 1 s -> 1.6 s', weight: 2, hue: 330 },
+  { id: 'grinder', name: 'Lens Grinder', text: 'Lenses focus x3.2 instead of x2.5', weight: 2, hue: 190 },
+  { id: 'trueprism', name: 'True Prism', text: 'Prism branches keep 75% power', weight: 2, hue: 300 },
 ];
 export const KINDLING = { radius: 1.1, damage: 12 };

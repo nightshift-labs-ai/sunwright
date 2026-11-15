@@ -72,6 +72,23 @@ function drawHealthBar(ctx, e, x, y, w) {
   ctx.fillRect(x - w / 2, y, w * Math.max(0, e.hp / e.maxHp), 5);
 }
 
+/** Little flickering flames on a beetle set burning by red prism light. */
+function drawFlames(ctx, x, y, size, t) {
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (let k = 0; k < 3; k++) {
+    const fx = x + (k - 1) * size * 0.5;
+    const h = size * (0.7 + Math.sin(t * 14 + k * 2) * 0.25);
+    ctx.fillStyle = k % 2 ? 'rgba(255,90,40,0.85)' : 'rgba(255,200,60,0.85)';
+    ctx.beginPath();
+    ctx.moveTo(fx - 5, y - size * 0.2);
+    ctx.quadraticCurveTo(fx, y - size * 0.2 - h * 1.4, fx + 5, y - size * 0.2);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 export function drawEnemy(ctx, e, time) {
   const x = toScreenX(e.x);
   const y = toScreenY(e.y);
@@ -114,6 +131,19 @@ export function drawEnemy(ctx, e, time) {
       ctx.stroke();
     }
     drawHead(ctx, size * 0.8, '#FFE14D');
+  } else if (e.type === 'glassback') {
+    drawLegs(ctx, size * 1.05, phase * 0.8);
+    const g = ctx.createLinearGradient(-size, -size, size, size);
+    g.addColorStop(0, '#FFFFFF');
+    g.addColorStop(0.45, '#BFD9F2');
+    g.addColorStop(1, '#6F8FC4');
+    drawShell(ctx, size, size * 0.78, g, '#3B1247', '#F2C14E');
+    ctx.strokeStyle = '#B0307A';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size, size * 0.72, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    drawHead(ctx, size * 0.8, '#FFE14D');
   } else if (e.type === 'matriarch') {
     const open = carapaceOpen(e);
     drawLegs(ctx, size * 1.2, phase * 0.4);
@@ -145,6 +175,14 @@ export function drawEnemy(ctx, e, time) {
     drawHead(ctx, size * 0.8, '#FFE14D');
   }
   ctx.restore();
+  if (e.burn > 0) drawFlames(ctx, x, y, size, time + e.id);
+  if (e.slow > 0) {
+    ctx.strokeStyle = 'rgba(150,215,255,0.9)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(x, y, size + 5, 0, Math.PI * 2);
+    ctx.stroke();
+  }
   drawHealthBar(ctx, e, x, y - size - 10, Math.max(26, size * 1.6));
   if (e.shielded) {
     ctx.fillStyle = '#F2C14E';

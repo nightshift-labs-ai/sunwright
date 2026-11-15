@@ -1,6 +1,7 @@
 // Burning and scoring: beam damage per tick with armour thresholds, the Flare, the CHAIN
 // multiplier for quick successive kills, shard drops, and beetles biting the Sunseed.
-import { BEAM, KINDLING, SCORING } from './config.js';
+import { BEAM, KINDLING, SCORING, TINT_EFFECTS } from './config.js';
+import { TINT_BLUE, TINT_GOLD, TINT_RED } from './beams.js';
 import { armourOf, enemyCell, reachedShrine } from './enemies.js';
 
 export function flareMultiplier(run) {
@@ -15,19 +16,27 @@ export function chainMultiplier(count) {
   return Math.max(1, Math.min(SCORING.chainMaxMult, count));
 }
 
-/** Every beetle on a lit cell loses (cell power x Flare) hp per second, unless its armour is higher. */
+/**
+ * Every beetle on a lit cell loses (cell power x Flare) hp per second unless its armour is
+ * higher; gold prism light ignores armour, red sets it burning, blue slows it.
+ */
 export function applyBeamDamage(run, dt) {
-  const lit = run.trace.lit;
+  const { lit, tints } = run.trace;
   const mult = flareMultiplier(run);
   for (const e of run.enemies) {
     const i = enemyCell(run, e);
     const power = i === null ? 0 : lit[i] * mult;
+    const tint = i === null ? 0 : tints[i];
     e.litPower = power;
-    e.shielded = power > 0 && power < armourOf(e);
-    if (power > 0 && !e.shielded) {
-      e.hp -= power * dt;
-      e.lastHurt = run.time;
+    e.shielded = power > 0 && power < armourOf(e) && !(tint & TINT_GOLD);
+    if (power > 0 && !e.shielded) e.hp -= power * dt;
+    if (power > 0 && tint & TINT_RED) e.burn = TINT_EFFECTS.burnSeconds;
+    if (power > 0 && tint & TINT_BLUE) e.slow = TINT_EFFECTS.slowSeconds;
+    if (e.burn > 0) {
+      e.burn -= dt;
+      e.hp -= TINT_EFFECTS.burnDps * dt;
     }
+    if (e.slow > 0) e.slow -= dt;
   }
 }
 
@@ -43,7 +52,7 @@ function registerKill(run, e) {
   run.shards += shards;
   run.stats.kills++;
   run.events.push({ t: run.time, type: 'kill', x: e.x, y: e.y, enemy: e.type, points, chain: chain.count, mult, shards, boss: !!e.def.boss });
-  if (run.boons.includes('kindling') && e.litPower > 0) {
+  if (run.boons.includes('kindling') && (e.litPower > 0 || e.burn > 0)) {
     for (const other of run.enemies) {
       if (other !== e && other.hp > 0 && Math.hypot(other.x - e.x, other.y - e.y) < KINDLING.radius) {
         other.hp -= KINDLING.damage;
