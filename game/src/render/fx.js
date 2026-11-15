@@ -163,7 +163,7 @@ function drawStarburst(ctx, x, y, r, alpha) {
 }
 
 /** Glow, halo and core widths and alphas of a beam. */
-const BEAM_PASSES = [[26, 0.18], [11, 0.55], [5, 0.95]];
+const BEAM_PASSES = [[26, 0.32], [11, 0.75], [5, 0.95]];
 /** Glow / halo / core colours per tint: sunlight, red (1), blue (2), gold (4). */
 const TINT_COLORS = {
   0: ['rgba(255,197,49,', 'rgba(255,128,24,', 'rgba(255,251,230,'],
@@ -180,25 +180,62 @@ const FOCUS_COLORS = ['rgba(255,120,40,', 'rgba(255,160,60,', 'rgba(255,251,230,
 export function drawBeams(ctx, trace, opts) {
   const alpha = opts.alpha ?? 1;
   const surge = 1 + (opts.flare ?? 0) * 0.3;
-  ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
-  ctx.lineCap = 'round';
+  // Beams go onto their own layer with normal blending, so crossings keep a gold glow, an orange
+  // edge and a white core instead of adding up to a white blot; the layer then lies over the scene.
+  const layer = beamLayer(ctx);
+  const g = layer.getContext('2d');
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.clearRect(0, 0, layer.width, layer.height);
+  g.setTransform(ctx.getTransform());
+  g.lineCap = 'round';
   for (let pass = 0; pass < 3; pass++) {
     const [width, a] = BEAM_PASSES[pass];
     for (const leg of trace.legs) {
       const w = Math.min(1.7, Math.max(0.5, Math.sqrt(leg.power / 10))) * surge;
       const colors = leg.focused && pass < 2 ? FOCUS_COLORS : TINT_COLORS[leg.tint] ?? TINT_COLORS[0];
-      ctx.strokeStyle = `${colors[pass]}${a * alpha})`;
-      ctx.lineWidth = width * w;
-      ctx.beginPath();
-      ctx.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));
-      ctx.lineTo(toScreenX(leg.x1), toScreenY(leg.y1));
-      ctx.stroke();
+      g.strokeStyle = `${colors[pass]}${a})`;
+      g.lineWidth = width * w;
+      g.beginPath();
+      g.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));
+      g.lineTo(toScreenX(leg.x1), toScreenY(leg.y1));
+      g.stroke();
     }
   }
-  const twinkle = 0.85 + Math.sin((opts.time ?? 0) * 7) * 0.15;
-  for (const b of trace.bursts) drawStarburst(ctx, toScreenX(b.x), toScreenY(b.y), 24 * Math.min(1.3, Math.max(0.7, Math.sqrt(b.power / 10))) * twinkle, 0.85 * alpha);
+  // Photons: bright dashes flowing along each leg, away from the sun.
+  g.setLineDash([5, 23]);
+  g.lineDashOffset = -(opts.time ?? 0) * 140;
+  g.strokeStyle = 'rgba(255,255,255,0.95)';
+  g.lineWidth = 3;
+  for (const leg of trace.legs) {
+    g.beginPath();
+    g.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));
+    g.lineTo(toScreenX(leg.x1), toScreenY(leg.y1));
+    g.stroke();
+  }
+  g.setLineDash([]);
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(layer, 0, 0);
   ctx.restore();
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const twinkle = 0.85 + Math.sin((opts.time ?? 0) * 7) * 0.15;
+  for (const b of trace.bursts) drawStarburst(ctx, toScreenX(b.x), toScreenY(b.y), 22 * Math.min(1.25, Math.max(0.7, Math.sqrt(b.power / 10))) * twinkle, 0.55 * alpha);
+  ctx.restore();
+}
+
+let beamCanvas = null;
+
+/** The offscreen beam layer, matched to the main canvas's backing size. */
+function beamLayer(ctx) {
+  const { width, height } = ctx.canvas;
+  if (!beamCanvas || beamCanvas.width !== width || beamCanvas.height !== height) {
+    beamCanvas = document.createElement('canvas');
+    beamCanvas.width = width;
+    beamCanvas.height = height;
+  }
+  return beamCanvas;
 }
 
 /** Where the first ray of a trace ends (follow legs end to start from the opening). */

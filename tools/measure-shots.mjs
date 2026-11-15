@@ -46,12 +46,21 @@ for (const f of files) {
         darkest = Math.min(darkest, sum / (b.length / 4));
       }
     }
+    let blown = 0;
+    for (let by = 140; by + 32 <= 680; by += 32) {
+      for (let bx = 250; bx + 32 <= 1030; bx += 32) {
+        const b = g.getImageData(bx, by, 32, 32).data;
+        let sum = 0;
+        for (let i = 0; i < b.length; i += 4) sum += 0.2126 * b[i] + 0.7152 * b[i + 1] + 0.0722 * b[i + 2];
+        if (sum / (b.length / 4) > 0.92 * 255) blown++;
+      }
+    }
     const mean = lum / n;
-    return { darkest, sat: sat / n, lumSd: Math.sqrt(lum2 / n - mean * mean), meanLum: mean, black: black / n, warm: red > blue };
+    return { blown, darkest, sat: sat / n, lumSd: Math.sqrt(lum2 / n - mean * mean), meanLum: mean, black: black / n, warm: red > blue };
   }, dataUrl);
   const ok = m.sat >= 0.33 && m.lumSd >= 40 && m.warm && m.black < 0.02 && m.meanLum >= 0.45 * 255 && m.darkest >= 0.15 * 255;
   if (!ok) failed++;
-  console.log(`${ok ? 'ok  ' : 'FAIL'} ${f}: saturation ${m.sat.toFixed(2)}  luminance SD ${m.lumSd.toFixed(1)}  mean ${(m.meanLum / 255).toFixed(2)}  darkest block ${(m.darkest / 255).toFixed(2)}  near-black ${(m.black * 100).toFixed(1)}%  warm ${m.warm}`);
+  console.log(`${ok ? 'ok  ' : 'FAIL'} ${f}: saturation ${m.sat.toFixed(2)}  luminance SD ${m.lumSd.toFixed(1)}  mean ${(m.meanLum / 255).toFixed(2)}  blown 32px blocks ${m.blown}  darkest block ${(m.darkest / 255).toFixed(2)}  near-black ${(m.black * 100).toFixed(1)}%  warm ${m.warm}`);
 }
 await browser.close();
 process.exit(failed ? 1 : 0);

@@ -135,6 +135,11 @@
 - Benchmark 3 item 7: identity colours + 2 px dark outlines - silver mirror in a lapis frame, cyan
   splitter, aqua lens, terracotta pillar, rainbow prism; the hotbar icons match.
 
+- Benchmark 3 item 10: beams drawn on their own layer with normal blending (gold glow 0.32, orange
+  edge 0.75, white core), so crossings no longer add up to white blots; photon dashes flow along each
+  leg away from the sun; starbursts softer. measure-shots counts near-white 32 px blocks on the board
+  (cover 5, from starburst centres; draft/results count their parchment plaques).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.
