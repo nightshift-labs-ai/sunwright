@@ -49,7 +49,7 @@ function text(ctx, str, x, y, size, color = INK, align = 'left', weight = 700) {
 }
 
 function panel(ctx, x, y, w, h) {
-  ctx.fillStyle = 'rgba(31,63,153,0.93)';
+  ctx.fillStyle = 'rgba(31,63,153,0.8)';
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, 10);
   ctx.fill();
@@ -188,10 +188,20 @@ function drawSunDial(ctx, run, cx, cy) {
     }
     text(ctx, wall[0].toUpperCase(), gx, gy + (wall === 'north' ? -22 : 30), 13, INK, 'center', 900);
   }
-  const phase = run.aperture.phase;
-  text(ctx, `NOW: ${phase.name} (${phase.wallName[0]})`, cx, cy + 44, 15, INK, 'center', 800);
-  if (nextAp) text(ctx, `NEXT: ${nextAp.phase.name} (${nextAp.phase.wallName[0]})`, cx, cy + 68, 17, GOLD, 'center', 900);
-  else text(ctx, 'FINAL SUN', cx, cy + 68, 17, GOLD, 'center', 900);
+  text(ctx, nextAp ? `NEXT: ${nextAp.phase.name} (${nextAp.phase.wallName[0]})` : 'FINAL SUN', cx, cy + 54, 18, GOLD, 'center', 900);
+  // The real trigger: the sun moves when this sun ends (never a timer).
+  if (nextAp) {
+    const chip = run.phase === 'build' ? 'after the coming sun' : 'after this sun';
+    ctx.font = `900 15px ${FONT}`;
+    const w = ctx.measureText(chip).width + 20;
+    ctx.fillStyle = '#FFB02E';
+    ctx.beginPath();
+    ctx.roundRect(cx - w / 2, cy + 62, w, 22, 11);
+    ctx.fill();
+    ctx.fillStyle = '#3B1247';
+    ctx.textAlign = 'center';
+    ctx.fillText(chip, cx, cy + 78);
+  }
 }
 
 /** One water droplet pip: pointed top, round bottom. */
@@ -242,10 +252,15 @@ function drawFountainPips(ctx, run, y) {
 
 
 function drawLeftPanel(ctx, run) {
-  panel(ctx, LEFT_X, 8, PANEL_W, 196);
+  panel(ctx, LEFT_X, 8, PANEL_W, 332);
   drawSunDial(ctx, run, LEFT_X + PANEL_W / 2, 94);
-  panel(ctx, LEFT_X, 212, PANEL_W, 136);
-  drawFountainPips(ctx, run, 236);
+  ctx.strokeStyle = 'rgba(242,193,78,0.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(LEFT_X + 12, 194);
+  ctx.lineTo(LEFT_X + PANEL_W - 12, 194);
+  ctx.stroke();
+  drawFountainPips(ctx, run, 222);
 }
 
 /** The wide bar across the top: day, phase and sun count, then the 9-sun track. */

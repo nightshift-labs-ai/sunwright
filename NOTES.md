@@ -148,6 +148,9 @@
 
 - Benchmark 2 item 22: potted palms and a lapis urn on the sand outside the walls (static surround).
 
+- Benchmark 3 item 5 (part): HUD panels at 80% opacity; sun dial + FOUNTAIN merged into one left
+  panel; dial shows only NEXT: EVENING (W) with an amber "after this sun" chip (the real trigger).
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).
@@ -156,7 +159,8 @@
 - Benchmark 2 item 12 (Glassback on the cover): tried one scout Glassback in sun 5 (+ draft chip
   showing nextSunPreview). Best winning seed 2090 gave 19 beetles / 4 types but weak beams, fading
   floaters and a floater-on-beam truth failure, Glassback not deflecting - reverted.
-- Benchmark 3 item 5 (hierarchy budget: board >= 58% of the cover, merge left panels) - lowest.
+- Benchmark 3 item 5 rest: board >= 58% of the cover (now ~52% incl. walls: needs a layout change),
+  <= 3 type sizes in the HUD.
 - M3 leftovers: colour-blind beam patterns option, illustrated How to play.
 
 ## Known bugs
