@@ -36,5 +36,5 @@
 
 ## Operator items
 - Entry route: no `makefun init` was run (needs the wallet keypair + drand fetch); the repo now has
-  commits, so a source-bundle entry would need a fresh repo. Prior entries used the GitHub route
-  with `.makefun/owner.json`, which is not added here.
+  commits, so a source-bundle entry would need a fresh repo. `.makefun/owner.json` (operator's entry
+  wallet, as given by the operator) is committed for the GitHub route; keep it unchanged.
