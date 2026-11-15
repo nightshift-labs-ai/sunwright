@@ -161,6 +161,9 @@
   Director v4 (STAGE_V4=1, two passes: identical cover, then scars after the cover tick and in the
   last sun, aiming at a 6/10 draft and win; STAGE_V4_LAST=0 skips the last-sun scar): seed 2013
   then loses on day 3; 2003/2010 win with 6/10 or 5/10 drafts but have sparse covers. Off by default.
+  Denser Day 2 noon (22 Scuttlers @0.55 s, 8 Veerwings): seed 2013 cover gets 19 beetles + 3
+  floaters but the run loses; the best winner (2048) has 20 beetles but almost no beams on the
+  cover - reverted (beams are the game's identity; keep seed 2013's lit cover).
 - Benchmark 2 item 12 (Glassback on the cover): tried one scout Glassback in sun 5 (+ draft chip
   showing nextSunPreview). Best winning seed 2090 gave 19 beetles / 4 types but weak beams, fading
   floaters and a floater-on-beam truth failure, Glassback not deflecting - reverted.
