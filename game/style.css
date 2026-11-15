@@ -17,6 +17,11 @@ button.big:hover { background: #cf3f93; }
 #tagline { margin: -6px 0 0; font: italic 700 24px Georgia, serif; color: #ffe9a8; letter-spacing: 3px; }
 .menu { margin-top: 26px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .picker { display: flex; gap: 12px; }
+.row { display: flex; gap: 12px; }
+.options label { display: grid; grid-template-columns: 220px 200px; justify-items: start; align-items: center; gap: 16px; font-weight: 800; font-size: 20px; }
+.options input[type=range] { width: 200px; accent-color: #f2c14e; }
+.options input[type=checkbox] { width: 24px; height: 24px; accent-color: #f2c14e; }
+.keys { margin: 0; font-weight: 700; opacity: 0.85; }
 .diff { display: flex; flex-direction: column; align-items: center; min-width: 150px; padding: 8px 14px; background: rgba(31, 63, 153, 0.9); }
 .diff.on { background: #f2c14e; color: #3b1247; border-color: #fff6df; }
 .diff small { font-weight: 600; font-size: 14px; opacity: 0.85; }

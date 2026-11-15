@@ -24,9 +24,13 @@
   RESULT_WIN_TITLE / RESULT_LOSE_TITLE, "SUN n/9" everywhere, X rerolls; internal ids renamed too
   (boon stays internal). tools/check-names.mjs scans every visible string for the banned words.
 
+- M3 (part): generative pentatonic music (marimba ostinato + drone; tempo/layers rise each sun,
+  sparse between suns), master/music/effects buses, Options screen (3 sliders, shake, mute) from
+  title and pause, F fast-forward x2 during a sun.
+
 ## Next
-- M3 feel: generative pentatonic music + volume sliders/options, hit-stop on CHAIN steps, shrine pip
-  crack, Flare draining ring polish, fast-forward F, colour-blind beam patterns (option).
+- M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
+  colour-blind beam patterns (option), How to play illustrated panels.
 - Staging: cover must show a lit prism fan (red/blue/gold) across a swarm; consider a hand-directed
   staging player for waves 1-5 instead of the greedy bot (still one real seeded run, forward order).
 

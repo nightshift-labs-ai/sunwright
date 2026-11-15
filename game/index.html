@@ -24,7 +24,10 @@
     <div class="menu">
       <button id="play-button" class="big" data-action="play">PLAY</button>
       <div id="difficulty-picker" class="picker"></div>
-      <button id="howto-button" data-action="howto">HOW TO PLAY</button>
+      <div class="row">
+        <button id="howto-button" data-action="howto">HOW TO PLAY</button>
+        <button id="options-button" data-action="options">OPTIONS</button>
+      </div>
     </div>
     <div id="rules-strip" class="rules">
       <p id="rule-sun">THE SUN MOVES EVERY WAVE</p>
@@ -50,8 +53,22 @@
       <h2>PAUSED</h2>
       <button data-action="resume">RESUME (ESC)</button>
       <button data-action="restart">RESTART RUN</button>
+      <button data-action="options">OPTIONS</button>
       <button data-action="mute">SOUND ON / OFF (M)</button>
       <button data-action="menu">QUIT TO TITLE</button>
+    </div>
+  </section>
+
+  <section id="options-screen" class="overlay hidden">
+    <div class="sheet small options">
+      <h2>OPTIONS</h2>
+      <label>Master volume <input id="opt-volume" type="range" min="0" max="1" step="0.05" data-setting="volume"></label>
+      <label>Music <input id="opt-music" type="range" min="0" max="1" step="0.05" data-setting="music"></label>
+      <label>Sound effects <input id="opt-sfx" type="range" min="0" max="1" step="0.05" data-setting="sfx"></label>
+      <label>Screen shake <input id="opt-shake" type="checkbox" data-setting="shake"></label>
+      <label>Sound muted (M) <input id="opt-muted" type="checkbox" data-setting="muted"></label>
+      <p class="keys">F - fast forward x2 during a sun</p>
+      <button data-action="closeOptions">BACK</button>
     </div>
   </section>
 

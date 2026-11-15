@@ -6,12 +6,12 @@ import { pieceAt, placementCheck, setPiece } from './grid.js';
 import { beamModsFor, litLength, traceBeams } from './beams.js';
 import { freshSeed } from './rng.js';
 import { createInput, drainIntents } from './input.js';
-import { createMenus, renderDraft, renderResults, renderTitle, showScreen } from './ui/menus.js';
+import { createMenus, renderDraft, renderOptions, renderResults, renderTitle, showScreen } from './ui/menus.js';
 import { drawFrame } from './render/scene.js';
 import { createFx, fxFromEvent, updateFx } from './render/fx.js';
 import { hotbarHit } from './render/hud.js';
 import { VIEW_H, VIEW_W, cellAtPixel } from './render/layout.js';
-import { playSfx, playSizzle, setBeamHum, setVolume, unlockAudio } from './audio.js';
+import { playSfx, playSizzle, setBeamHum, setVolume, unlockAudio, updateMusic } from './audio.js';
 import { loadBest, loadSettings, recordRun, saveSettings } from './save.js';
 import { createTitleDemo, stepTitleDemo } from './titledemo.js';
 import { installTestHook } from './testhook.js';
@@ -40,6 +40,8 @@ const app = {
   accumulator: 0,
   lastFrame: 0,
   overlay: '',
+  showOptions: false,
+  fast: false,
 };
 const NO_UI = { ghost: null, ghostTrace: null, hoverCell: null };
 
@@ -76,8 +78,9 @@ function goTitle() {
 
 function toggleMute() {
   app.settings.muted = !app.settings.muted;
-  setVolume(app.settings.volume, app.settings.muted);
+  setVolume(app.settings);
   saveSettings(app.settings);
+  if (app.showOptions) renderOptions(app.settings);
 }
 
 function order(o) {
@@ -115,6 +118,16 @@ function handleUiAction(action, arg) {
     case 'resume': app.paused = false; break;
     case 'restart': startRun(undefined, run?.difficultyId); break;
     case 'mute': toggleMute(); break;
+    case 'options':
+      app.showOptions = true;
+      renderOptions(app.settings);
+      break;
+    case 'closeOptions': app.showOptions = false; break;
+    case 'setting':
+      app.settings[arg.name] = arg.value;
+      setVolume(app.settings);
+      saveSettings(app.settings);
+      break;
     case 'menu': goTitle(); break;
     case 'pick': order({ type: 'pick', index: Number(arg) }); break;
     case 'reroll': order({ type: 'reroll' }); break;
@@ -129,8 +142,13 @@ function handleKeyInPlay(code) {
   if (code === 'KeyM') return toggleMute();
   const over = run.phase === 'won' || run.phase === 'lost';
   if (code === 'Escape') {
-    if (over) goTitle();
+    if (app.showOptions) app.showOptions = false;
+    else if (over) goTitle();
     else app.paused = !app.paused;
+    return;
+  }
+  if (code === 'KeyF') {
+    app.fast = !app.fast;
     return;
   }
   if (app.paused) return;
@@ -181,7 +199,10 @@ function handleIntent(it) {
     else if (it.kind === 'wheel' && !app.paused) rotateAtHover(it.dir);
   } else if (it.kind === 'key') {
     if (it.code === 'Enter' || it.code === 'Space') startRun();
-    else if (it.code === 'Escape') app.screen = 'title';
+    else if (it.code === 'Escape') {
+      app.showOptions = false;
+      app.screen = 'title';
+    }
     else if (it.code === 'KeyM') toggleMute();
   }
 }
@@ -262,7 +283,8 @@ function updateHover() {
 function syncOverlays() {
   let want = null;
   const run = app.run;
-  if (app.screen === 'title') want = 'title';
+  if (app.showOptions) want = 'options';
+  else if (app.screen === 'title') want = 'title';
   else if (app.screen === 'howto') want = 'howto';
   else if (app.paused) want = 'pause';
   else if (run.phase === 'draft') want = 'draft';
@@ -279,12 +301,15 @@ function syncOverlays() {
 function render() {
   if (app.screen === 'play') {
     const run = app.run;
+    app.ui.fast = app.fast;
     drawFrame(ctx, { run, ui: app.ui, fx: app.fx, time: run.time, showHud: true, shake: app.settings.shake, shrineHurtAgo: run.time - app.shrineHurtAt });
     setBeamHum(litLength(run.trace), run.phase === 'wave' && !app.paused);
+    updateMusic(run.waveIndex, run.phase === 'wave' && !app.paused);
     if (run.phase === 'wave' && !app.paused) playSizzle(run.enemies.reduce((n, e) => n + (e.litPower > 0 && !e.shielded ? 1 : 0), 0));
   } else {
     drawFrame(ctx, { run: app.demo.run, ui: NO_UI, fx: app.fx, time: app.demo.run.time, showHud: false, shake: false });
     setBeamHum(0, false);
+    updateMusic(0, false);
   }
 }
 
@@ -293,14 +318,14 @@ function frame(now) {
   app.lastFrame = now;
   for (const it of drainIntents(input)) handleIntent(it);
   if (!app.manual) {
-    app.accumulator += dt;
+    app.accumulator += dt * (app.fast && app.run?.phase === 'wave' ? 2 : 1);
     let steps = 0;
-    while (app.accumulator >= DT && steps < 8) {
+    while (app.accumulator >= DT && steps < 16) {
       tick();
       app.accumulator -= DT;
       steps++;
     }
-    if (steps === 8) app.accumulator = 0;
+    if (steps === 16) app.accumulator = 0;
   }
   updateHover();
   syncOverlays();
@@ -311,7 +336,7 @@ function frame(now) {
 // Audio may only start after a user gesture.
 window.addEventListener('pointerdown', unlockAudio);
 window.addEventListener('keydown', unlockAudio);
-setVolume(app.settings.volume, app.settings.muted);
+setVolume(app.settings);
 window.addEventListener('resize', fitStage);
 fitStage();
 if (!DIFFICULTIES[app.settings.difficulty]) app.settings.difficulty = 'normal';

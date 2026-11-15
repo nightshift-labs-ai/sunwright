@@ -396,7 +396,7 @@ function drawHotbar(ctx, run, ui) {
     text(ctx, `START ${NAMES.sun}`, bx + 95, HOTBAR.y + 56, 20, INK, 'center', 900);
   } else if (run.phase === 'wave') {
     text(ctx, ui.hint ? ui.hint.slice(0, 44) : 'Q/E or wheel: turn glass live', fx + 156, HOTBAR.y + 34, 14, INK, 'left', 600);
-    text(ctx, 'ESC pause  -  M mute', fx + 156, HOTBAR.y + 58, 14, 'rgba(255,246,223,0.75)', 'left', 600);
+    text(ctx, `ESC pause - M mute - F speed${ui.fast ? ' x2' : ''}`, fx + 156, HOTBAR.y + 58, 14, ui.fast ? '#FFF2A8' : 'rgba(255,246,223,0.75)', 'left', 700);
   }
 }
 

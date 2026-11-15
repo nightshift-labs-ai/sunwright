@@ -33,7 +33,7 @@ export function recordRun(difficultyId, score, waves) {
 }
 
 export function loadSettings() {
-  return { muted: false, volume: 0.8, shake: true, difficulty: 'normal', ...readSave().settings };
+  return { muted: false, volume: 0.8, music: 0.6, sfx: 0.9, shake: true, difficulty: 'normal', ...readSave().settings };
 }
 
 export function saveSettings(settings) {

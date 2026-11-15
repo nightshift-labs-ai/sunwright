@@ -7,7 +7,7 @@ import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 
 
-const SCREENS = ['title', 'howto', 'pause', 'draft', 'results'];
+const SCREENS = ['title', 'howto', 'options', 'pause', 'draft', 'results'];
 
 function el(id) {
   return document.getElementById(id);
@@ -27,6 +27,10 @@ export function createMenus(intents) {
     const button = e.target.closest('[data-action]');
     if (button) intents.push({ kind: 'ui', action: button.dataset.action, arg: button.dataset.arg ?? null });
   });
+  document.getElementById('options-screen').addEventListener('input', (e) => {
+    const input = e.target.closest('[data-setting]');
+    if (input) intents.push({ kind: 'ui', action: 'setting', arg: { name: input.dataset.setting, value: input.type === 'checkbox' ? input.checked : Number(input.value) } });
+  });
   const menus = { current: 'title', draftKey: '', resultsKey: '' };
   return menus;
 }
@@ -35,6 +39,13 @@ export function createMenus(intents) {
 export function showScreen(menus, name) {
   menus.current = name;
   for (const s of SCREENS) el(`${s}-screen`).classList.toggle('hidden', s !== name);
+}
+
+/** Put the saved settings into the options sliders and boxes. */
+export function renderOptions(settings) {
+  for (const name of ['volume', 'music', 'sfx']) el(`opt-${name}`).value = settings[name];
+  el('opt-shake').checked = settings.shake;
+  el('opt-muted').checked = settings.muted;
 }
 
 /** Difficulty buttons with each difficulty's best score. */
