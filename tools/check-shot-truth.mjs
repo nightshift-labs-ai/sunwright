@@ -4,7 +4,8 @@
 // Also checks each screenshot file: JPEG, 1280x800, at most 256 KiB, and the shots sort the cover first.
 //   node tools/check-shot-truth.mjs
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { WAVE_COUNT } from '../game/src/config.js';
+import { ENEMIES, WAVE_COUNT } from '../game/src/config.js';
+import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
 import { currentBanner, winLoseHeadline } from '../game/src/announce.js';
 import { rankFor } from '../game/src/combat.js';
@@ -44,6 +45,7 @@ function hudFacts(run) {
     sunsHeld: run.stats.wavesCleared,
     offersSeen: run.stats.offersSeen,
     rank: rankFor(run),
+    nextSun: nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name),
   };
 }
 

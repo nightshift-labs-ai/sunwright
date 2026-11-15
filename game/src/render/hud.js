@@ -8,7 +8,7 @@ import { chainMultiplier, chainWindow } from '../combat.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
 import { currentBanner, winLoseHeadline } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
-import { waveRoster } from '../waves.js';
+import { nextSunPreview, waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
 import { drawCharmBadge } from './charms.js';
 import { BOARD_W, BOARD_X, BOARD_Y, CELL, QUARTZ_ANCHOR, VIEW_W, WALL } from './layout.js';
@@ -58,7 +58,7 @@ function panel(ctx, x, y, w, h) {
   ctx.stroke();
 }
 
-function sunGlyph(ctx, x, y, r, lit) {
+function sunGlyph(ctx, x, y, r, lit, color = '#FFE27A') {
   ctx.save();
   if (lit) {
     ctx.globalCompositeOperation = 'lighter';
@@ -69,10 +69,12 @@ function sunGlyph(ctx, x, y, r, lit) {
     ctx.fillRect(x - r * 2.2, y - r * 2.2, r * 4.4, r * 4.4);
     ctx.globalCompositeOperation = 'source-over';
   }
-  ctx.fillStyle = lit ? '#FFE27A' : 'rgba(255,230,170,0.35)';
+  ctx.globalAlpha = lit ? 1 : 0.6;
+  ctx.fillStyle = color;
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.fill();
+  ctx.globalAlpha = 1;
   ctx.strokeStyle = lit ? '#FFF6DF' : 'rgba(255,230,170,0.35)';
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -86,9 +88,9 @@ function sunGlyph(ctx, x, y, r, lit) {
 }
 
 /** The Hornback Titan's horned skull (sun track, INCOMING row, results). */
-export function drawTitanSkull(ctx, x, y, r, crossed = false) {
+export function drawTitanSkull(ctx, x, y, r, crossed = false, bone = '#F4E9D2') {
   ctx.save();
-  ctx.fillStyle = '#F4E9D2';
+  ctx.fillStyle = bone;
   ctx.strokeStyle = '#3B1247';
   ctx.lineWidth = Math.max(1.5, r / 6);
   ctx.beginPath();
@@ -133,8 +135,10 @@ export function drawTitanSkull(ctx, x, y, r, crossed = false) {
 export function drawSunTrack(ctx, x, y, spacing, r, held, current) {
   for (let k = 0; k < WAVE_COUNT; k++) {
     const gx = x + k * spacing;
-    if (k === WAVE_COUNT - 1) drawTitanSkull(ctx, gx, y + 2, r * 1.05, held >= WAVE_COUNT);
-    else sunGlyph(ctx, gx, y, r * 0.62, k < held);
+    // Suns grow and burn hotter towards the end: pale yellow at sun 1, deep orange at sun 8.
+    const heat = k / (WAVE_COUNT - 2);
+    if (k === WAVE_COUNT - 1) drawTitanSkull(ctx, gx, y + 2, r * 1.3, held >= WAVE_COUNT, '#FF6B5E');
+    else sunGlyph(ctx, gx, y, r * (0.5 + 0.3 * heat), k < held, `rgb(255,${Math.round(240 - 118 * heat)},${Math.round(170 - 150 * heat)})`);
     if (k === current) {
       ctx.strokeStyle = '#FFFFFF';
       ctx.lineWidth = 2.5;
@@ -303,8 +307,21 @@ function drawIncoming(ctx, run, y0) {
     y += 32;
   }
   const titanLeft = run.waveIndex === WAVE_COUNT - 1 && inWave ? left.get('titan') ?? 0 : 1;
-  drawTitanSkull(ctx, x0 + 22, y, 9, titanLeft === 0);
+  drawTitanSkull(ctx, x0 + 22, y, 9, titanLeft === 0, '#FF6B5E');
   text(ctx, `${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, x0 + 38, y + 5, 12.5, '#FFB0B0', 'left', 900);
+  const preview = nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name);
+  if (preview) fitLine(ctx, preview, x0 + 12, y + 32, PANEL_W - 20, 14, '#FFE27A');
+}
+
+/** One HUD line squeezed horizontally to fit maxW. */
+function fitLine(ctx, str, x, y, maxW, size, color) {
+  ctx.font = `900 ${size}px ${FONT}`;
+  const squeeze = Math.min(1, maxW / ctx.measureText(str).width);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(squeeze, 1);
+  text(ctx, str, 0, 0, size, color, 'left', 900);
+  ctx.restore();
 }
 
 /** Owned glass charms as small medallions. */

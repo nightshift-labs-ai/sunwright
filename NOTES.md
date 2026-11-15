@@ -127,6 +127,11 @@
   yet, so the cover's solved-plan ratio is reported, not enforced. Defeat title fit now measured
   after the overlay shows (it overflowed before).
 
+- Benchmark 3 item 8: sun track grows and warms from pale yellow (sun 1) to deep orange (sun 8),
+  sun 9 a big red Titan skull; INCOMING ends with "NEXT SUN: +4 SCUTTLER, NEW GLASSBACK" from
+  waves.nextSunPreview (first-ever kinds, then biggest rises), truth-checked. README carries the three
+  live make.fun badges (kit repo_readme check).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

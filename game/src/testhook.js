@@ -1,7 +1,8 @@
 // A tiny test hook for the staging and playtest tools (only with ?test=1 in the URL): the page
 // stops advancing on its own and the tools step the real fixed-step loop, queue real orders,
 // point the mouse, and read back the numbers the HUD shows.
-import { WAVE_COUNT } from './config.js';
+import { ENEMIES, WAVE_COUNT } from './config.js';
+import { nextSunPreview } from './waves.js';
 import { enemiesRemaining } from './sim.js';
 import { rankFor } from './combat.js';
 import { currentBanner, winLoseHeadline } from './announce.js';
@@ -123,6 +124,7 @@ export function installTestHook(app, api) {
         sunsHeld: run.stats.wavesCleared,
         offersSeen: run.stats.offersSeen,
         rank: rankFor(run),
+        nextSun: nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name),
         best: app.ui.best,
         history: loadHistory().slice(-3),
         tick: run.tick,

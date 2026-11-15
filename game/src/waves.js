@@ -26,6 +26,19 @@ export function firstWaveOf(type) {
   return WAVES.findIndex((groups) => groups.some((g) => g[0] === type));
 }
 
+/** What the next sun adds over this one, from the wave tables: first-ever kinds, then the biggest rises. */
+export function nextSunPreview(waveIndex, diff, nameOf) {
+  if (waveIndex + 1 >= WAVES.length) return '';
+  const now = new Map(waveRoster(waveIndex, diff).map((r) => [r.type, r.count]));
+  const changes = waveRoster(waveIndex + 1, diff)
+    .map((r) => ({ type: r.type, isNew: firstWaveOf(r.type) === waveIndex + 1, more: r.count - (now.get(r.type) ?? 0) }))
+    .filter((c) => c.isNew || c.more > 0)
+    .sort((a, b) => b.isNew - a.isNew || b.more - a.more)
+    .slice(0, 2)
+    .map((c) => (c.isNew ? `NEW ${nameOf(c.type)}` : `+${c.more} ${nameOf(c.type)}`));
+  return changes.length ? `NEXT SUN: ${changes.join(', ')}` : '';
+}
+
 export function waveSize(waveIndex, diff) {
   return buildWaveSchedule(waveIndex, diff).length;
 }
