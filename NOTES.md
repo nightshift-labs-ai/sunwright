@@ -170,7 +170,7 @@
   showing nextSunPreview). Best winning seed 2090 gave 19 beetles / 4 types but weak beams, fading
   floaters and a floater-on-beam truth failure, Glassback not deflecting - reverted.
 - Benchmark 3 item 5 rest: board >= 58% of the cover (now ~52% incl. walls: needs a layout change),
-  <= 3 type sizes in the HUD.
+  (HUD type sizes done: 15 / 20 / 32 px plus the 61 px banner.)
 
 ## Known bugs
 - Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.

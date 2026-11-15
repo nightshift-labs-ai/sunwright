@@ -186,9 +186,11 @@ function drawSunDial(ctx, run, cx, cy) {
       ctx.stroke();
       ctx.setLineDash([]);
     }
-    text(ctx, wall[0].toUpperCase(), gx, gy + (wall === 'north' ? -22 : 30), 13, INK, 'center', 900);
+    text(ctx, wall[0].toUpperCase(), gx, gy + (wall === 'north' ? -22 : 30), 15, INK, 'center', 900);
   }
-  text(ctx, nextAp ? `NEXT: ${nextAp.phase.name} (${nextAp.phase.wallName[0]})` : 'FINAL SUN', cx, cy + 54, 18, GOLD, 'center', 900);
+  const nextLine = nextAp ? `NEXT: ${nextAp.phase.name} (${nextAp.phase.wallName[0]})` : 'FINAL SUN';
+  ctx.font = `900 20px ${FONT}`;
+  fitLine(ctx, nextLine, cx - Math.min(PANEL_W - 16, ctx.measureText(nextLine).width) / 2, cy + 54, PANEL_W - 16, 20, GOLD);
   // The real trigger: the sun moves when this sun ends (never a timer).
   if (nextAp) {
     const chip = run.phase === 'build' ? 'after the coming sun' : 'after this sun';
@@ -217,8 +219,8 @@ function droplet(ctx, x, y, r) {
 /** FOUNTAIN n/10: a droplet per HP, empty ones pulsing red, and how the run is lost. */
 function drawFountainPips(ctx, run, y) {
   const x0 = LEFT_X + 10;
-  text(ctx, NAMES.fountainShort, x0, y, 17, INK, 'left', 900);
-  text(ctx, `${run.shrineHp}/${run.shrineMax}`, LEFT_X + PANEL_W - 10, y + 2, 24, run.shrineHp <= 3 ? '#FF8A8A' : '#7DFFC4', 'right', 900);
+  text(ctx, NAMES.fountainShort, x0, y, 15, INK, 'left', 900);
+  text(ctx, `${run.shrineHp}/${run.shrineMax}`, LEFT_X + PANEL_W - 10, y + 2, 20, run.shrineHp <= 3 ? '#FF8A8A' : '#7DFFC4', 'right', 900);
   const pulse = 0.5 + Math.sin(run.time * 6) * 0.5;
   for (let k = 0; k < run.shrineMax; k++) {
     const x = x0 + 12 + (k % 5) * 38;
@@ -269,8 +271,8 @@ function drawSunBar(ctx, run) {
   const x = BOARD_X - WALL + 4;
   const w = BOARD_W + WALL * 2 - 8;
   panel(ctx, x, 4, w, 58);
-  text(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, x + 16, 44, 28, INK, 'left', 900);
-  drawSunTrack(ctx, x + w - 26 - 8 * 44, 33, 44, 13, run.stats.wavesCleared, run.waveIndex);
+  text(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, x + 16, 44, 32, INK, 'left', 900);
+  drawSunTrack(ctx, x + w - 26 - 8 * 40, 33, 40, 13, run.stats.wavesCleared, run.waveIndex);
 }
 
 const ICON_ENEMIES = Object.fromEntries(Object.keys(ENEMIES).map((type) => [type, { id: 3, type, def: ENEMIES[type], heading: 0, hp: 1, maxHp: 1, litPower: 0, age: 0, x: 0, y: 0 }]));
@@ -305,7 +307,7 @@ function drawQuartzGem(ctx, x, y) {
 function drawIncoming(ctx, run, y0) {
   const x0 = RIGHT_X;
   const inWave = run.phase === 'wave';
-  text(ctx, inWave ? `INCOMING - ${enemiesRemaining(run)} LEFT` : `${NAMES.sun} ${run.waveIndex + 1} BRINGS`, x0 + 12, y0 + 22, 16, inWave ? '#FFB0D8' : INK, 'left', 900);
+  text(ctx, inWave ? `INCOMING - ${enemiesRemaining(run)} LEFT` : `${NAMES.sun} ${run.waveIndex + 1} BRINGS`, x0 + 12, y0 + 22, 15, inWave ? '#FFB0D8' : INK, 'left', 900);
   const roster = waveRoster(run.waveIndex, run.diff);
   const left = new Map();
   if (inWave) {
@@ -317,15 +319,15 @@ function drawIncoming(ctx, run, y0) {
     if (row.type === 'titan') continue;
     drawEnemyIcon(ctx, row.type, x0 + 26, y, 0.62);
     text(ctx, ENEMIES[row.type].name, x0 + 48, y + 6, 15, INK, 'left', 800);
-    text(ctx, inWave ? `${left.get(row.type) ?? 0}` : `x${row.count}`, x0 + PANEL_W - 10, y + 7, 19, '#FFE14D', 'right', 900);
-    if (row.isNew && !inWave) text(ctx, 'NEW', x0 + 48, y + 21, 11, '#FF8AD0', 'left', 900);
+    text(ctx, inWave ? `${left.get(row.type) ?? 0}` : `x${row.count}`, x0 + PANEL_W - 10, y + 7, 20, '#FFE14D', 'right', 900);
+    if (row.isNew && !inWave) text(ctx, 'NEW', x0 + 48, y + 21, 15, '#FF8AD0', 'left', 900);
     y += 32;
   }
   const titanLeft = run.waveIndex === WAVE_COUNT - 1 && inWave ? left.get('titan') ?? 0 : 1;
   drawTitanSkull(ctx, x0 + 22, y, 9, titanLeft === 0, '#FF6B5E');
-  text(ctx, `${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, x0 + 38, y + 5, 12.5, '#FFB0B0', 'left', 900);
+  fitLine(ctx, `${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, x0 + 38, y + 5, PANEL_W - 46, 15, '#FFB0B0');
   const preview = nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name);
-  if (preview) fitLine(ctx, preview, x0 + 12, y + 32, PANEL_W - 20, 14, '#FFE27A');
+  if (preview) fitLine(ctx, preview, x0 + 12, y + 32, PANEL_W - 20, 15, '#FFE27A');
 }
 
 /** One HUD line squeezed horizontally to fit maxW. */
@@ -355,13 +357,13 @@ function drawTooltip(ctx, run, ui, y0) {
   ctx.globalAlpha = 0.85;
   drawPieceIcon(ctx, type, RIGHT_X + 30, y0 + 40);
   ctx.globalAlpha = 1;
-  text(ctx, `${PIECES[type].name}`, RIGHT_X + 58, y0 + 26, 17, GOLD, 'left', 900);
-  text(ctx, `${pieceCost(run, type)} ${NAMES.currency.toLowerCase()}`, RIGHT_X + 58, y0 + 46, 14, '#BDF4FF', 'left', 800);
-  text(ctx, PIECES[type].short, RIGHT_X + 12, y0 + 74, 14, INK, 'left', 700);
+  text(ctx, `${PIECES[type].name}`, RIGHT_X + 58, y0 + 26, 15, GOLD, 'left', 900);
+  text(ctx, `${pieceCost(run, type)} ${NAMES.currency.toLowerCase()}`, RIGHT_X + 58, y0 + 46, 15, '#BDF4FF', 'left', 800);
+  fitLine(ctx, PIECES[type].short, RIGHT_X + 12, y0 + 74, PANEL_W - 20, 15, INK);
   const keys = hover
     ? `${hover.type === 'pillar' ? '' : 'Q/E turn - '}X sell +${liftRefund(run, hover)}`
     : `${PIECE_ORDER.indexOf(type) + 1} select - click place`;
-  text(ctx, keys, RIGHT_X + 12, y0 + 96, 14, '#FFF2A8', 'left', 900);
+  text(ctx, keys, RIGHT_X + 12, y0 + 96, 15, '#FFF2A8', 'left', 900);
 }
 
 
@@ -369,7 +371,7 @@ function drawRightPanel(ctx, run, ui) {
   const x0 = RIGHT_X;
   panel(ctx, x0, 8, PANEL_W, 128);
   text(ctx, 'SCORE', x0 + 12, 30, 15, INK, 'left', 900);
-  text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 34, '#FFF2A8', 'right', 900);
+  text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 32, '#FFF2A8', 'right', 900);
   text(ctx, `BEST ${ui.best.toLocaleString('en-US')}`, x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
   drawComboLine(ctx, run, x0, 120);
   panel(ctx, x0, 142, PANEL_W, 62);
@@ -515,7 +517,7 @@ function drawHotbar(ctx, run, ui) {
     }
     drawPieceIcon(ctx, type, x + 32, HOTBAR.y + 36);
     text(ctx, String(i + 1), x + 9, HOTBAR.y + 19, 15, GOLD, 'left', 900);
-    text(ctx, PIECES[type].name, x + HOTBAR.w / 2, HOTBAR.y + 70, 13, INK, 'center', 700);
+    text(ctx, PIECES[type].name, x + HOTBAR.w / 2, HOTBAR.y + 70, 15, INK, 'center', 700);
     text(ctx, unlocked ? `${cost}` : 'DAY 2', x + (unlocked ? 80 : 72), HOTBAR.y + 40, unlocked ? 24 : 14, afford ? '#BDF4FF' : '#FF8A8A', 'center', 900);
     ctx.fillStyle = unlocked ? '#7FE8FF' : 'rgba(0,0,0,0)';
     ctx.beginPath();
@@ -539,10 +541,10 @@ function drawHotbar(ctx, run, ui) {
     ctx.arc(fx + 30, HOTBAR.y + 38, 24, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (run.flareLeft / BEAM.flareSeconds));
     ctx.stroke();
   }
-  text(ctx, 'SPACE', fx + 62, HOTBAR.y + 26, 14, GOLD, 'left', 900);
-  text(ctx, NAMES.flare, fx + 62, HOTBAR.y + 48, 18, INK, 'left', 900);
+  text(ctx, 'SPACE', fx + 62, HOTBAR.y + 26, 15, GOLD, 'left', 900);
+  text(ctx, NAMES.flare, fx + 62, HOTBAR.y + 48, 20, INK, 'left', 900);
   const flareState = run.flareLeft > 0 ? 'BURNING' : ready ? 'READY' : run.phase === 'wave' ? 'USED' : 'NEXT SUN';
-  text(ctx, flareState, fx + 62, HOTBAR.y + 69, 14, ready ? '#7DFFC4' : '#FFF2A8', 'left', 900);
+  text(ctx, flareState, fx + 62, HOTBAR.y + 69, 15, ready ? '#7DFFC4' : '#FFF2A8', 'left', 900);
   ctx.globalAlpha = 1;
   if (run.phase === 'build') {
     const bx = fx + 150;
