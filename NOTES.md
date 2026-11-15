@@ -147,10 +147,16 @@
   plaque under the heading.
 
 ## Next
-- M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
-  colour-blind beam patterns (option), How to play illustrated panels.
-- Staging: cover must show a lit prism fan (red/blue/gold) across a swarm; consider a hand-directed
-  staging player for waves 1-5 instead of the greedy bot (still one real seeded run, forward order).
+- Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
+  floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).
+  Tried: director v3 (STAGE_V3=1: extra bite on the cover sun, no healing charms) gives 6/10 draft
+  but a dead cover - reverted to the default. Solved-plan prune (STAGE_PRUNE=1) has no winning seed.
+- Benchmark 2 item 12 (Glassback on the cover): tried one scout Glassback in sun 5 (+ draft chip
+  showing nextSunPreview). Best winning seed 2090 gave 19 beetles / 4 types but weak beams, fading
+  floaters and a floater-on-beam truth failure, Glassback not deflecting - reverted.
+- Benchmark 3 item 5 (hierarchy budget: board >= 58% of the cover, merge left panels) - lowest.
+- Benchmark 2 item 22 (potted palms / urns / awning outside the courtyard) - low.
+- M3 leftovers: colour-blind beam patterns option, illustrated How to play.
 
 ## Known bugs
 - Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.
