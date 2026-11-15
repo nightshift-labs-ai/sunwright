@@ -29,7 +29,7 @@ function logLineFor(run, ev) {
 }
 
 function bannerFor(run, ev) {
-  if (ev.type === 'flare') return `${NAMES.flare}! DOUBLE POWER`;
+  if (ev.type === 'flare') return `${NAMES.flare}! - DOUBLE POWER`;
   if (ev.type === 'boss') return `THE TITAN COMES!`;
   if (ev.type === 'bite' && run.shrineHp <= 3) return `${NAMES.fountainShort} ${run.shrineHp}/${run.shrineMax} - HOLD ON!`;
   if (ev.type === 'waveStart') return `${NAMES.sun} ${ev.wave + 1}: ${run.aperture.phase.name} (${run.aperture.phase.wallName[0]})`;
