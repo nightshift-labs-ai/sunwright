@@ -176,6 +176,11 @@
   drawn speaker and `M sound on` (red X + `M sound off` when muted). M toggles the real master gain and
   saves settings.muted; the playtest reads the gain (audio.audioProbe) and the save both ways.
 
+- Benchmark 5 item 5: the pink lose line is gone; under the hook a plum band holds two 34 px stroked
+  lines from announce.titleRules(): `Place glass to bend sunlight onto beetles` (cream) and
+  `WIN: survive 9 suns - LOSE: the fountain runs dry` (gold, suns = WAVE_COUNT). check-shot-truth
+  checks both lines and the ENTER hint (text, >= 34 px, unclipped). Demo courtyard at scale 0.565.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

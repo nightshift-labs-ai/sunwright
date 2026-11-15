@@ -49,6 +49,14 @@ export function announceEvents(run, events) {
   }
 }
 
+/** The title's two rule lines: the core verb, then the win and lose conditions (suns counted from config). */
+export function titleRules() {
+  return {
+    verb: 'Place glass to bend sunlight onto beetles',
+    winLose: `WIN: survive ${WAVE_COUNT} ${NAMES.suns.toLowerCase()} - LOSE: the ${NAMES.fountainShort.toLowerCase()} runs dry`,
+  };
+}
+
 /** The run's win and lose conditions with the real count of suns still to hold (current included). */
 export function winLoseHeadline(run) {
   const left = WAVE_COUNT - run.stats.wavesCleared;

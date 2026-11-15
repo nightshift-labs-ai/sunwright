@@ -55,6 +55,13 @@ for (const h of history) {
 await page.evaluate(() => window.__test.ui('menu'));
 await page.waitForTimeout(150);
 await capture('2-title.jpg', await page.evaluate(() => window.__test.advance(240)));
+manifest.shots.at(-1).titleText = await page.evaluate(() =>
+  ['rule-verb', 'rule-winlose', 'start-hint'].map((id) => {
+    const n = document.getElementById(id);
+    const r = n.getBoundingClientRect();
+    return { id, text: n.textContent.trim(), px: parseFloat(getComputedStyle(n).fontSize), inside: r.left >= 0 && r.right <= 1280 && r.width <= n.parentElement.getBoundingClientRect().width + 0.5 };
+  }),
+);
 await page.evaluate(([seed, diff]) => window.__test.start(seed, diff), [SEED, DIFF]);
 await page.evaluate(() => window.__test.pointAt(-1, -1));
 await capture('1-play.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, cover.tick]));

@@ -29,7 +29,7 @@ function drawCellCursor(ctx, cell, ok) {
 }
 
 /** Where the title's demo courtyard sits: right of the menu card, between the rules and the key band. */
-const TITLE_DEMO = { x: 942, y: 550, scale: 0.58 };
+const TITLE_DEMO = { x: 942, y: 554, scale: 0.565 };
 
 const nextCache = { run: null, version: -1, value: null };
 

@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { ENEMIES, RESULT_LOSE_TITLE, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
-import { currentBanner, draftHint, historyChip, winLoseHeadline } from '../game/src/announce.js';
+import { currentBanner, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
 import { rankFor } from '../game/src/combat.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
@@ -73,6 +73,18 @@ for (const shot of manifest.shots) if (shot.tagOverlaps) check(shot.tagOverlaps.
 for (const shot of manifest.shots) if (shot.textOverlaps) check(shot.textOverlaps.length === 0, `${shot.name} text on text: ${shot.textOverlaps.join(' | ')}`);
 for (const shot of manifest.shots) if (shot.floaters !== undefined) console.log(`${shot.name}: ${shot.floaters} floating numbers, ${shot.textOverlaps.length} overlaps`);
 for (const shot of manifest.shots) if (shot.textOutside) check(shot.textOutside.length === 0, `${shot.name} text outside its plaque: ${shot.textOutside.join(' | ')}`);
+
+// Title: the rule lines are announce.titleRules() (suns from config), each at least 34 px and unclipped.
+for (const shot of manifest.shots) {
+  if (!shot.titleText) continue;
+  const rules = titleRules();
+  const want = { 'rule-verb': rules.verb, 'rule-winlose': rules.winLose, 'start-hint': 'CLICK PLAY OR PRESS ENTER' };
+  for (const t of shot.titleText) {
+    check(t.text === want[t.id], `${shot.name} ${t.id}: shown "${t.text}" vs "${want[t.id]}"`);
+    check(t.px >= 34 && t.inside, `${shot.name} ${t.id}: ${t.px}px, inside ${t.inside}`);
+  }
+  console.log(`${shot.name}: ${shot.titleText.map((t) => `${t.text} (${t.px}px)`).join(' | ')}`);
+}
 
 // Draft: each roundel's effect line is its charm's line from config, the pick hint counts the offer,
 // and no two draft text boxes collide.

@@ -6,7 +6,7 @@ import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { rankFor } from '../combat.js';
-import { draftHint, historyChip } from '../announce.js';
+import { draftHint, historyChip, titleRules } from '../announce.js';
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
 
@@ -49,7 +49,7 @@ export function renderOptions(settings) {
   el('opt-patterns').checked = !!settings.patterns;
 }
 
-/** Difficulty buttons with each difficulty's best score. */
+/** Difficulty buttons with each difficulty's best score, the scope line and the rule lines. */
 export function showTitle(menus, bestFor, selected) {
   el('difficulty-picker').innerHTML = DIFFICULTY_ORDER.map((id) => {
     const best = bestFor(id);
@@ -57,6 +57,9 @@ export function showTitle(menus, bestFor, selected) {
       <b>${DIFFICULTIES[id].name}</b><small>${best.played ? `best ${best.score.toLocaleString('en-US')}` : 'not played yet'}</small></button>`;
   }).join('');
   el('rule-scope').textContent = SCOPE_LINE;
+  const rules = titleRules();
+  el('rule-verb').textContent = rules.verb;
+  el('rule-winlose').textContent = rules.winLose;
 }
 
 /** The draft: a huge "SUN MOVES WEST - PICK 1", three roundels each with its one-line effect, NEW chip, reroll and how to pick. */
