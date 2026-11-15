@@ -52,7 +52,8 @@ kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 28px sys
 .sunbanner { margin: 6px 0 0; padding: 0 30px 6px; width: max-content; white-space: nowrap; font: 900 112px system-ui, sans-serif; line-height: 1.05; letter-spacing: -1px; transform: scaleX(0.72); color: #ffe27a; -webkit-text-stroke: 3px #3b1247; paint-order: stroke fill; background: rgba(31, 63, 153, 0.94); border: 5px solid #f2c14e; border-radius: 18px; }
 .roundels { display: flex; gap: 46px; margin-top: 200px; }
 .roundel { position: relative; width: 236px; height: 236px; border-radius: 50%; padding: 0 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 7px solid #f2c14e; background: none; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.5), 0 0 30px rgba(255, 210, 90, 0.45); }
-.roundel.rare { border-color: #fff6df; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.5), 0 0 40px rgba(255, 255, 220, 0.85); }
+.roundel.rare { border-color: #fff6df; box-shadow: 0 0 0 6px #b0307a, 0 10px 0 6px rgba(91, 58, 30, 0.5), 0 0 40px rgba(255, 255, 220, 0.85); }
+.roundel .synergy { position: absolute; z-index: 2; bottom: -26px; white-space: nowrap; padding: 2px 12px; font: 900 20px system-ui, sans-serif; color: #3b1247; background: #7dffc4; border: 3px solid #f2c14e; border-radius: 14px; }
 .roundel .glass { position: absolute; inset: 0; z-index: 0; border-radius: 50%; overflow: hidden; background: conic-gradient(from 15deg, hsl(var(--hue) 80% 52%) 0 60deg, hsl(calc(var(--hue) + 35) 80% 38%) 0 120deg, hsl(var(--hue) 75% 60%) 0 180deg, hsl(calc(var(--hue) + 35) 80% 42%) 0 240deg, hsl(var(--hue) 80% 50%) 0 300deg, hsl(calc(var(--hue) + 35) 75% 36%) 0); }
 .roundel .glass::after { content: ""; position: absolute; inset: 28px; border-radius: 50%; background: radial-gradient(#fffaf0, #f6dfae); border: 3px solid #f2c14e; }
 .roundel b, .roundel .key, .roundel .effect, .roundel .glyph { position: relative; z-index: 1; }

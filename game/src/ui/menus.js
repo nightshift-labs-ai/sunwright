@@ -1,7 +1,7 @@
 // DOM overlays above the canvas: title (with difficulty picker and best scores), how to play,
 // pause, the draft's stained-glass roundels, and the results screen. Buttons only queue
 // { kind: 'ui', action, arg } intents; main.js decides what they do.
-import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, NAMES, PIECES, PIECE_ORDER, RESULT_LOSE_TITLE, RESULT_WIN_TITLE, SCOPE_LINE, WAVE_COUNT } from '../config.js';
+import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, NAMES, PIECES, PIECE_ORDER, RESULT_LOSE_TITLE, RESULT_WIN_TITLE, SCOPE_LINE, SYNERGY, WAVE_COUNT } from '../config.js';
 import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
@@ -68,7 +68,7 @@ export function showDraft(menus, run) {
       return `<button class="roundel ${b.weight <= 2 ? 'rare' : ''}" style="--hue:${b.hue}" data-action="pick" data-arg="${i}">
         <span class="glass"></span><span class="key">${i + 1}</span>
         <canvas class="glyph" width="96" height="96" data-charm="${id}"></canvas>
-        <b>${escapeHtml(b.name)}</b><span class="effect">${escapeHtml(b.text)}</span></button>`;
+        <b>${escapeHtml(b.name)}</b><span class="effect">${escapeHtml(b.text)}</span>${synergyTag(run, id)}</button>`;
     })
     .join('');
   for (const canvas of el('draft-roundels').querySelectorAll('canvas.glyph')) drawCharmGlyph(canvas.getContext('2d'), canvas.dataset.charm, 48, 48, 46);
@@ -84,6 +84,12 @@ export function showDraft(menus, run) {
 function clock(seconds) {
   const s = Math.max(0, Math.round(seconds));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+/** "+ pairs with X" when the run already owns this charm's partner. */
+function synergyTag(run, id) {
+  const partner = SYNERGY[id];
+  return partner && run.boons.includes(partner) ? `<span class="synergy">+ pairs with ${escapeHtml(boonById(partner).name)}</span>` : '';
 }
 
 /** Shrink each stat label horizontally until it fits its tile on one line (needs the overlay shown). */

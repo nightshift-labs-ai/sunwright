@@ -155,11 +155,17 @@ export const BOONS = [
   { id: 'mend', name: NAMES.charm.mend, text: 'Heal the fountain 4 HP', weight: 3, hue: 120, repeat: true },
   { id: 'spreading', name: NAMES.charm.spreading, text: 'Burned beetles scorch their neighbours', weight: 2, hue: 8 },
   { id: 'highsun', name: NAMES.charm.highsun, text: 'Every beam +20% power', weight: 2, hue: 52 },
-  { id: 'longchain', name: NAMES.charm.longchain, text: 'SEAR window 1 s -> 1.6 s', weight: 2, hue: 330 },
+  { id: 'longchain', name: NAMES.charm.longchain, text: 'SEAR window 1s -> 1.6s', weight: 2, hue: 330 },
   { id: 'grinder', name: NAMES.charm.grinder, text: 'Lenses focus x3.2 instead of x2.5', weight: 2, hue: 190 },
   { id: 'trueprism', name: NAMES.charm.trueprism, text: 'Prism branches keep 75% power', weight: 2, hue: 300 },
 ];
 export const SPREAD_BURN = { radius: 1.1, damage: 12 };
+/** Charm pairs that work well together (a draft roundel names its partner when you own it). */
+export const SYNERGY = {
+  silvered: 'highsun', highsun: 'silvered', burning: 'grinder', grinder: 'burning', spreading: 'trueprism',
+  trueprism: 'spreading', flare2: 'highsun', magnet: 'discount', discount: 'magnet', sunstone: 'mend',
+  mend: 'sunstone', longchain: 'spreading',
+};
 
 /** The game's scope in one line, counted from the tables above (title screen and index.html note). */
 export const SCOPE_LINE = `${PIECE_ORDER.length} glass - ${ENEMY_ORDER.filter((t) => !ENEMIES[t].boss).length} beetles + the Titan - ${WAVE_COUNT} suns - ${BOONS.length} charms - ${DIFFICULTY_ORDER.length} difficulties`;
