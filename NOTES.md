@@ -249,6 +249,11 @@
   every 0.5 s): 2013 gets worse (10 beetles, 1 lit, 0 floaters: kills come faster and floaters next to
   moving beams fail the no-text-on-beam rule); 2112 reaches 5 lit / 13 beetles but 0 floaters and a
   flawless 10/10 win. Off by default; 2013 K=1 stays the staging.
+  STAGE_V4=1 scan (same seeds): 2112 wins with draft 6/10 and win 5/10, cover 17 beetles / 3 lit /
+  SEAR x5 / prism split but 0 floaters, 10 stray panes and no Mend on its draft; staged and looked
+  at, kept 2013 (floaters, fuller beams). That shot showed the pill hiding the FOUNTAIN tag: fixed
+  (the tag's adaptive spot avoids the pill; boardTagOverlaps counts tag-under-pill for the planner
+  and check-shot-truth).
 
 ## Known bugs
 - Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.

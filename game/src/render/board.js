@@ -4,6 +4,7 @@
 import { BOARD, DX, DY } from '../config.js';
 import { sunApertureFor } from '../sun.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL, WALL_FRONT } from './layout.js';
+import { bannerLayout } from './banner.js';
 
 export const PALETTE = {
   sandA: '#D8A86A',
@@ -309,7 +310,10 @@ export function boardLabelBoxes(run) {
   const fy = BOARD_Y + s.r * CELL + CELL / 2;
   const legs = run.trace?.legs ?? [];
   const spots = FOUNTAIN_TAG_SPOTS.map(([dx, dy]) => tagBox('FOUNTAIN', fx + dx, fy + dy));
-  labels.push(spots.find((b) => !boxHitsBeam(b, legs) && !boxHitsBeetle(b, run)) ?? spots[0]);
+  // The tag also keeps out from under the docked banner pill.
+  const pill = bannerLayout(run);
+  const underPill = (b) => !!pill && b.x0 < pill.x1 && pill.x0 < b.x1 && b.y0 < pill.y1 && pill.y0 < b.y1;
+  labels.push(spots.find((b) => !boxHitsBeam(b, legs) && !boxHitsBeetle(b, run) && !underPill(b)) ?? spots[0]);
   return labels;
 }
 

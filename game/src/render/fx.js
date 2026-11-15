@@ -97,7 +97,9 @@ export function floaterConflicts(fx, run) {
 /** Board tags (SWARM, FOUNTAIN, SUN - x) that a beam core or a beetle covers right now. */
 export function boardTagOverlaps(run) {
   const bad = [];
+  const pill = bannerLayout(run);
   for (const t of boardLabelBoxes(run)) {
+    if (pill && overlaps(t, pill)) bad.push(`${t.text} / banner`);
     if (boxTouchesBeam(t, run.trace.legs)) bad.push(`${t.text} / beam`);
     for (const e of run.enemies) {
       const r = e.def.size * CELL;
