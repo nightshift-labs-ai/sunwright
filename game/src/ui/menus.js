@@ -45,7 +45,7 @@ export function renderOptions(settings) {
 }
 
 /** Difficulty buttons with each difficulty's best score. */
-export function renderTitle(bestFor, selected) {
+export function showTitle(menus, bestFor, selected) {
   el('difficulty-picker').innerHTML = DIFFICULTY_ORDER.map((id) => {
     const best = bestFor(id);
     return `<button class="diff ${id === selected ? 'on' : ''}" data-action="difficulty" data-arg="${id}">
@@ -54,7 +54,7 @@ export function renderTitle(bestFor, selected) {
 }
 
 /** The draft: a huge "SUN MOVES WEST - PICK 1", three roundels (effect on hover), reroll, NEW chip. */
-export function renderDraft(menus, run) {
+export function showDraft(menus, run) {
   const key = `${run.waveIndex}|${run.offer.join(',')}|${run.quartz}`;
   if (key === menus.draftKey) return;
   menus.draftKey = key;
@@ -79,6 +79,13 @@ export function renderDraft(menus, run) {
   el('draft-new').textContent = unlocked ? `NEW GLASS: ${PIECES[unlocked].name} [${PIECE_ORDER.indexOf(unlocked) + 1}]` : newFoe ? `NEW: ${ENEMIES[newFoe.type].name}` : '';
 }
 
+/** Break a title at the space nearest its middle (for narrow history cells). */
+function twoLines(title) {
+  const words = title.split(' ');
+  const half = Math.ceil(words.length / 2);
+  return `${words.slice(0, half).join(' ')}<br>${words.slice(half).join(' ')}`;
+}
+
 function clock(seconds) {
   const s = Math.max(0, Math.round(seconds));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -88,8 +95,8 @@ function clock(seconds) {
  * Results: THE TITAN IS ASH (or THE SWARM BROKE THROUGH) across the top, then score with NEW BEST,
  * one-line tiles and the restart keys; the canvas draws the Titan's carcass beside it.
  */
-export function renderResults(menus, run, isBest) {
-  const key = `${run.seed}|${run.phase}|${run.score}`;
+export function showResults(menus, run, isBest, history) {
+  const key = `${run.seed}|${run.phase}|${run.score}|${history.length}`;
   if (key === menus.resultsKey) return;
   menus.resultsKey = key;
   const won = run.phase === 'won';
@@ -104,7 +111,21 @@ export function renderResults(menus, run, isBest) {
   const tiles = [
     [`LONGEST ${NAMES.combo}`, `x${run.chain.best}`],
     [NAMES.fountainShort, `${run.shrineHp}/${run.shrineMax}`],
-    won && run.stats.titanSeconds !== undefined ? ['TITAN BURNED IN', clock(run.stats.titanSeconds)] : ['BEETLES BURNED', run.stats.kills],
+    won && run.stats.titanSeconds !== undefined ? ['TITAN BURNED', clock(run.stats.titanSeconds)] : ['BEETLES', run.stats.kills],
   ];
   el('results-stats').innerHTML = tiles.map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('');
+  el('results-history').innerHTML =
+    '<span class="label">RUN HISTORY</span>' +
+    history
+      .map((h) =>
+        h.outcome === 'won'
+          ? `<div class="won"><b>WON ${h.suns}/${WAVE_COUNT}</b><small>${h.score.toLocaleString('en-US')}</small></div>`
+          : `<div class="fell"><i class="dry"></i><b>${twoLines(RESULT_LOSE_TITLE)}</b><small>Day ${h.day} ${h.phase.toLowerCase()}</small></div>`,
+      )
+      .join('');
+}
+
+/** R / S on the results screen (and the RUN AGAIN / SAME SEED buttons): queue a fresh run. */
+export function restartRun(intents, sameSeed) {
+  intents.push({ kind: 'ui', action: sameSeed ? 'sameSeed' : 'runAgain', arg: null });
 }

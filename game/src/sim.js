@@ -219,6 +219,11 @@ export function stepSim(run, orders) {
   announceEvents(run, run.events.slice(Math.min(first, run.events.length)));
 }
 
+/** What the save keeps of a finished run (also shown in the results' RUN HISTORY). */
+export function runSummary(run) {
+  return { difficultyId: run.difficultyId, outcome: run.phase, score: run.score, suns: run.stats.wavesCleared, day: run.aperture.day, phase: run.aperture.phase.name };
+}
+
 /** Waves still to spawn plus beetles on the board, for the HUD's remaining bar. */
 export function enemiesRemaining(run) {
   return run.schedule.length - run.spawnCursor + run.enemies.length;

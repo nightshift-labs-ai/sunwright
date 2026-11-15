@@ -70,6 +70,12 @@
   track with the skull crossed out, charm badges; sepia dim at noon (sunrise wash removed).
   tools/thumbs.py writes the judge-scale contact sheet (768 cover + 252 px cells).
 
+- RUN HISTORY: save.js recordRun(summary) + loadHistory(); results strip of the last 3 runs (losses
+  in red with RESULT_LOSE_TITLE + a dry-basin icon + day/phase; WON 9/9 with score). shots.mjs first
+  replays two real losing runs (seeds 3002, 3004: Day 2 evening, Day 3 noon) so the history and
+  BEST (18,260 on the cover) are real; check-shot-truth asserts BEST and the history against
+  headless replays. menus.js exports showTitle / showDraft / showResults / restartRun.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

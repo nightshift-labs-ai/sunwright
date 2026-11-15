@@ -1,4 +1,5 @@
-// Persistence in localStorage: best score and furthest wave per difficulty, and settings.
+// Persistence in localStorage: best score and furthest sun per difficulty, the run history shown
+// on the results screen, and settings.
 const KEY = 'sunwright.save.v1';
 
 function readSave() {
@@ -21,15 +22,26 @@ export function loadBest(difficultyId) {
   return readSave().best?.[difficultyId] ?? { score: 0, waves: 0 };
 }
 
-/** Record a finished run; returns true when it is a new best score. */
-export function recordRun(difficultyId, score, waves) {
+const HISTORY_KEEP = 10;
+
+/**
+ * Record a finished run (summary: { difficultyId, outcome, score, suns, day, phase }) in the
+ * history and the per-difficulty best; returns true when it is a new best score.
+ */
+export function recordRun(summary) {
   const data = readSave();
   data.best ??= {};
-  const old = data.best[difficultyId] ?? { score: 0, waves: 0 };
-  const isBest = score > old.score;
-  data.best[difficultyId] = { score: Math.max(old.score, score), waves: Math.max(old.waves, waves) };
+  const old = data.best[summary.difficultyId] ?? { score: 0, waves: 0 };
+  const isBest = summary.score > old.score;
+  data.best[summary.difficultyId] = { score: Math.max(old.score, summary.score), waves: Math.max(old.waves, summary.suns) };
+  data.history = [...(data.history ?? []), summary].slice(-HISTORY_KEEP);
   writeSave(data);
   return isBest;
+}
+
+/** Finished runs, oldest first. */
+export function loadHistory() {
+  return readSave().history ?? [];
 }
 
 export function loadSettings() {

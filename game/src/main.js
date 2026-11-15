@@ -1,18 +1,18 @@
 // Boot and the main loop: a fixed 60 Hz sim step separate from rendering, the screen state
 // (title / how to play / play + pause), and turning queued input intents into sim orders.
 import { DIFFICULTIES, DT, PIECES, PIECE_ORDER } from './config.js';
-import { createRun, pieceCost, pieceUnlocked, stepSim } from './sim.js';
+import { createRun, pieceCost, pieceUnlocked, runSummary, stepSim } from './sim.js';
 import { pieceAt, placementCheck, setPiece } from './grid.js';
 import { beamModsFor, litLength, traceBeams } from './beams.js';
 import { freshSeed } from './rng.js';
 import { createInput, drainIntents } from './input.js';
-import { createMenus, renderDraft, renderOptions, renderResults, renderTitle, showScreen } from './ui/menus.js';
+import { createMenus, renderOptions, restartRun, showDraft, showResults, showScreen, showTitle } from './ui/menus.js';
 import { drawFrame } from './render/scene.js';
 import { createFx, fxFromEvent, updateFx } from './render/fx.js';
 import { hotbarHit } from './render/hud.js';
 import { VIEW_H, VIEW_W, cellAtPixel } from './render/layout.js';
 import { playSfx, playSizzle, setBeamHum, setVolume, unlockAudio, updateMusic } from './audio.js';
-import { loadBest, loadSettings, recordRun, saveSettings } from './save.js';
+import { loadBest, loadHistory, loadSettings, recordRun, saveSettings } from './save.js';
 import { createTitleDemo, stepTitleDemo } from './titledemo.js';
 import { installTestHook } from './testhook.js';
 
@@ -118,7 +118,7 @@ function handleUiAction(action, arg) {
     case 'difficulty':
       app.settings.difficulty = arg;
       saveSettings(app.settings);
-      renderTitle(loadBest, arg);
+      showTitle(menus, loadBest, arg);
       break;
     case 'howto': app.screen = 'howto'; break;
     case 'back': app.screen = 'title'; break;
@@ -160,8 +160,8 @@ function handleKeyInPlay(code) {
   }
   if (app.paused) return;
   if (over) {
-    if (code === 'KeyR') startRun(undefined, run.difficultyId);
-    else if (code === 'KeyS') startRun(run.seed, run.difficultyId);
+    if (code === 'KeyR') restartRun(input.intents, false);
+    else if (code === 'KeyS') restartRun(input.intents, true);
     return;
   }
   const digit = code.startsWith('Digit') ? Number(code.slice(5)) : 0;
@@ -221,7 +221,7 @@ function consumeEvents(run, withSound) {
     fxFromEvent(app.fx, ev);
     if (withSound && EVENT_SOUNDS[ev.type]) playSfx(EVENT_SOUNDS[ev.type]);
     if (ev.type === 'bite') app.shrineHurtAt = run.time;
-    if (ev.type === 'won' || ev.type === 'lost') app.isBest = recordRun(run.difficultyId, run.score, run.stats.wavesCleared);
+    if (ev.type === 'won' || ev.type === 'lost') app.isBest = recordRun(runSummary(run));
   }
   run.events.length = 0;
 }
@@ -299,10 +299,10 @@ function syncOverlays() {
   else if (app.paused) want = 'pause';
   else if (run.phase === 'draft') want = 'draft';
   else if ((run.phase === 'won' || run.phase === 'lost') && run.time - run.endedAt >= RESULTS_DELAY) want = 'results';
-  if (want === 'draft') renderDraft(menus, run);
-  if (want === 'results') renderResults(menus, run, app.isBest);
+  if (want === 'draft') showDraft(menus, run);
+  if (want === 'results') showResults(menus, run, app.isBest, loadHistory().slice(-3));
   if (want !== app.overlay) {
-    if (want === 'title') renderTitle(loadBest, app.settings.difficulty);
+    if (want === 'title') showTitle(menus, loadBest, app.settings.difficulty);
     showScreen(menus, want);
     app.overlay = want;
   }

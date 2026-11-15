@@ -4,6 +4,7 @@
 import { WAVE_COUNT } from './config.js';
 import { enemiesRemaining } from './sim.js';
 import { currentBanner } from './announce.js';
+import { loadHistory } from './save.js';
 
 export function installTestHook(app, api) {
   app.manual = true;
@@ -67,6 +68,7 @@ export function installTestHook(app, api) {
         log: run.log.join(' | '),
         sunsHeld: run.stats.wavesCleared,
         best: app.ui.best,
+        history: loadHistory().slice(-3),
         tick: run.tick,
       };
     },

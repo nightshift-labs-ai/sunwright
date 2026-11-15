@@ -5,7 +5,7 @@
 //   node tools/check-shot-truth.mjs
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { WAVE_COUNT } from '../game/src/config.js';
-import { createRun, enemiesRemaining, stepSim } from '../game/src/sim.js';
+import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
 import { currentBanner } from '../game/src/announce.js';
 
 const manifest = JSON.parse(readFileSync('tools/shots-manifest.json', 'utf8'));
@@ -41,11 +41,11 @@ function hudFacts(run) {
   };
 }
 
-function replayTo(tick) {
-  const run = createRun(manifest.seed, manifest.difficulty);
+function replayTo(tick, seed = manifest.seed, log = manifest.log) {
+  const run = createRun(seed, manifest.difficulty);
   let k = 0;
   while (run.tick < tick) {
-    const orders = k < manifest.log.length && manifest.log[k].tick === run.tick ? manifest.log[k++].orders : [];
+    const orders = k < log.length && log[k].tick === run.tick ? log[k++].orders : [];
     stepSim(run, orders);
     run.events.length = 0;
   }
@@ -58,6 +58,19 @@ for (const shot of manifest.shots) {
   const shown = { ...shot.state, boons: shot.state.boons.join(',') };
   for (const [key, value] of Object.entries(truth)) check(shown[key] === value, `${shot.name} ${key}: shown ${shown[key]} vs sim ${value}`);
   console.log(`${shot.name}: tick ${shot.state.tick} ${truth.phase} day ${truth.day} ${truth.sun} wave ${truth.wave}/${truth.waves} score ${truth.score} quartz ${truth.quartz} hp ${truth.shrineHp}/${truth.shrineMax}`);
+}
+
+// RUN HISTORY and BEST: the earlier real runs and the main run, replayed, must be what the save shows.
+const earlier = (manifest.history ?? []).map((h) => runSummary(replayTo(h.endTick + 2, h.seed, h.log)));
+const bestBefore = Math.max(0, ...earlier.map((h) => h.score));
+for (const shot of manifest.shots) {
+  if (shot.state.screen !== 'play') continue;
+  check(shot.state.best === bestBefore, `${shot.name} BEST: shown ${shot.state.best} vs saved ${bestBefore}`);
+  if (shot.state.phase === 'won' || shot.state.phase === 'lost') {
+    const expected = [...earlier, runSummary(replayTo(shot.state.tick))].slice(-3);
+    check(JSON.stringify(shot.state.history) === JSON.stringify(expected), `${shot.name} RUN HISTORY: shown ${JSON.stringify(shot.state.history)} vs runs ${JSON.stringify(expected)}`);
+    console.log(`${shot.name} RUN HISTORY: ${expected.map((h) => `${h.outcome} day ${h.day} ${h.phase} ${h.score}`).join(' | ')}; BEST before ${bestBefore}`);
+  }
 }
 
 /** JPEG size from its SOF marker. */
