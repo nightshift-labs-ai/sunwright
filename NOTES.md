@@ -205,6 +205,14 @@
   splitter and lens joints get a small glint. Trace bursts carry a kind. check-shot-truth replays the
   cover and compares the drawn bursts. Cover: 2 big bursts, 0 blown 32 px blocks (was 5).
 
+- Benchmark 5 item 10: the event banner is a 304 px lapis pill (< 40% of the 780 px board) docked inside
+  the wall beside the gate it names (render/banner.js: next sun's window for NEXT SUN advice, else the
+  current one), headline 32 px + second line 20 px split at " - ", nub pointing at the window. When it
+  sits at the next sun's gate, the NEXT SUN (W) ghost label is dropped (the pill says it). Floaters
+  avoid the pill. check-shot-truth replays the box, its width and its gate. Stage planner now only
+  takes cover ticks the checks pass (no floater conflict, no covered tag) and rewards an active SEAR:
+  cover tick 4694, SEAR x3, 17 beetles, 1 floater.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

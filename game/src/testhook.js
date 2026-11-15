@@ -9,24 +9,13 @@ import { currentBanner, winLoseHeadline } from './announce.js';
 import { loadHistory } from './save.js';
 import { audioProbe } from './audio.js';
 import { squeezeReport } from './render/fit.js';
-import { boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
-import { boardLabelBoxes } from './render/board.js';
+import { bannerLayout } from './render/banner.js';
+import { boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
 
-/** Board tags (SWARM, FOUNTAIN) that a beam core or a beetle covers right now. */
-function tagOverlaps(app) {
-  const run = app.run;
-  if (!run) return [];
-  const bad = [];
-  for (const t of boardLabelBoxes(run)) {
-    if (boxTouchesBeam(t, run.trace.legs)) bad.push(`${t.text} / beam`);
-    for (const e of run.enemies) {
-      const r = e.def.size * 60;
-      const x = 250 + e.x * 60;
-      const y = 140 + e.y * 60;
-      if (t.x0 < x + r && x - r < t.x1 && t.y0 < y + r && y - r < t.y1) bad.push(`${t.text} / ${e.type}`);
-    }
-  }
-  return bad;
+/** The banner pill's wall and box as drawn (render/banner.js), or null. */
+function bannerBox(run) {
+  const b = bannerLayout(run);
+  return b && { wall: b.wall, x0: b.x0, y0: b.y0, x1: b.x1, y1: b.y1 };
 }
 
 /** Measure each floating number as drawn now and list any that overlap another, a label or a beam core. */
@@ -128,7 +117,7 @@ export function installTestHook(app, api) {
       return floaterOverlaps(app);
     },
     tagOverlaps() {
-      return tagOverlaps(app);
+      return app.run ? boardTagOverlaps(app.run) : [];
     },
     draftText() {
       return draftText();
@@ -176,6 +165,7 @@ export function installTestHook(app, api) {
         offer: run.offer.slice(),
         kills: run.stats.kills,
         banner: currentBanner(run),
+        bannerBox: bannerBox(run),
         headline: winLoseHeadline(run),
         log: run.log.join(' | '),
         sunsHeld: run.stats.wavesCleared,

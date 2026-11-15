@@ -72,6 +72,13 @@ export function currentBanner(run) {
   return `NEXT ${NAMES.sun}: ${sunApertureFor(run.seed, run.waveIndex + 1).phase.wallName} - REAIM GLASS`;
 }
 
+/** Which sun (wave index) the banner talks about: the next one for the NEXT SUN advice, else the current. */
+export function bannerSun(run) {
+  if (run.banner && run.time - run.banner.at < BANNER_SECONDS) return run.waveIndex;
+  if (run.phase === 'wave' && run.waveIndex + 1 < WAVE_COUNT) return run.waveIndex + 1;
+  return run.waveIndex;
+}
+
 /** The draft's context line under its heading: the sun just held, what burned in it, the fountain. */
 export function draftContext(run) {
   return `${NAMES.sun} ${run.stats.wavesCleared} HELD - ${run.stats.sunKills} burned - ${NAMES.fountainShort} ${run.shrineHp}/${run.shrineMax}`;

@@ -1,7 +1,7 @@
 // One frame of the game: courtyard, glass, shrine, beetles, light, effects, then the HUD.
 // The draft dims the board so the new opening's beam (through the current layout) stands out;
 // a win floods the courtyard with sunrise, a defeat drains the light.
-import { drawBeamGhost, drawBeams, drawDecals, drawFx, drawNextSunGhost, drawScreenFx, shakeOffset } from './fx.js';
+import { bannerAtNextGate, drawBeamGhost, drawBeams, drawDecals, drawFx, drawNextSunGhost, drawScreenFx, shakeOffset } from './fx.js';
 import { drawHud } from './hud.js';
 import { drawBoardTags, drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawSandSurround, drawShrine } from './board.js';
 import { drawEnemies } from './beetles.js';
@@ -93,7 +93,7 @@ export function drawFrame(ctx, frame) {
   } else if (phase !== 'lost') {
     if (frame.showHud && (phase === 'wave' || phase === 'build') && run.waveIndex + 1 < WAVE_COUNT) {
       const next = nextSunTrace(run);
-      drawNextSunGhost(ctx, next.trace, `NEXT ${NAMES.sun} (${next.wall})`, time);
+      drawNextSunGhost(ctx, next.trace, bannerAtNextGate(run) ? '' : `NEXT ${NAMES.sun} (${next.wall})`, time);
     }
     const alpha = phase === 'wave' || phase === 'won' ? 1 : phase === 'build' ? 0.8 : 0.95;
     drawBeams(ctx, ui.ghostTrace ?? run.trace, { alpha, flare: run.flareLeft > 0 ? 1 : 0, time, patterns: frame.patterns, enemies: ui.ghostTrace ? [] : run.enemies });

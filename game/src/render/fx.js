@@ -4,8 +4,9 @@
 import { NAMES, WAVE_COUNT } from '../config.js';
 import { beamModsFor, bigStarbursts, traceBeams } from '../beams.js';
 import { sunApertureFor } from '../sun.js';
-import { currentBanner } from '../announce.js';
-import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
+import { bannerSun, currentBanner } from '../announce.js';
+import { bannerLayout } from './banner.js';
+import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
 import { boardLabelBoxes } from './board.js';
 import { BEETLE_COLORS } from './beetles.js';
 
@@ -91,6 +92,21 @@ export function floaterConflicts(fx, run) {
     if (labels.some((l) => overlaps(box, l)) || boxTouchesBeam(box, run.trace.legs)) n++;
   });
   return n;
+}
+
+/** Board tags (SWARM, FOUNTAIN, SUN - x) that a beam core or a beetle covers right now. */
+export function boardTagOverlaps(run) {
+  const bad = [];
+  for (const t of boardLabelBoxes(run)) {
+    if (boxTouchesBeam(t, run.trace.legs)) bad.push(`${t.text} / beam`);
+    for (const e of run.enemies) {
+      const r = e.def.size * CELL;
+      const x = toScreenX(e.x);
+      const y = toScreenY(e.y);
+      if (t.x0 < x + r && x - r < t.x1 && t.y0 < y + r && y - r < t.y1) bad.push(`${t.text} / ${e.type}`);
+    }
+  }
+  return bad;
 }
 
 function overlaps(a, b) {
@@ -390,9 +406,10 @@ export function ghostLabelBox(trace, label) {
 /** Labels on the board that floaters must keep clear of: floor words and the NEXT SUN tag. */
 export function boardTextBoxes(run) {
   const boxes = boardLabelBoxes(run);
-  // The event banner plaque over the top of the courtyard (see hud.drawEventBanner).
-  if (currentBanner(run)) boxes.push({ text: 'BANNER', x0: 640 - VIEW_W * 0.3, x1: 640 + VIEW_W * 0.3, y0: BOARD_Y + 6, y1: BOARD_Y + 68 });
-  if ((run.phase === 'wave' || run.phase === 'build') && run.waveIndex + 1 < WAVE_COUNT) {
+  // The event banner pill docked at its gate (render/banner.js, drawn by hud.drawEventBanner).
+  const banner = bannerLayout(run);
+  if (banner) boxes.push({ text: 'BANNER', x0: banner.x0, x1: banner.x1, y0: banner.y0, y1: banner.y1 });
+  if ((run.phase === 'wave' || run.phase === 'build') && run.waveIndex + 1 < WAVE_COUNT && !bannerAtNextGate(run)) {
     const ap = sunApertureFor(run.seed, run.waveIndex + 1);
     const trace = traceBeams(run.grid, ap, beamModsFor(run.boons));
     if (trace.legs.length) boxes.push({ text: 'NEXT SUN', ...ghostLabelBox(trace, `NEXT ${NAMES.sun} (${ap.phase.wallName[0]})`) });
@@ -400,7 +417,12 @@ export function boardTextBoxes(run) {
   return boxes;
 }
 
-/** The next sun's light through today's glass: a faint white dashed line labelled at its window. */
+/** True when the banner pill already names the next sun at its gate (then the ghost needs no label). */
+export function bannerAtNextGate(run) {
+  return !!currentBanner(run) && bannerSun(run) === run.waveIndex + 1;
+}
+
+/** The next sun's light through today's glass: a faint white dashed line labelled at its window (label '' = none). */
 export function drawNextSunGhost(ctx, trace, label, time) {
   if (!trace.legs.length) return;
   ctx.save();
@@ -418,6 +440,10 @@ export function drawNextSunGhost(ctx, trace, label, time) {
     }
   }
   ctx.setLineDash([]);
+  if (!label) {
+    ctx.restore();
+    return;
+  }
   const at = ghostLabelBox(trace, label);
   const x = at.align === 'right' ? at.x1 : at.align === 'left' ? at.x0 : (at.x0 + at.x1) / 2;
   const y = at.y1 - 4;

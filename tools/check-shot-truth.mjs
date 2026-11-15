@@ -7,7 +7,9 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { ENEMIES, RESULT_LOSE_TITLE, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
-import { currentBanner, draftContext, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
+import { bannerSun, currentBanner, draftContext, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
+import { bannerLayout } from '../game/src/render/banner.js';
+import { BOARD_W } from '../game/src/render/layout.js';
 import { rankFor } from '../game/src/combat.js';
 import { MAX_STARBURSTS, beamModsFor, bigStarbursts, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
@@ -18,6 +20,15 @@ const failures = [];
 const check = (ok, what) => {
   if (!ok) failures.push(what);
 };
+
+/** The banner pill as render/banner.js places it: docked at the gate of the sun it names, <= 40% of the board. */
+function bannerBox(run) {
+  const b = bannerLayout(run);
+  if (!b) return null;
+  check(b.x1 - b.x0 <= 0.4 * BOARD_W, `banner pill ${b.x1 - b.x0} px is wider than 40% of the board`);
+  check(b.wall === sunApertureFor(run.seed, bannerSun(run)).wall, `banner pill not docked at its sun's gate`);
+  return { wall: b.wall, x0: b.x0, y0: b.y0, x1: b.x1, y1: b.y1 };
+}
 
 /** The HUD's numbers, computed the way render/hud.js computes them. */
 function hudFacts(run) {
@@ -41,6 +52,7 @@ function hudFacts(run) {
     boons: run.boons.join(','),
     kills: run.stats.kills,
     banner: currentBanner(run),
+    bannerBox: JSON.stringify(bannerBox(run)),
     headline: winLoseHeadline(run),
     log: run.log.join(' | '),
     sunsHeld: run.stats.wavesCleared,
@@ -64,7 +76,7 @@ function replayTo(tick, seed = manifest.seed, log = manifest.log) {
 for (const shot of manifest.shots) {
   if (shot.state.screen !== 'play') continue;
   const truth = hudFacts(replayTo(shot.state.tick));
-  const shown = { ...shot.state, boons: shot.state.boons.join(',') };
+  const shown = { ...shot.state, boons: shot.state.boons.join(','), bannerBox: JSON.stringify(shot.state.bannerBox ?? null) };
   for (const [key, value] of Object.entries(truth)) check(shown[key] === value, `${shot.name} ${key}: shown ${shown[key]} vs sim ${value}`);
   console.log(`${shot.name}: tick ${shot.state.tick} ${truth.phase} day ${truth.day} ${truth.sun} wave ${truth.wave}/${truth.waves} score ${truth.score} quartz ${truth.quartz} hp ${truth.shrineHp}/${truth.shrineMax}`);
 }

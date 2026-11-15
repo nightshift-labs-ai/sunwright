@@ -6,12 +6,13 @@ import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, WAVE_COUNT } from '../config
 import { boonById } from '../draft.js';
 import { chainMultiplier, chainWindow } from '../combat.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
-import { currentBanner, winLoseHeadline } from '../announce.js';
+import { winLoseHeadline } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
 import { nextSunPreview, waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
 import { drawCharmBadge } from './charms.js';
 import { fitSized } from './fit.js';
+import { bannerLayout } from './banner.js';
 import { BOARD_W, BOARD_X, BOARD_Y, CELL, QUARTZ_ANCHOR, VIEW_W, WALL } from './layout.js';
 
 const INK = '#FFF6DF';
@@ -413,23 +414,39 @@ function drawWinLoseFrieze(ctx, run) {
   fitLine(ctx, line, 640, 99, w - 24, 32, '#FFF2A8', 'center');
 }
 
-/** The big banner over the courtyard: the latest event, or what the next sun asks of you. */
+/**
+ * The event banner: a lapis pill (render/banner.js) docked at the gate it talks about, e.g.
+ * NEXT SUN: WEST / REAIM GLASS beside the west window. It fades while the mouse works the cells under it.
+ */
 function drawEventBanner(ctx, run, ui) {
-  const message = currentBanner(run);
-  if (!message) return;
-  // Fade out of the way while the mouse works the top rows it covers.
+  const b = bannerLayout(run);
+  if (!b) return;
+  const w = b.x1 - b.x0;
+  const h = b.y1 - b.y0;
   ctx.save();
-  if (ui.hoverCell && ui.hoverCell.r <= 1) ctx.globalAlpha = 0.45;
-  const w = Math.round(VIEW_W * 0.6);
-  const x = 640 - w / 2;
-  ctx.fillStyle = 'rgba(31,63,153,0.9)';
-  ctx.beginPath();
-  ctx.roundRect(x, BOARD_Y + 6, w, 62, 12);
-  ctx.fill();
+  if (ui.hoverCell) {
+    const hx = BOARD_X + ui.hoverCell.c * CELL;
+    const hy = BOARD_Y + ui.hoverCell.r * CELL;
+    if (hx < b.x1 && b.x0 < hx + CELL && hy < b.y1 && b.y0 < hy + CELL) ctx.globalAlpha = 0.45;
+  }
+  ctx.fillStyle = 'rgba(31,63,153,0.94)';
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(...b.nub[0]);
+  ctx.lineTo(...b.nub[2]);
+  ctx.lineTo(...b.nub[1]);
+  ctx.closePath();
+  ctx.fill();
   ctx.stroke();
-  fitLine(ctx, message, 640, BOARD_Y + 59, w - 28, [61, 54, 48, 42, 36], '#FFE27A', 'center');
+  ctx.beginPath();
+  ctx.roundRect(b.x0, b.y0, w, h, Math.min(24, h / 2));
+  ctx.fill();
+  ctx.stroke();
+  const cx = b.x0 + w / 2;
+  fitLine(ctx, b.head, cx, b.y0 + (b.sub ? 36 : 35), w - 24, [32, 28, 24], '#FFE27A', 'center');
+  if (b.sub) fitLine(ctx, b.sub, cx, b.y0 + 63, w - 24, 20, INK, 'center');
   ctx.restore();
 }
 
