@@ -1,7 +1,7 @@
 // The run state and its fixed-step update. Input never touches this state directly: it queues
 // orders, and stepSim applies them at the start of the next 60 Hz tick, then advances the phase
 // machine build -> wave -> draft -> build ... -> won | lost.
-import { BEAM, DIFFICULTIES, DT, ECONOMY, FLARE_CHARGES, FOUNTAIN_MAX, PIECES, WAVE_COUNT } from './config.js';
+import { BEAM, CHARM_FX, DIFFICULTIES, DT, ECONOMY, FLARE_CHARGES, FOUNTAIN_MAX, PIECES, WAVE_COUNT } from './config.js';
 import { beamModsFor, traceBeams } from './beams.js';
 import { sunApertureFor } from './sun.js';
 import { moveEnemies, shellBlockers, spawnEnemy } from './enemies.js';
@@ -73,7 +73,7 @@ export function pieceUnlocked(run, type) {
 }
 
 export function pieceCost(run, type) {
-  const discount = run.boons.includes('discount') && (type === 'mirror' || type === 'splitter') ? 1 : 0;
+  const discount = run.boons.includes('discount') && (type === 'mirror' || type === 'splitter') ? CHARM_FX.discount.cost : 0;
   return Math.max(1, PIECES[type].cost - discount);
 }
 
@@ -158,7 +158,7 @@ function startWave(run) {
   run.schedule = buildWaveSchedule(run.waveIndex, run.diff);
   run.spawnCursor = 0;
   run.waveTime = 0;
-  run.flareCharges = FLARE_CHARGES + (run.boons.includes('flare2') ? 1 : 0);
+  run.flareCharges = FLARE_CHARGES + (run.boons.includes('flare2') ? CHARM_FX.flare2.charges : 0);
   run.flareLeft = 0;
   run.waveNotes = new Set();
   refreshLight(run);
@@ -166,7 +166,7 @@ function startWave(run) {
 }
 
 function finishWave(run) {
-  if (run.boons.includes('sunstone')) run.shrineHp = Math.min(run.shrineMax, run.shrineHp + 1);
+  if (run.boons.includes('sunstone')) run.shrineHp = Math.min(run.shrineMax, run.shrineHp + CHARM_FX.sunstone.heal);
   const bonus = waveClearBonus(run);
   run.score += bonus;
   run.quartz += ECONOMY.waveQuartz + ECONOMY.waveQuartzPerWave * run.waveIndex;

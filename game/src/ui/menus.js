@@ -6,6 +6,7 @@ import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { rankFor } from '../combat.js';
+import { draftHint } from '../announce.js';
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
 
@@ -58,7 +59,7 @@ export function showTitle(menus, bestFor, selected) {
   el('rule-scope').textContent = SCOPE_LINE;
 }
 
-/** The draft: a huge "SUN MOVES WEST - PICK 1", three roundels (effect on hover), reroll, NEW chip. */
+/** The draft: a huge "SUN MOVES WEST - PICK 1", three roundels each with its one-line effect, NEW chip, reroll and how to pick. */
 export function showDraft(menus, run) {
   const key = `${run.waveIndex}|${run.offer.join(',')}|${run.quartz}`;
   if (key === menus.draftKey) return;
@@ -71,7 +72,7 @@ export function showDraft(menus, run) {
       return `<button class="roundel ${b.weight <= 2 ? 'rare' : ''}" style="--hue:${b.hue}" data-action="pick" data-arg="${i}">
         <span class="glass"></span><span class="key">${i + 1}</span>
         <canvas class="glyph" width="96" height="96" data-charm="${id}"></canvas>
-        <b>${escapeHtml(b.name)}</b><span class="effect">${escapeHtml(b.text)}</span>${synergyTag(run, id)}</button>`;
+        <b>${escapeHtml(b.name)}</b><span class="effect">${escapeHtml(b.line)}</span>${synergyTag(run, id)}</button>`;
     })
     .join('');
   for (const canvas of el('draft-roundels').querySelectorAll('canvas.glyph')) drawCharmGlyph(canvas.getContext('2d'), canvas.dataset.charm, 48, 48, 46);
@@ -79,6 +80,7 @@ export function showDraft(menus, run) {
   const reroll = el('draft-reroll');
   reroll.textContent = `X - reroll (${cost} ${NAMES.currency.toLowerCase()})`;
   reroll.disabled = run.quartz < cost;
+  el('draft-hint').textContent = draftHint(run);
   const unlocked = PIECE_ORDER.find((type) => PIECES[type].unlockWave === run.waveIndex);
   const newFoe = waveRoster(run.waveIndex, run.diff).find((r) => r.isNew);
   el('draft-new').textContent = unlocked ? `NEW GLASS: ${PIECES[unlocked].name} [${PIECE_ORDER.indexOf(unlocked) + 1}]` : newFoe ? `NEW: ${ENEMIES[newFoe.type].name}` : '';

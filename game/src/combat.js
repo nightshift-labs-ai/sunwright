@@ -1,6 +1,6 @@
 // Burning and scoring: beam damage per tick with armour thresholds, the Flare, the CHAIN
 // multiplier for quick successive kills, quartz drops, and beetles biting the Sun Fountain.
-import { BEAM, RANK_THRESHOLDS, SPREAD_BURN, SCORING, TINT_EFFECTS } from './config.js';
+import { BEAM, CHARM_FX, RANK_THRESHOLDS, SPREAD_BURN, SCORING, TINT_EFFECTS } from './config.js';
 import { TINT_BLUE, TINT_GOLD, TINT_RED } from './beams.js';
 import { armourOf, enemyCell, reachedShrine } from './enemies.js';
 
@@ -16,7 +16,7 @@ export function flareMultiplier(run) {
 }
 
 export function chainWindow(run) {
-  return run.boons.includes('longchain') ? 1.6 : SCORING.chainWindow;
+  return run.boons.includes('longchain') ? CHARM_FX.longchain.window : SCORING.chainWindow;
 }
 
 export function chainMultiplier(count) {
@@ -57,7 +57,7 @@ function registerKill(run, e) {
   chain.best = Math.max(chain.best, chain.count);
   const mult = chainMultiplier(chain.count);
   const points = e.def.score * mult;
-  const quartz = e.def.quartz + (run.boons.includes('magnet') ? 1 : 0);
+  const quartz = e.def.quartz + (run.boons.includes('magnet') ? CHARM_FX.magnet.quartz : 0);
   run.score += points;
   run.quartz += quartz;
   run.feedback.quartzAt = run.time;

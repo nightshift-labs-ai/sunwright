@@ -63,3 +63,8 @@ export function currentBanner(run) {
   if (run.waveIndex + 1 >= WAVE_COUNT) return 'LAST SUN - BURN THE TITAN';
   return `NEXT ${NAMES.sun}: ${sunApertureFor(run.seed, run.waveIndex + 1).phase.wallName} - REAIM GLASS`;
 }
+
+/** How to take a charm, under the draft roundels. */
+export function draftHint(run) {
+  return `CLICK A ROUNDEL OR PRESS 1-${run.offer.length}`;
+}

@@ -7,10 +7,11 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { ENEMIES, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
-import { currentBanner, winLoseHeadline } from '../game/src/announce.js';
+import { currentBanner, draftHint, winLoseHeadline } from '../game/src/announce.js';
 import { rankFor } from '../game/src/combat.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
+import { boonById } from '../game/src/draft.js';
 
 const manifest = JSON.parse(readFileSync('tools/shots-manifest.json', 'utf8'));
 const failures = [];
@@ -72,6 +73,18 @@ for (const shot of manifest.shots) if (shot.tagOverlaps) check(shot.tagOverlaps.
 for (const shot of manifest.shots) if (shot.textOverlaps) check(shot.textOverlaps.length === 0, `${shot.name} text on text: ${shot.textOverlaps.join(' | ')}`);
 for (const shot of manifest.shots) if (shot.floaters !== undefined) console.log(`${shot.name}: ${shot.floaters} floating numbers, ${shot.textOverlaps.length} overlaps`);
 for (const shot of manifest.shots) if (shot.textOutside) check(shot.textOutside.length === 0, `${shot.name} text outside its plaque: ${shot.textOutside.join(' | ')}`);
+
+// Draft: each roundel's effect line is its charm's line from config, the pick hint counts the offer,
+// and no two draft text boxes collide.
+for (const shot of manifest.shots) {
+  if (!shot.draftText) continue;
+  const run = replayTo(shot.state.tick);
+  const d = shot.draftText;
+  check(JSON.stringify(d.effects) === JSON.stringify(run.offer.map((id) => boonById(id).line)), `${shot.name} roundel effects: shown ${JSON.stringify(d.effects)} vs offer ${run.offer.join(',')}`);
+  check(d.hint === draftHint(run), `${shot.name} pick hint: shown ${d.hint} vs ${draftHint(run)}`);
+  check(d.overlaps.length === 0, `${shot.name} draft text collides: ${d.overlaps.join(' | ')}`);
+  console.log(`${shot.name}: roundels ${d.effects.join(' / ')}; ${d.hint}; ${d.overlaps.length} collisions`);
+}
 
 // Solved plan on the cover: >= 70% of the glass is lit, and every unlit piece is on the next sun's ghost.
 for (const shot of manifest.shots) {

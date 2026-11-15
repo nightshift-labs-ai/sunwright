@@ -155,6 +155,11 @@
 
 - M3: How to play has three code-drawn pictures (render/howto.js: build / burn / adapt).
 
+- Benchmark 5 item 1: each draft roundel shows its one-line effect (30 px, BOONS[].line) in its own
+  400 px column; numbers come from config CHARM_FX, which the sim now reads too (beams, combat, sim,
+  draft). Footer: NEW chip, then `X - reroll` + `CLICK A ROUNDEL OR PRESS 1-3` (34 px). Floating
+  numbers hide under the draft. check-shot-truth: effects = offer lines, hint, no draft text collisions.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

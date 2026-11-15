@@ -94,7 +94,7 @@ export function drawFrame(ctx, frame) {
     const alpha = phase === 'wave' || phase === 'won' ? 1 : phase === 'build' ? 0.8 : 0.95;
     drawBeams(ctx, ui.ghostTrace ?? run.trace, { alpha, flare: run.flareLeft > 0 ? 1 : 0, time, patterns: frame.patterns });
   }
-  drawFx(ctx, fx);
+  drawFx(ctx, fx, phase !== 'draft');
   if (phase !== 'draft' && !frame.resultsHero) drawBoardTags(ctx, run);
   ctx.restore();
   if (frame.resultsHero) drawResultsHero(ctx, run, time);

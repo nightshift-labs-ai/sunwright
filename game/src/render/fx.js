@@ -410,8 +410,8 @@ export function drawNextSunGhost(ctx, trace, label, time) {
   ctx.restore();
 }
 
-/** Particles and floating text, drawn above the board. */
-export function drawFx(ctx, fx) {
+/** Particles, then the floating numbers (left off under the draft roundels: texts false). */
+export function drawFx(ctx, fx, texts = true) {
   for (const p of fx.particles) {
     const k = p.life / p.max;
     if (p.kind === 'smoke') {
@@ -441,6 +441,7 @@ export function drawFx(ctx, fx) {
       ctx.fill();
     }
   }
+  if (!texts) return;
   ctx.textAlign = 'center';
   ctx.lineJoin = 'round';
   for (const t of fx.texts) {

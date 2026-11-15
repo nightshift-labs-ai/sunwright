@@ -62,6 +62,7 @@ manifest.shots.at(-1).textOverlaps = await page.evaluate(() => window.__test.tex
 manifest.shots.at(-1).floaters = await page.evaluate(() => window.__test.floaterCount());
 manifest.shots.at(-1).tagOverlaps = await page.evaluate(() => window.__test.tagOverlaps());
 await capture('3-draft.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, draftTick]));
+manifest.shots.at(-1).draftText = await page.evaluate(() => window.__test.draftText());
 await capture('4-results.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, endTick + 150]));
 await page.waitForTimeout(100);
 // Every results text box must sit inside its plaque, and the plaques inside a 24 px margin.

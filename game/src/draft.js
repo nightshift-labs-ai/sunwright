@@ -1,6 +1,6 @@
 // The between-wave draft: offer three different boons (weighted, owned ones removed unless
 // repeatable), reroll for quartz, and apply the chosen boon to the run.
-import { BOONS, ECONOMY } from './config.js';
+import { BOONS, CHARM_FX, ECONOMY } from './config.js';
 import { pickWeighted } from './rng.js';
 
 export function boonById(id) {
@@ -37,6 +37,6 @@ export function rerollOffer(run) {
 export function applyBoon(run, id) {
   run.boons.push(id);
   if (id === 'mend') {
-    run.shrineHp = Math.min(run.shrineMax, run.shrineHp + 4);
+    run.shrineHp = Math.min(run.shrineMax, run.shrineHp + CHARM_FX.mend.heal);
   }
 }

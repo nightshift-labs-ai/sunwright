@@ -143,20 +143,37 @@ export const RANK_THRESHOLDS = [
 ];
 export const FLARE_CHARGES = 1;
 
-/** Glass charms (internally boons) offered in the draft. weight: how often it shows; repeat: may be taken again. */
+/** What each glass charm changes, in numbers: the sim reads these, and so does every charm line. */
+export const CHARM_FX = {
+  burning: { lensReach: 2 },
+  flare2: { charges: 1 },
+  magnet: { quartz: 1 },
+  discount: { cost: 1 },
+  sunstone: { heal: 1 },
+  mend: { heal: 4 },
+  highsun: { power: 1.2 },
+  longchain: { window: 1.6 },
+  grinder: { lensMult: 3.2 },
+  trueprism: { prismShare: 0.75 },
+};
+const pct = (x) => `${Math.round(x * 100)}%`;
+/**
+ * Glass charms (internally boons) offered in the draft. text: the full sentence; line: the one-line
+ * effect under its draft roundel. weight: how often it shows; repeat: may be taken again.
+ */
 export const BOONS = [
-  { id: 'silvered', name: NAMES.charm.silvered, text: 'Mirrors lose no power', weight: 2, hue: 205 },
-  { id: 'burning', name: NAMES.charm.burning, text: 'Lens focus reaches +2 cells', weight: 3, hue: 22 },
-  { id: 'flare2', name: NAMES.charm.flare2, text: '+1 Flare charge every sun', weight: 3, hue: 48 },
-  { id: 'magnet', name: NAMES.charm.magnet, text: 'Every beetle drops +1 quartz', weight: 3, hue: 280 },
-  { id: 'discount', name: NAMES.charm.discount, text: 'Mirrors and splitters cost 1 less', weight: 3, hue: 160 },
-  { id: 'sunstone', name: NAMES.charm.sunstone, text: 'Fountain heals 1 HP after every sun', weight: 2, hue: 140 },
-  { id: 'mend', name: NAMES.charm.mend, text: 'Heal the fountain 4 HP', weight: 3, hue: 120, repeat: true },
-  { id: 'spreading', name: NAMES.charm.spreading, text: 'Burned beetles scorch their neighbours', weight: 2, hue: 8 },
-  { id: 'highsun', name: NAMES.charm.highsun, text: 'Every beam +20% power', weight: 2, hue: 52 },
-  { id: 'longchain', name: NAMES.charm.longchain, text: 'SEAR window 1s -> 1.6s', weight: 2, hue: 330 },
-  { id: 'grinder', name: NAMES.charm.grinder, text: 'Lenses focus x3.2 instead of x2.5', weight: 2, hue: 190 },
-  { id: 'trueprism', name: NAMES.charm.trueprism, text: 'Prism branches keep 75% power', weight: 2, hue: 300 },
+  { id: 'silvered', name: NAMES.charm.silvered, text: 'Mirrors lose no power', line: 'Mirrors: no loss', weight: 2, hue: 205 },
+  { id: 'burning', name: NAMES.charm.burning, text: `Lens focus reaches +${CHARM_FX.burning.lensReach} cells`, line: `Lens reach +${CHARM_FX.burning.lensReach}`, weight: 3, hue: 22 },
+  { id: 'flare2', name: NAMES.charm.flare2, text: `+${CHARM_FX.flare2.charges} Flare charge every sun`, line: `+${CHARM_FX.flare2.charges} Flare every sun`, weight: 3, hue: 48 },
+  { id: 'magnet', name: NAMES.charm.magnet, text: `Every beetle drops +${CHARM_FX.magnet.quartz} quartz`, line: `+${CHARM_FX.magnet.quartz} quartz a kill`, weight: 3, hue: 280 },
+  { id: 'discount', name: NAMES.charm.discount, text: `Mirrors and splitters cost ${CHARM_FX.discount.cost} less`, line: `Mirror, Splitter -${CHARM_FX.discount.cost}`, weight: 3, hue: 160 },
+  { id: 'sunstone', name: NAMES.charm.sunstone, text: `Fountain heals ${CHARM_FX.sunstone.heal} HP after every sun`, line: `Fountain +${CHARM_FX.sunstone.heal} a sun`, weight: 2, hue: 140 },
+  { id: 'mend', name: NAMES.charm.mend, text: `Heal the fountain ${CHARM_FX.mend.heal} HP`, line: `Fountain +${CHARM_FX.mend.heal} now`, weight: 3, hue: 120, repeat: true },
+  { id: 'spreading', name: NAMES.charm.spreading, text: 'Burned beetles scorch their neighbours', line: 'Kills burn nearby', weight: 2, hue: 8 },
+  { id: 'highsun', name: NAMES.charm.highsun, text: `Every beam +${pct(CHARM_FX.highsun.power - 1)} power`, line: `Beams +${pct(CHARM_FX.highsun.power - 1)} power`, weight: 2, hue: 52 },
+  { id: 'longchain', name: NAMES.charm.longchain, text: `SEAR window ${SCORING.chainWindow}s -> ${CHARM_FX.longchain.window}s`, line: `SEAR ${SCORING.chainWindow}s -> ${CHARM_FX.longchain.window}s`, weight: 2, hue: 330 },
+  { id: 'grinder', name: NAMES.charm.grinder, text: `Lenses focus x${CHARM_FX.grinder.lensMult} instead of x${BEAM.lensMult}`, line: `Lens x${BEAM.lensMult} -> x${CHARM_FX.grinder.lensMult}`, weight: 2, hue: 190 },
+  { id: 'trueprism', name: NAMES.charm.trueprism, text: `Prism branches keep ${pct(CHARM_FX.trueprism.prismShare)} power`, line: `Prism ${pct(BEAM.prismShare)} -> ${pct(CHARM_FX.trueprism.prismShare)}`, weight: 2, hue: 300 },
 ];
 export const SPREAD_BURN = { radius: 1.1, damage: 12 };
 /** Charm pairs that work well together (a draft roundel names its partner when you own it). */

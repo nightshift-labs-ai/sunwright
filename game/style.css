@@ -48,10 +48,11 @@ kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 28px sys
 .howto-cols b { color: #ffe27a; }
 .howto-pic { display: block; width: 100%; height: auto; margin: 0 0 8px; border: 2px solid #f2c14e; border-radius: 8px; }
 
-/* Draft: one huge heading, three roundels with big keys, one footer line (readable at 252 px wide). */
+/* Draft: one huge heading, three roundels with big keys and a one-line effect under each, the NEW chip,
+   then reroll and how to pick (readable at 252 px wide). Each roundel owns a 400 px column. */
 #draft-screen { justify-content: flex-start; }
 .sunbanner { margin: 6px 0 0; padding: 0 30px 6px; width: max-content; white-space: nowrap; font: 900 112px system-ui, sans-serif; line-height: 1.05; letter-spacing: -1px; transform: scaleX(0.72); color: #ffe27a; -webkit-text-stroke: 3px #3b1247; paint-order: stroke fill; background: rgba(31, 63, 153, 0.94); border: 5px solid #f2c14e; border-radius: 18px; }
-.roundels { display: flex; gap: 46px; margin-top: 200px; }
+.roundels { display: flex; gap: 164px; margin-top: 156px; }
 .roundel { position: relative; width: 236px; height: 236px; border-radius: 50%; padding: 0 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 7px solid #f2c14e; background: none; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.5), 0 0 30px rgba(255, 210, 90, 0.45); }
 .roundel.rare { border-color: #fff6df; box-shadow: 0 0 0 6px #b0307a, 0 10px 0 6px rgba(91, 58, 30, 0.5), 0 0 40px rgba(255, 255, 220, 0.85); }
 .roundel .synergy { position: absolute; z-index: 2; bottom: -26px; white-space: nowrap; padding: 2px 12px; font: 900 20px system-ui, sans-serif; color: #3b1247; background: #7dffc4; border: 3px solid #f2c14e; border-radius: 14px; }
@@ -61,12 +62,13 @@ kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 28px sys
 .roundel .glyph { width: 96px; height: 96px; margin-top: 4px; }
 .roundel b { font: 900 30px Georgia, serif; line-height: 1.02; color: #7a2e14; }
 .roundel .key { position: absolute; top: -34px; width: 68px; height: 68px; border-radius: 50%; background: #f2c14e; border: 4px solid #fff6df; color: #3b1247; font: 900 48px system-ui, sans-serif; display: flex; align-items: center; justify-content: center; }
-.roundel .effect { display: none; position: absolute; top: calc(100% + 14px); white-space: nowrap; padding: 6px 16px; font: 800 30px system-ui, sans-serif; color: #fff6df; background: rgba(31, 63, 153, 0.95); border: 3px solid #f2c14e; border-radius: 10px; }
-.roundel:hover .effect { display: block; }
+.roundel .effect { position: absolute; top: calc(100% + 34px); white-space: nowrap; padding: 4px 16px; font: 800 30px system-ui, sans-serif; line-height: 1.2; letter-spacing: 0; color: #fff6df; background: rgba(31, 63, 153, 0.95); border: 3px solid #f2c14e; border-radius: 10px; }
 .roundel:hover { transform: translateY(-4px) scale(1.03); }
-.draft-foot { position: absolute; bottom: 26px; display: flex; gap: 24px; align-items: center; }
-#draft-reroll { font-size: 34px; padding: 8px 26px; }
-.newchip { font: 900 34px system-ui, sans-serif; color: #fff6df; background: #b0307a; border: 3px solid #f2c14e; border-radius: 12px; padding: 8px 22px; }
+.draft-foot { position: absolute; bottom: 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.draft-keys { display: flex; gap: 24px; align-items: center; }
+#draft-reroll { font-size: 34px; padding: 6px 26px; letter-spacing: 0; }
+.draft-hint { font: 900 34px system-ui, sans-serif; color: #ffe27a; -webkit-text-stroke: 2px #3b1247; paint-order: stroke fill; padding: 6px 20px; background: rgba(59, 18, 71, 0.82); border-radius: 12px; white-space: nowrap; }
+.newchip { font: 900 34px system-ui, sans-serif; color: #fff6df; background: #b0307a; border: 3px solid #f2c14e; border-radius: 12px; padding: 4px 22px; }
 .newchip:empty { display: none; }
 
 /* Results: a full-width title plaque, the hero art on the canvas at the left, an opaque plaque at the right,

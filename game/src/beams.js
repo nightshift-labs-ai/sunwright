@@ -2,7 +2,7 @@
 // lenses, prisms and pillars. Produces the power and tint on every cell (what burns beetles),
 // the beam legs to draw, and the bounce points that get a starburst. Glassback shells stop
 // any light but gold. Loops are cut by tracking visited (cell, direction) pairs.
-import { BEAM, DX, DY } from './config.js';
+import { BEAM, CHARM_FX, DX, DY } from './config.js';
 import { cellIndex, inBounds, isShrineCell, pieceAt } from './grid.js';
 
 /** Beam tints (bit flags on lit cells): plain sunlight is 0. */
@@ -37,11 +37,11 @@ export function prismFan(rot, dir) {
 export function beamModsFor(boons) {
   const has = (id) => boons.includes(id);
   return {
-    power: BEAM.power * (has('highsun') ? 1.2 : 1),
+    power: BEAM.power * (has('highsun') ? CHARM_FX.highsun.power : 1),
     bounceLoss: has('silvered') ? 0 : BEAM.bounceLoss,
-    lensMult: has('grinder') ? 3.2 : BEAM.lensMult,
-    lensReach: BEAM.lensReach + (has('burning') ? 2 : 0),
-    prismShare: has('trueprism') ? 0.75 : BEAM.prismShare,
+    lensMult: has('grinder') ? CHARM_FX.grinder.lensMult : BEAM.lensMult,
+    lensReach: BEAM.lensReach + (has('burning') ? CHARM_FX.burning.lensReach : 0),
+    prismShare: has('trueprism') ? CHARM_FX.trueprism.prismShare : BEAM.prismShare,
   };
 }
 
