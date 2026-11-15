@@ -140,6 +140,9 @@
   leg away from the sun; starbursts softer. measure-shots counts near-white 32 px blocks on the board
   (cover 5, from starburst centres; draft/results count their parchment plaques).
 
+- Benchmark 2 item 14: lit window gets a god-ray wedge + sun disk; inactive windows are shuttered
+  lapis arches; kills leave a scorch + flipped husk on the floor layer for 6 s (fx.decals).
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

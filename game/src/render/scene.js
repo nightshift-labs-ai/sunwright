@@ -1,7 +1,7 @@
 // One frame of the game: courtyard, glass, shrine, beetles, light, effects, then the HUD.
 // The draft dims the board so the new opening's beam (through the current layout) stands out;
 // a win floods the courtyard with sunrise, a defeat drains the light.
-import { drawBeamGhost, drawBeams, drawFx, drawNextSunGhost, drawScreenFx, shakeOffset } from './fx.js';
+import { drawBeamGhost, drawBeams, drawDecals, drawFx, drawNextSunGhost, drawScreenFx, shakeOffset } from './fx.js';
 import { drawHud } from './hud.js';
 import { drawBoardTags, drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawSandSurround, drawShrine } from './board.js';
 import { drawEnemies } from './beetles.js';
@@ -64,6 +64,7 @@ export function drawFrame(ctx, frame) {
   }
   drawCourtyard(ctx, run, time, !!frame.titleTraces);
   if (frame.showHud && (phase === 'build' || phase === 'wave')) drawMarchLines(ctx, run, time);
+  drawDecals(ctx, fx);
   const shadow = shadowVectorFor(run.aperture.wall);
   const showPlan = frame.showHud && (phase === 'wave' || phase === 'build');
   const next = showPlan && run.waveIndex + 1 < WAVE_COUNT ? nextSunTrace(run) : null;

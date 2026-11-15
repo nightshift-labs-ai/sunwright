@@ -8,11 +8,44 @@ import { currentBanner } from '../announce.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
 import { boardLabelBoxes } from './board.js';
 
+/** Seconds a kill's scorch mark and flipped husk stay on the floor. */
+const DECAL_LIFE = 6;
+
+/** Where the beams have been killing: a scorch on the sand and a flipped husk, fading over 6 s. */
+export function drawDecals(ctx, fx) {
+  for (const d of fx.decals) {
+    const k = d.life / d.max;
+    const scorch = ctx.createRadialGradient(d.x, d.y + 4, 2, d.x, d.y + 4, d.size * 1.8);
+    scorch.addColorStop(0, `rgba(70,32,12,${0.45 * k})`);
+    scorch.addColorStop(1, 'rgba(70,32,12,0)');
+    ctx.fillStyle = scorch;
+    ctx.fillRect(d.x - d.size * 1.8, d.y - d.size * 1.8 + 4, d.size * 3.6, d.size * 3.6);
+    ctx.globalAlpha = Math.min(1, k * 1.6);
+    ctx.fillStyle = d.enemy === 'veerwing' ? '#7A3B9A' : '#4A1A55';
+    ctx.beginPath();
+    ctx.ellipse(d.x, d.y, d.size, d.size * 0.7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(201,154,214,0.8)';
+    ctx.beginPath();
+    ctx.ellipse(d.x, d.y, d.size * 0.6, d.size * 0.35, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#2A0E30';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let j = -1; j <= 1; j++) {
+      ctx.moveTo(d.x + j * d.size * 0.5, d.y - d.size * 0.4);
+      ctx.lineTo(d.x + j * d.size * 0.7, d.y - d.size * 1.1);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+}
+
 /** Seconds a floating number lives (opaque for the first 70%). */
 export const FLOATER_LIFE = 1.4;
 
 export function createFx() {
-  return { particles: [], texts: [], shake: 0, flash: 0, hurt: 0, seed: 12345, waveBanner: 0 };
+  return { particles: [], texts: [], decals: [], shake: 0, flash: 0, hurt: 0, seed: 12345, waveBanner: 0 };
 }
 
 function fxRandom(fx) {
@@ -87,7 +120,7 @@ export function fxFromEvent(fx, ev, run = null) {
     const y = toScreenY(ev.y);
     burst(fx, x, y, 10, 'smoke', 'rgba(110,80,70,', 40, 0.9, 9);
     burst(fx, x, y, 14, 'spark', '#FFD34D', 160, 0.45, 3);
-    fx.particles.push({ kind: 'husk', x, y, vx: 0, vy: 0, life: 1.4, max: 1.4, size: ev.boss ? 34 : 18, color: ev.enemy });
+    fx.decals.push({ x, y, life: DECAL_LIFE, max: DECAL_LIFE, size: ev.boss ? 40 : 18, enemy: ev.enemy });
     for (let k = 0; k < ev.quartz; k++) {
       fx.particles.push({ kind: 'quartz', x: x + k * 6, y, sx: x + k * 6, sy: y, vx: 0, vy: 0, life: 0.75 + k * 0.08, max: 0.75 + k * 0.08, size: 6, color: '#7FE8FF' });
     }
@@ -134,6 +167,8 @@ export function updateFx(fx, run, dt) {
     p.vy = p.vy * (1 - dt * 2.5) + (p.kind === 'spark' ? 60 * dt : 0);
   }
   fx.particles = fx.particles.filter((p) => p.life > 0);
+  for (const d of fx.decals) d.life -= dt;
+  fx.decals = fx.decals.filter((d) => d.life > 0);
   for (const t of fx.texts) {
     t.life -= dt;
     t.y -= 24 * dt;
@@ -371,22 +406,6 @@ export function drawFx(ctx, fx) {
       ctx.globalAlpha = k;
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
-      ctx.globalAlpha = 1;
-    } else if (p.kind === 'husk') {
-      // A beetle flipped on its back, legs in the air, dimming.
-      ctx.globalAlpha = Math.min(1, k * 1.5);
-      ctx.fillStyle = p.color === 'veerwing' ? '#7A3B9A' : '#4A1A55';
-      ctx.beginPath();
-      ctx.ellipse(p.x, p.y, p.size, p.size * 0.7, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#2A0E30';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      for (let j = -1; j <= 1; j++) {
-        ctx.moveTo(p.x + j * p.size * 0.5, p.y - p.size * 0.4);
-        ctx.lineTo(p.x + j * p.size * 0.7, p.y - p.size * 1.1);
-      }
-      ctx.stroke();
       ctx.globalAlpha = 1;
     } else if (p.kind === 'quartz') {
       const t = 1 - k;
