@@ -25,7 +25,6 @@
   (boon stays internal). tools/check-names.mjs scans every visible string for the banned words.
 
 ## Next
-- M2: tune difficulties apart (Gentle clearly easier, Scorched harder); careful bot should win sometimes.
 - M3 feel: generative pentatonic music + volume sliders/options, hit-stop on CHAIN steps, shrine pip
   crack, Flare draining ring polish, fast-forward F, colour-blind beam patterns (option).
 - Staging: cover must show a lit prism fan (red/blue/gold) across a swarm; consider a hand-directed
@@ -38,6 +37,9 @@
 - 18:35 UTC, 8 seeds: greedy keeper 0/8 wins mean 3.3 waves; careful keeper 0/8 mean 3.3.
 - 18:50 UTC (prism + Glassback + dazzle), 8 seeds: greedy gentle 1/8 (5.4), keeper 1/8 (5.4),
   scorched 0/8 (3.5); careful keeper 0/8 (5.5). Greedy keeper wins 9/60 seeds (2001-2060).
+- 18:50 UTC (Gentle 0.65 hp / 0.8 count / 18 quartz / 14 HP; Scorched 1.35 hp / 12 quartz), 8 seeds:
+  greedy gentle 2/8 (6.8), normal 1/8 (5.4), scorched 0/8 (3.3); careful flat ~5.5 on all three
+  (it cannot lift pieces: an old lens can block a new opening, e.g. seed 56433 sun 3 - a bot limit).
 
 ## Operator items
 - Entry route: no `makefun init` was run (needs the wallet keypair + drand fetch); the repo now has

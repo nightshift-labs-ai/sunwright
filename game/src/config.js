@@ -126,9 +126,9 @@ export const WAVES = [
 ];
 
 export const DIFFICULTIES = {
-  gentle: { name: NAMES.difficulty.gentle, hpMul: 0.8, countMul: 0.85, startQuartz: 16, shrineHp: 12 },
+  gentle: { name: NAMES.difficulty.gentle, hpMul: 0.65, countMul: 0.8, startQuartz: 18, shrineHp: 14 },
   normal: { name: NAMES.difficulty.normal, hpMul: 1, countMul: 1, startQuartz: 14, shrineHp: 10 },
-  scorched: { name: NAMES.difficulty.scorched, hpMul: 1.3, countMul: 1.2, startQuartz: 10, shrineHp: 8 },
+  scorched: { name: NAMES.difficulty.scorched, hpMul: 1.35, countMul: 1.2, startQuartz: 12, shrineHp: 8 },
 };
 export const DIFFICULTY_ORDER = ['gentle', 'normal', 'scorched'];
 
