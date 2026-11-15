@@ -160,6 +160,11 @@
   draft). Footer: NEW chip, then `X - reroll` + `CLICK A ROUNDEL OR PRESS 1-3` (34 px). Floating
   numbers hide under the draft. check-shot-truth: effects = offer lines, hint, no draft text collisions.
 
+- Benchmark 5 item 2: results LAST 3 RUNS strip (replaces the 30 px red caption): 30 px label, the real
+  lose title at 22 px inside the strip only, chips `LOST - Day 2 evening` (red) / `WON 9/9` (gold) from
+  the save via announce.historyChip. check-shot-truth rebuilds the chips from the replayed runs and
+  checks the label size, the caption size, and that a won results screen has no other lose title.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

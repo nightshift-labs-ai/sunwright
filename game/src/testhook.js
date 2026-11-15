@@ -68,6 +68,26 @@ function draftText() {
   return { effects: all('.effect'), hint: all('.draft-hint')[0], reroll: all('#draft-reroll')[0], overlaps: bad };
 }
 
+/** The results LAST 3 RUNS strip as shown: label, small lose title, chips, their type sizes, and any
+ *  other results text that repeats the lose title. */
+function resultsText() {
+  const screen = document.getElementById('results-screen');
+  if (screen.classList.contains('hidden')) return null;
+  const strip = document.getElementById('results-history');
+  const px = (n) => (n ? parseFloat(getComputedStyle(n).fontSize) : 0);
+  const label = strip.querySelector('.strip-head b');
+  const cap = strip.querySelector('.strip-head small');
+  const elsewhere = [...screen.querySelectorAll('*')].filter((n) => !strip.contains(n) && !n.childElementCount && n.textContent.trim() === cap?.textContent.trim());
+  return {
+    label: label?.textContent.trim() ?? '',
+    labelPx: px(label),
+    cap: cap?.textContent.trim() ?? '',
+    capPx: px(cap),
+    capElsewhere: elsewhere.length,
+    chips: [...strip.querySelectorAll('.chip')].map((n) => ({ text: n.textContent.trim(), won: n.classList.contains('won') })),
+  };
+}
+
 export function installTestHook(app, api) {
   app.manual = true;
   window.__test = {
@@ -109,6 +129,9 @@ export function installTestHook(app, api) {
     },
     draftText() {
       return draftText();
+    },
+    resultsText() {
+      return resultsText();
     },
     floaterCount() {
       return app.fx.texts.length;

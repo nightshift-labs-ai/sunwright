@@ -68,3 +68,8 @@ export function currentBanner(run) {
 export function draftHint(run) {
   return `CLICK A ROUNDEL OR PRESS 1-${run.offer.length}`;
 }
+
+/** One RUN HISTORY chip on the results screen, from a saved run summary. */
+export function historyChip(h) {
+  return h.outcome === 'won' ? `WON ${h.suns}/${WAVE_COUNT}` : `LOST - Day ${h.day} ${h.phase.toLowerCase()}`;
+}

@@ -65,6 +65,7 @@ await capture('3-draft.jpg', await page.evaluate(([log, t]) => window.__test.rep
 manifest.shots.at(-1).draftText = await page.evaluate(() => window.__test.draftText());
 await capture('4-results.jpg', await page.evaluate(([log, t]) => window.__test.replay(log, t), [log, endTick + 150]));
 await page.waitForTimeout(100);
+manifest.shots.at(-1).resultsText = await page.evaluate(() => window.__test.resultsText());
 // Every results text box must sit inside its plaque, and the plaques inside a 24 px margin.
 manifest.shots.at(-1).textOutside = await page.evaluate(() => {
   const bad = [];

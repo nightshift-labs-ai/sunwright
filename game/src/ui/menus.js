@@ -6,7 +6,7 @@ import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { rankFor } from '../combat.js';
-import { draftHint } from '../announce.js';
+import { draftHint, historyChip } from '../announce.js';
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
 
@@ -115,7 +115,7 @@ function nextGoal(run) {
 
 /**
  * Results: THE TITAN IS ASH (or THE SWARM BROKE THROUGH) across the top, then score with NEW BEST,
- * stat tiles, run line, RUN HISTORY and the restart keys; the canvas draws the Titan beside it.
+ * stat tiles, run line, the LAST 3 RUNS strip and the restart keys; the canvas draws the Titan beside it.
  */
 export function showResults(menus, run, record, history) {
   const key = `${run.seed}|${run.phase}|${run.score}|${history.length}`;
@@ -141,12 +141,12 @@ export function showResults(menus, run, record, history) {
   requestAnimationFrame(() => fitLabels(el('results-stats')));
   const delta = run.score - record.previousBest;
   el('results-meta').textContent = `${run.diff.name} - seed ${run.seed} - ${clock(run.time)} - ${delta >= 0 ? `+${delta.toLocaleString('en-US')} over best` : `${(-delta).toLocaleString('en-US')} under best`}`;
+  // LAST 3 RUNS strip: the label, the real lose title in small type when a run fell, one chip per run.
   const losses = history.some((h) => h.outcome !== 'won');
-  el('results-history').innerHTML =
-    (losses ? `<span class="cap">${RESULT_LOSE_TITLE}</span>` : '') +
-    history
-      .map((h) => (h.outcome === 'won' ? `<span class="chip won">WON ${h.suns}/${WAVE_COUNT}</span>` : `<span class="chip fell">Day ${h.day} ${h.phase.toLowerCase()}</span>`))
-      .join('');
+  el('results-history').innerHTML = history.length
+    ? `<div class="strip-head"><b>LAST ${history.length} RUN${history.length > 1 ? 'S' : ''}</b>${losses ? `<small>${RESULT_LOSE_TITLE}</small>` : ''}</div>` +
+      `<div class="chips">${history.map((h) => `<span class="chip ${h.outcome === 'won' ? 'won' : 'fell'}">${historyChip(h)}</span>`).join('')}</div>`
+    : '';
   el('results-next').textContent = nextGoal(run);
 }
 
