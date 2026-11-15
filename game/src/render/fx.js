@@ -8,6 +8,19 @@ import { currentBanner } from '../announce.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
 import { boardLabelBoxes } from './board.js';
 
+/** Light text on sand: a 3 px dark-brown outline and a 2 px drop shadow under it. */
+function outlinedText(ctx, str, x, y, color) {
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 6;
+  ctx.shadowColor = 'rgba(40,15,5,0.7)';
+  ctx.shadowOffsetY = 2;
+  ctx.strokeStyle = '#3A1A08';
+  ctx.strokeText(str, x, y);
+  ctx.shadowColor = 'transparent';
+  ctx.fillStyle = color;
+  ctx.fillText(str, x, y);
+}
+
 /** Seconds a kill's scorch mark and flipped husk stay on the floor. */
 const DECAL_LIFE = 6;
 
@@ -390,11 +403,7 @@ export function drawNextSunGhost(ctx, trace, label, time) {
   ctx.font = '900 20px system-ui, sans-serif';
   ctx.textAlign = at.align;
   ctx.lineJoin = 'round';
-  ctx.lineWidth = 5;
-  ctx.strokeStyle = '#3A1A08';
-  ctx.strokeText(label, x, y);
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(label, x, y);
+  outlinedText(ctx, label, x, y, '#FFFFFF');
   ctx.restore();
 }
 
@@ -438,11 +447,7 @@ export function drawFx(ctx, fx) {
     ctx.globalAlpha = k > 0.3 ? 1 : Math.max(0, k / 0.3);
     const pop = age < 0.15 ? 1.4 - (age / 0.15) * 0.4 : 1;
     ctx.font = `900 ${Math.round(t.size * pop)}px system-ui, sans-serif`;
-    ctx.lineWidth = 6;
-    ctx.strokeStyle = '#3A1A08';
-    ctx.strokeText(t.text, t.x, t.y);
-    ctx.fillStyle = t.color;
-    ctx.fillText(t.text, t.x, t.y);
+    outlinedText(ctx, t.text, t.x, t.y, t.color);
   }
   ctx.globalAlpha = 1;
 }

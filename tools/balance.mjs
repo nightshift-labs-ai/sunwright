@@ -95,7 +95,7 @@ export function playRun(seed, difficulty, bot = 'greedy', onTick = null, directo
       if (run.flareCharges > 0 && run.flareLeft <= 0 && lit >= (careful ? 4 : 2) && !orders.holdFlare) orders.push({ type: 'flare' });
       step(orders);
     } else if (run.phase === 'draft') {
-      const index = careful ? run.offer.indexOf(BOON_TASTE.find((id) => run.offer.includes(id))) : 0;
+      const index = director?.pick ? director.pick(run) : careful ? run.offer.indexOf(BOON_TASTE.find((id) => run.offer.includes(id))) : 0;
       step([{ type: 'pick', index: Math.max(0, index) }]);
     } else break;
   }

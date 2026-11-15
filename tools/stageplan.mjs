@@ -17,7 +17,10 @@ const BOT = 'greedy';
  * cover sun then plays normally: its bigger swarm bites again, and the cover is the moment that
  * best shows density, burning, a fresh bite and a beetle at the rim.
  */
-const DIRECTED = { [COVER_WAVE - 1]: 8 };
+/** Fountain targets per sun: { start: act only once HP is at most this, after: from this many seconds, to: stop at }. */
+const DIRECTED = { [COVER_WAVE - 1]: { start: 10, after: 0.5, to: 8 } };
+/** With STAGE_V3=1 the cover sun bites once more after the cover moment (7 -> 6), for a 6/10 draft. */
+if (process.env.STAGE_V3 === '1') DIRECTED[COVER_WAVE] = { start: 7, after: 12, to: 6 };
 
 function mostUsefulPieces(run, K) {
   const cols = run.grid.cols;
@@ -64,13 +67,14 @@ export function makeDirector(K) {
   let turned = null;
   const director = (run) => {
     const orders = [];
-    const target = DIRECTED[run.waveIndex];
-    if (target === undefined) return orders;
+    const plan = DIRECTED[run.waveIndex];
+    if (plan === undefined) return orders;
+    const target = plan.to;
     if (wave !== run.waveIndex) {
       wave = run.waveIndex;
       turned = null;
     }
-    if (turned === null && run.waveTime > 0.5 && run.shrineHp > target) {
+    if (turned === null && run.waveTime > plan.after && run.shrineHp <= plan.start && run.shrineHp > target) {
       turned = mostUsefulPieces(run, K);
       for (const p of turned) orders.push({ type: 'rotate', c: p.c, r: p.r, dir: 1 });
     } else if (turned && turned.length && run.shrineHp <= target) {
@@ -88,6 +92,8 @@ export function makeDirector(K) {
     if (run.waveIndex !== COVER_WAVE + 1 || !swapped.length) return [];
     return swapped.splice(0).flatMap((p) => [{ type: 'lift', c: p.c, r: p.r }, { type: 'place', piece: p.piece, c: p.c, r: p.r, rot: p.rot }]);
   };
+  // Keep the fountain's scars visible: never take the healing charms while staging.
+  if (process.env.STAGE_V3 === '1') director.pick = (run) => Math.max(0, run.offer.findIndex((id) => id !== 'sunstone' && id !== 'mend'));
   return director;
 }
 
@@ -113,7 +119,7 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT) {
       const burning = run.enemies.filter((e) => e.litPower > 0 && !e.shielded).length;
       const types = new Set(run.enemies.map((e) => e.type)).size;
       const hurt = run.shrineHp < run.shrineMax;
-      const score = Math.min(run.enemies.length, 24) * 2 + Math.min(burning, 8) * 2 + types * 4 + Math.min(opaque, 6) * 3 + (opaque >= 3 ? 30 : 0) + (freshBite ? 12 : 0) + (atRim ? 12 : 0) + (hurt ? 20 : 0) + (run.enemies.some((e) => e.shielded) ? 4 : 0);
+      const score = Math.min(run.enemies.length, 24) * 2 + Math.min(burning, 8) * 2 + types * 4 + Math.min(opaque, 6) * 3 + (opaque >= 3 ? 30 : 0) + (freshBite ? 12 : 0) + (atRim ? 12 : 0) + (hurt ? 20 : 0) + (run.shrineHp === 7 ? 25 : 0) + (run.enemies.some((e) => e.shielded) ? 4 : 0);
       if (score > cover.score) cover = { tick: run.tick, score, hp: run.shrineHp, enemies: run.enemies.length, burning, types, opaque, freshBite, atRim };
     }
     if (run.phase === 'draft' && run.waveIndex === COVER_WAVE + 1 && draftTick < 0) {
