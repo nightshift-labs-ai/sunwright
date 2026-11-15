@@ -1,6 +1,7 @@
 // Screenshot look gate: decode each screenshot in headless Chromium and measure mean HSV
 // saturation (target >= 0.33, aim 0.45), luminance standard deviation (>= 40), a warm floor
-// (mean R > mean B over the frame) and the share of near-black pixels (keep it tiny).
+// (mean R > mean B over the frame), the share of near-black pixels, mean luminance >= 0.45 and
+// no 64x64 block darker than 0.15 (no dark frames).
 //   node tools/measure-shots.mjs
 import { readFileSync, readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -36,12 +37,21 @@ for (const f of files) {
       blue += b;
       n++;
     }
+    let darkest = 255;
+    for (let by = 0; by + 64 <= c.height; by += 64) {
+      for (let bx = 0; bx + 64 <= c.width; bx += 64) {
+        const b = g.getImageData(bx, by, 64, 64).data;
+        let sum = 0;
+        for (let i = 0; i < b.length; i += 4) sum += 0.2126 * b[i] + 0.7152 * b[i + 1] + 0.0722 * b[i + 2];
+        darkest = Math.min(darkest, sum / (b.length / 4));
+      }
+    }
     const mean = lum / n;
-    return { sat: sat / n, lumSd: Math.sqrt(lum2 / n - mean * mean), meanLum: mean, black: black / n, warm: red > blue };
+    return { darkest, sat: sat / n, lumSd: Math.sqrt(lum2 / n - mean * mean), meanLum: mean, black: black / n, warm: red > blue };
   }, dataUrl);
-  const ok = m.sat >= 0.33 && m.lumSd >= 40 && m.warm && m.black < 0.02;
+  const ok = m.sat >= 0.33 && m.lumSd >= 40 && m.warm && m.black < 0.02 && m.meanLum >= 0.45 * 255 && m.darkest >= 0.15 * 255;
   if (!ok) failed++;
-  console.log(`${ok ? 'ok  ' : 'FAIL'} ${f}: saturation ${m.sat.toFixed(2)}  luminance SD ${m.lumSd.toFixed(1)}  mean ${m.meanLum.toFixed(0)}  near-black ${(m.black * 100).toFixed(1)}%  warm ${m.warm}`);
+  console.log(`${ok ? 'ok  ' : 'FAIL'} ${f}: saturation ${m.sat.toFixed(2)}  luminance SD ${m.lumSd.toFixed(1)}  mean ${(m.meanLum / 255).toFixed(2)}  darkest block ${(m.darkest / 255).toFixed(2)}  near-black ${(m.black * 100).toFixed(1)}%  warm ${m.warm}`);
 }
 await browser.close();
 process.exit(failed ? 1 : 0);

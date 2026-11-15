@@ -32,6 +32,9 @@
   front face with gold pilasters and an arched sun window; side-wall slots; low south curb with
   burrow arches; SUN - E/N/W plaques; floor labels SWARM / FOUNTAIN; shadows >= 0.6 cell long.
 
+- M4 (part): no dark frames - sepia rgba(70,40,15,0.35) dims, orange-edged white-core beams,
+  parchment roundel centres; measure-shots gates mean luminance >= 0.45, no 64x64 block < 0.15.
+
 ## Next
 - M3 feel (rest): hit-stop-like pop on SEAR steps, fountain pip crack, quartz counter pulse,
   colour-blind beam patterns (option), How to play illustrated panels.

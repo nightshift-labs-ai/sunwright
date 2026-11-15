@@ -47,10 +47,10 @@ button.big:hover { background: #cf3f93; }
 .roundel { position: relative; width: 240px; height: 240px; border-radius: 50%; padding: 0 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 7px solid #f2c14e; overflow: hidden; background: #1f3f99; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.5), 0 0 30px rgba(255, 210, 90, 0.35); }
 .roundel.rare { border-color: #fff6df; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.5), 0 0 40px rgba(255, 255, 220, 0.8); }
 .roundel .glass { position: absolute; inset: 0; z-index: 0; background: conic-gradient(from 15deg, hsl(var(--hue) 80% 52%) 0 60deg, hsl(calc(var(--hue) + 35) 80% 38%) 0 120deg, hsl(var(--hue) 75% 60%) 0 180deg, hsl(calc(var(--hue) + 35) 80% 42%) 0 240deg, hsl(var(--hue) 80% 50%) 0 300deg, hsl(calc(var(--hue) + 35) 75% 36%) 0); opacity: 0.92; }
-.roundel .glass::after { content: ""; position: absolute; inset: 34px; border-radius: 50%; background: radial-gradient(rgba(20, 20, 60, 0.72), rgba(20, 20, 60, 0.55)); border: 3px solid rgba(242, 193, 78, 0.85); }
+.roundel .glass::after { content: ""; position: absolute; inset: 30px; border-radius: 50%; background: radial-gradient(#fffaf0, #f6dfae); border: 3px solid #f2c14e; }
 .roundel b, .roundel .effect, .roundel .key { position: relative; z-index: 1; }
-.roundel b { font: 900 25px Georgia, serif; color: #fff2a8; }
-.roundel .effect { font-size: 17px; font-weight: 700; line-height: 1.3; }
+.roundel b { font: 900 25px Georgia, serif; color: #7a2e14; }
+.roundel .effect { font-size: 17px; font-weight: 800; line-height: 1.3; color: #3b1247; }
 .roundel .key { width: 34px; height: 34px; border-radius: 50%; background: #f2c14e; color: #3b1247; font-weight: 900; display: flex; align-items: center; justify-content: center; }
 .roundel:hover { transform: translateY(-4px) scale(1.03); }
 .draft-foot { display: flex; gap: 22px; align-items: center; margin-top: 30px; }

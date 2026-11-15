@@ -103,10 +103,10 @@ function drawStarburst(ctx, x, y, r, alpha) {
 }
 
 /** Glow, halo and core widths and alphas of a beam. */
-const BEAM_PASSES = [[26, 0.18], [12, 0.4], [5, 0.95]];
+const BEAM_PASSES = [[26, 0.18], [11, 0.55], [5, 0.95]];
 /** Glow / halo / core colours per tint: sunlight, red (1), blue (2), gold (4). */
 const TINT_COLORS = {
-  0: ['rgba(255,197,49,', 'rgba(255,214,90,', 'rgba(255,251,230,'],
+  0: ['rgba(255,197,49,', 'rgba(255,128,24,', 'rgba(255,251,230,'],
   1: ['rgba(255,77,61,', 'rgba(255,110,80,', 'rgba(255,215,200,'],
   2: ['rgba(89,184,255,', 'rgba(120,200,255,', 'rgba(225,245,255,'],
   4: ['rgba(255,170,20,', 'rgba(255,200,40,', 'rgba(255,246,190,'],

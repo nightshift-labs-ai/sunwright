@@ -6,7 +6,7 @@ import { drawBeams, drawFx, drawScreenFx, shakeOffset } from './fx.js';
 import { drawCourtyard, drawPiece, drawPieces, drawShrine } from './board.js';
 import { drawEnemies } from './beetles.js';
 import { drawHud } from './hud.js';
-import { BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W } from './layout.js';
+import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL, WALL_FRONT } from './layout.js';
 
 function drawCellCursor(ctx, cell, ok) {
   const x = BOARD_X + cell.c * CELL;
@@ -59,8 +59,8 @@ export function drawFrame(ctx, frame) {
   }
   drawEnemies(ctx, run, time);
   if (phase === 'draft' || phase === 'lost') {
-    ctx.fillStyle = phase === 'lost' ? 'rgba(40,15,50,0.5)' : 'rgba(30,20,70,0.42)';
-    ctx.fillRect(BOARD_X - 30, BOARD_Y - 30, VIEW_W, VIEW_H);
+    ctx.fillStyle = 'rgba(70,40,15,0.35)';
+    ctx.fillRect(BOARD_X - WALL, BOARD_Y - WALL_FRONT - WALL, BOARD_W + WALL * 2, BOARD_H + WALL_FRONT + WALL * 2);
   }
   if (phase !== 'lost') {
     const alpha = phase === 'wave' || phase === 'won' ? 1 : phase === 'build' ? 0.8 : 0.95;
