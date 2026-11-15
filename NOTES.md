@@ -196,6 +196,10 @@
   Glasswright's Discount renamed Glass Discount. Draft heading and results title drop font size
   (84 / 104 px) instead of squeezing; the event banner tries 61-36 px; sun track spacing 36 px.
 
+- Benchmark 5 item 8: beetles.BEETLE_COLORS, one colour per kind: Scuttler magenta, Veerwing violet
+  (lilac wings), Shellback bronze (metallic sweep, gold ribs), Glassback cyan (teal ring), Titan plum.
+  The INCOMING icons are the same sprites; floor husks and the results Titan use the same palette.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

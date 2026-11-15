@@ -7,6 +7,7 @@ import { sunApertureFor } from '../sun.js';
 import { currentBanner } from '../announce.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
 import { boardLabelBoxes } from './board.js';
+import { BEETLE_COLORS } from './beetles.js';
 
 /** Light text on sand: a 3 px dark-brown outline and a 2 px drop shadow under it. */
 function outlinedText(ctx, str, x, y, color) {
@@ -34,7 +35,7 @@ export function drawDecals(ctx, fx) {
     ctx.fillStyle = scorch;
     ctx.fillRect(d.x - d.size * 1.8, d.y - d.size * 1.8 + 4, d.size * 3.6, d.size * 3.6);
     ctx.globalAlpha = Math.min(1, k * 1.6);
-    ctx.fillStyle = d.enemy === 'veerwing' ? '#7A3B9A' : '#4A1A55';
+    ctx.fillStyle = (BEETLE_COLORS[d.enemy] ?? BEETLE_COLORS.scuttler).under;
     ctx.beginPath();
     ctx.ellipse(d.x, d.y, d.size, d.size * 0.7, 0, 0, Math.PI * 2);
     ctx.fill();

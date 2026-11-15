@@ -4,6 +4,7 @@
 import { NAMES, WAVE_COUNT } from '../config.js';
 import { boonById } from '../draft.js';
 import { drawCharmBadge } from './charms.js';
+import { BEETLE_COLORS } from './beetles.js';
 import { fitOption } from './fit.js';
 import { drawSunTrack } from './hud.js';
 import { VIEW_H, VIEW_W } from './layout.js';
@@ -32,7 +33,7 @@ function drawTitanCarcass(ctx, x, y, s, time) {
       ctx.stroke();
     }
   }
-  ctx.fillStyle = '#2A0E3A';
+  ctx.fillStyle = BEETLE_COLORS.titan.under;
   ctx.beginPath();
   ctx.ellipse(0, 0, 110 * s, 64 * s, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -44,7 +45,7 @@ function drawTitanCarcass(ctx, x, y, s, time) {
     ctx.ellipse(k * 34 * s, -6 * s, 15 * s, 40 * s, 0, 0, Math.PI * 2);
     ctx.fill();
   }
-  ctx.fillStyle = '#3A1458';
+  ctx.fillStyle = BEETLE_COLORS.titan.top;
   ctx.beginPath();
   ctx.ellipse(118 * s, 6 * s, 34 * s, 28 * s, 0, 0, Math.PI * 2);
   ctx.fill();

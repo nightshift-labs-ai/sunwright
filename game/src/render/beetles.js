@@ -1,9 +1,19 @@
-// Beetle sprites drawn in code: magenta Scuttlers with walking legs, violet Veerwings with
-// beating wings, armour-plated Shellbacks, and the Hornback Titan with her opening carapace.
+// Beetle sprites drawn in code, one colour per kind (the INCOMING icons are these same sprites):
+// magenta Scuttlers, violet Veerwings with beating wings, bronze armour-plated Shellbacks, cyan
+// Glassbacks, and the plum Hornback Titan with her opening carapace.
 import { armourOf, carapaceOpen } from '../enemies.js';
 import { CELL, toScreenX, toScreenY } from './layout.js';
 
 const HEADING_ANGLE = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
+
+/** Each kind's shell (top), underside and head; husks and the results Titan use the same. */
+export const BEETLE_COLORS = {
+  scuttler: { top: '#C2307E', under: '#6A1A4A', head: '#5A1446' },
+  veerwing: { top: '#7B4BE0', under: '#3E2183', head: '#3E2183', wing: 'rgba(176,140,255,0.85)' },
+  shellback: { top: '#B86E2C', under: '#5C3210', head: '#4A2810', light: '#E7A75A', dark: '#7A4317' },
+  glassback: { top: '#6FE6F2', under: '#0D4F66', head: '#0D4F66', light: '#E9FFFF', dark: '#1597B8' },
+  titan: { top: '#6E2160', under: '#33102D', head: '#4A1640' },
+};
 
 function drawLegs(ctx, len, phase) {
   ctx.strokeStyle = '#3B1247';
@@ -45,8 +55,8 @@ function drawShell(ctx, rx, ry, top, under, ridge) {
   ctx.fill();
 }
 
-function drawHead(ctx, rx, eye) {
-  ctx.fillStyle = '#5A1E6E';
+function drawHead(ctx, rx, eye, color) {
+  ctx.fillStyle = color;
   ctx.beginPath();
   ctx.ellipse(rx * 0.95, 0, rx * 0.36, rx * 0.4, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -113,7 +123,7 @@ export function drawEnemy(ctx, e, time) {
   const phase = time * 18 + e.id;
   if (e.type === 'veerwing') {
     const flap = 0.55 + Math.abs(Math.sin(phase * 0.9)) * 0.6;
-    ctx.fillStyle = 'rgba(214,120,255,0.85)';
+    ctx.fillStyle = BEETLE_COLORS.veerwing.wing;
     for (const side of [-1, 1]) {
       ctx.beginPath();
       ctx.ellipse(-2, side * size * 0.75 * flap, size * 0.75, size * 0.55 * flap, side * 0.4, 0, Math.PI * 2);
@@ -125,11 +135,18 @@ export function drawEnemy(ctx, e, time) {
       ctx.arc(-2, side * size * 0.75 * flap, 3.2, 0, Math.PI * 2);
       ctx.fill();
     }
-    drawShell(ctx, size * 0.7, size * 0.38, '#9A3BC9', '#5A1E6E', '#3B1247');
-    drawHead(ctx, size * 0.6, '#FFE14D');
+    const c = BEETLE_COLORS.veerwing;
+    drawShell(ctx, size * 0.7, size * 0.38, c.top, c.under, '#2A145C');
+    drawHead(ctx, size * 0.6, '#FFE14D', c.head);
   } else if (e.type === 'shellback') {
     drawLegs(ctx, size * 1.1, phase * 0.6);
-    drawShell(ctx, size, size * 0.8, '#7A2A8C', '#3B1247', '#F2C14E');
+    // Bronze: a metallic sweep, gold rib plates.
+    const c = BEETLE_COLORS.shellback;
+    const g = ctx.createLinearGradient(-size, -size, size, size);
+    g.addColorStop(0, c.light);
+    g.addColorStop(0.5, c.top);
+    g.addColorStop(1, c.dark);
+    drawShell(ctx, size, size * 0.8, g, c.under, '#F2C14E');
     ctx.strokeStyle = '#F2C14E';
     ctx.lineWidth = 2;
     for (const k of [-0.4, 0.15]) {
@@ -137,20 +154,21 @@ export function drawEnemy(ctx, e, time) {
       ctx.arc(size * k, 0, size * 0.6, -1.1, 1.1);
       ctx.stroke();
     }
-    drawHead(ctx, size * 0.8, '#FFE14D');
+    drawHead(ctx, size * 0.8, '#FFE14D', c.head);
   } else if (e.type === 'glassback') {
     drawLegs(ctx, size * 1.05, phase * 0.8);
+    const c = BEETLE_COLORS.glassback;
     const g = ctx.createLinearGradient(-size, -size, size, size);
-    g.addColorStop(0, '#FFFFFF');
-    g.addColorStop(0.45, '#BFD9F2');
-    g.addColorStop(1, '#6F8FC4');
-    drawShell(ctx, size, size * 0.78, g, '#3B1247', '#F2C14E');
-    ctx.strokeStyle = '#B0307A';
+    g.addColorStop(0, c.light);
+    g.addColorStop(0.45, c.top);
+    g.addColorStop(1, c.dark);
+    drawShell(ctx, size, size * 0.78, g, c.under, '#F2C14E');
+    ctx.strokeStyle = '#0E6F86';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.ellipse(0, 0, size, size * 0.72, 0, 0, Math.PI * 2);
     ctx.stroke();
-    drawHead(ctx, size * 0.8, '#FFE14D');
+    drawHead(ctx, size * 0.8, '#FFE14D', c.head);
   } else if (e.type === 'titan') {
     const open = carapaceOpen(e);
     drawLegs(ctx, size * 1.2, phase * 0.4);
@@ -161,25 +179,26 @@ export function drawEnemy(ctx, e, time) {
       ctx.fill();
       ctx.save();
       for (const side of [-1, 1]) {
-        ctx.fillStyle = '#2A0E3A';
+        ctx.fillStyle = BEETLE_COLORS.titan.under;
         ctx.beginPath();
         ctx.ellipse(-size * 0.15, side * size * 0.75, size * 0.8, size * 0.32, side * 0.5, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
     } else {
-      drawShell(ctx, size, size * 0.85, '#3A1458', '#1E0A30', '#B0307A');
+      drawShell(ctx, size, size * 0.85, BEETLE_COLORS.titan.top, BEETLE_COLORS.titan.under, '#B0307A');
       ctx.strokeStyle = '#FF4D8D';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
       ctx.stroke();
     }
-    drawHead(ctx, size * 0.8, '#FF4D8D');
+    drawHead(ctx, size * 0.8, '#FF4D8D', BEETLE_COLORS.titan.head);
   } else {
     drawLegs(ctx, size, phase);
-    drawShell(ctx, size, size * 0.72, '#B0307A', '#5A1E6E', '#5A1E6E');
-    drawHead(ctx, size * 0.8, '#FFE14D');
+    const c = BEETLE_COLORS.scuttler;
+    drawShell(ctx, size, size * 0.72, c.top, c.under, c.under);
+    drawHead(ctx, size * 0.8, '#FFE14D', c.head);
   }
   ctx.restore();
   if (e.burn > 0) drawFlames(ctx, x, y, size, time + e.id);
