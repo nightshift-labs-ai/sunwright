@@ -164,10 +164,9 @@ export function showResults(menus, run, record, history) {
   requestAnimationFrame(() => fitLabels(el('results-stats')));
   const delta = run.score - record.previousBest;
   el('results-meta').textContent = `${run.diff.name} - seed ${run.seed} - ${clock(run.time)} - ${delta >= 0 ? `+${delta.toLocaleString('en-US')} over best` : `${(-delta).toLocaleString('en-US')} under best`}`;
-  // LAST 3 RUNS strip: the label, the real lose title in small type when a run fell, one chip per run.
-  const losses = history.some((h) => h.outcome !== 'won');
+  // LAST 3 RUNS strip: the label and one chip per run (a fallen run's red chip says LOST - Day d phase).
   el('results-history').innerHTML = history.length
-    ? `<div class="strip-head"><b>LAST ${history.length} RUN${history.length > 1 ? 'S' : ''}</b>${losses ? `<small>${RESULT_LOSE_TITLE}</small>` : ''}</div>` +
+    ? `<div class="strip-head"><b>LAST ${history.length} RUN${history.length > 1 ? 'S' : ''}</b></div>` +
       `<div class="chips">${history.map((h) => `<span class="chip ${h.outcome === 'won' ? 'won' : 'fell'}">${historyChip(h)}</span>`).join('')}</div>`
     : '';
   el('results-next').textContent = nextGoal(run);

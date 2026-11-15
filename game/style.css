@@ -105,7 +105,6 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
 .history:empty { display: none; }
 .history .strip-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .history .strip-head b { font: 900 30px system-ui, sans-serif; color: #3b1247; line-height: 1.15; }
-.history .strip-head small { font: 900 22px system-ui, sans-serif; color: #c0303a; white-space: nowrap; }
 .history .chips { display: flex; justify-content: center; gap: 8px; }
 .history .chip { font: 900 26px system-ui, sans-serif; padding: 1px 12px; border-radius: 20px; border: 3px solid #f2c14e; white-space: nowrap; }
 .history .fell { color: #fff6df; background: #c0303a; }

@@ -4,7 +4,7 @@
 // Also checks each screenshot file: JPEG, 1280x800, at most 256 KiB, and the shots sort the cover first.
 //   node tools/check-shot-truth.mjs
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { ENEMIES, RESULT_LOSE_TITLE, WAVE_COUNT } from '../game/src/config.js';
+import { ENEMIES, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
 import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
@@ -210,8 +210,7 @@ for (const shot of manifest.shots) {
       const want = expected.map((h) => ({ text: historyChip(h), won: h.outcome === 'won' }));
       check(JSON.stringify(strip.chips) === JSON.stringify(want), `${shot.name} LAST RUNS chips: shown ${JSON.stringify(strip.chips)} vs saved ${JSON.stringify(want)}`);
       check(strip.label === `LAST ${expected.length} RUNS` && strip.labelPx >= 30, `${shot.name} strip label: ${strip.label} at ${strip.labelPx}px`);
-      const fell = expected.some((h) => h.outcome !== 'won');
-      check(fell ? strip.cap === RESULT_LOSE_TITLE && strip.capPx <= 24 : strip.cap === '', `${shot.name} lose title in the strip: ${strip.cap} at ${strip.capPx}px`);
+      check(strip.cap === '', `${shot.name} lose title in the strip: ${strip.cap}`);
       if (shot.state.phase === 'won') check(strip.capElsewhere === 0, `${shot.name} lose title shown outside the strip on a win`);
       console.log(`${shot.name} strip: ${strip.label} (${strip.labelPx}px) ${strip.cap} (${strip.capPx}px) | ${strip.chips.map((c) => c.text).join(' | ')}`);
     }

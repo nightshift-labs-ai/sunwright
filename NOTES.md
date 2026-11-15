@@ -244,6 +244,10 @@
   demo drops its fountain bites (no -1 FOUNTAIN or red flash on the title). Ticks found with a
   headless scan of the demo + fx.
 
+- Benchmark 6 item 4: win results carry no lose title (the strip is LAST 3 RUNS + chips; reverses
+  Bench5-2's caption). The Titan carcass is ash: charcoal shell, ash plates with glowing ember cracks,
+  embers rising through the smoke, drawn at 0.82 (about 235 px wide), whole in the left column.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.

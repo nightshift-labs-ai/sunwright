@@ -4,14 +4,13 @@
 import { NAMES, WAVE_COUNT } from '../config.js';
 import { boonById } from '../draft.js';
 import { drawCharmBadge } from './charms.js';
-import { BEETLE_COLORS } from './beetles.js';
 import { fitOption } from './fit.js';
 import { drawSunTrack } from './hud.js';
 import { VIEW_H, VIEW_W } from './layout.js';
 
-const HERO = { x: 182, y: 336 };
+const HERO = { x: 172, y: 344 };
 
-/** The Titan on its back: pale belly plates, legs kicked up, horns, smoke curling off it. */
+/** The Titan burned to ash, on its back: charcoal shell, ash-grey plates with glowing cracks, legs up, smoke and embers. */
 function drawTitanCarcass(ctx, x, y, s, time) {
   ctx.save();
   ctx.translate(x, y);
@@ -20,7 +19,7 @@ function drawTitanCarcass(ctx, x, y, s, time) {
   scorch.addColorStop(1, 'rgba(60,25,10,0)');
   ctx.fillStyle = scorch;
   ctx.fillRect(-150 * s, -110 * s, 300 * s, 280 * s);
-  ctx.strokeStyle = '#26091C';
+  ctx.strokeStyle = '#26201E';
   ctx.lineWidth = 9 * s;
   ctx.lineCap = 'round';
   for (const side of [-1, 1]) {
@@ -33,19 +32,30 @@ function drawTitanCarcass(ctx, x, y, s, time) {
       ctx.stroke();
     }
   }
-  ctx.fillStyle = BEETLE_COLORS.titan.under;
+  ctx.fillStyle = '#3A3434';
   ctx.beginPath();
   ctx.ellipse(0, 0, 110 * s, 64 * s, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.lineWidth = 5 * s;
   ctx.stroke();
-  ctx.fillStyle = '#C99AD6';
+  ctx.fillStyle = '#B8ADA6';
   for (let k = -2; k <= 2; k++) {
     ctx.beginPath();
     ctx.ellipse(k * 34 * s, -6 * s, 15 * s, 40 * s, 0, 0, Math.PI * 2);
     ctx.fill();
   }
-  ctx.fillStyle = BEETLE_COLORS.titan.top;
+  // Ember cracks still glowing in the ash plates.
+  ctx.strokeStyle = `rgba(255,${130 + Math.round(Math.sin(time * 5) * 30)},50,0.9)`;
+  ctx.lineWidth = 3 * s;
+  for (let k = -2; k <= 2; k++) {
+    ctx.beginPath();
+    ctx.moveTo(k * 34 * s - 6 * s, -34 * s);
+    ctx.lineTo(k * 34 * s + 5 * s, -12 * s);
+    ctx.lineTo(k * 34 * s - 4 * s, 8 * s);
+    ctx.lineTo(k * 34 * s + 4 * s, 26 * s);
+    ctx.stroke();
+  }
+  ctx.fillStyle = '#4A403C';
   ctx.beginPath();
   ctx.ellipse(118 * s, 6 * s, 34 * s, 28 * s, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -70,9 +80,17 @@ function drawTitanCarcass(ctx, x, y, s, time) {
   }
   for (let k = 0; k < 7; k++) {
     const t = (time * 0.35 + k / 7) % 1;
-    ctx.fillStyle = `rgba(120,95,85,${0.55 * (1 - t)})`;
+    ctx.fillStyle = `rgba(120,110,105,${0.55 * (1 - t)})`;
     ctx.beginPath();
     ctx.arc((k - 3) * 22 * s + Math.sin(t * 6 + k) * 10 * s, -60 * s - t * 170 * s, (14 + t * 26) * s, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // Embers drifting up out of the smoke.
+  for (let k = 0; k < 9; k++) {
+    const t = (time * 0.5 + k / 9) % 1;
+    ctx.fillStyle = `rgba(255,${150 + (k % 3) * 35},60,${1 - t})`;
+    ctx.beginPath();
+    ctx.arc((k - 4) * 18 * s + Math.sin(t * 8 + k * 2) * 14 * s, -30 * s - t * 140 * s, 3.5 * s, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.restore();
@@ -169,7 +187,7 @@ export function drawResultsHero(ctx, run, time) {
   ctx.stroke();
   drawSunTrack(ctx, 48, 193, 36, 12, run.stats.wavesCleared, won ? -1 : run.waveIndex);
   if (won) {
-    drawTitanCarcass(ctx, HERO.x, HERO.y, 0.72, time);
+    drawTitanCarcass(ctx, HERO.x, HERO.y, 0.82, time);
     if (run.stats.titanSeconds !== undefined) {
       caption(ctx, 'TITAN BURNED IN', 192, 474, 30, '#FFE27A');
       caption(ctx, clock(run.stats.titanSeconds), 192, 514, 40, '#FFFFFF');
