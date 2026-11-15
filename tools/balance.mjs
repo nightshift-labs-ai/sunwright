@@ -65,7 +65,7 @@ function reaimOrders(run) {
 
 /**
  * Play one run. Returns { result, log, run } where log is [{ tick, orders }] and tick is the
- * run's tick just before the step that applied them. onTick(run) is called after every step.
+ * run's tick just before the step that applied them. onTick(run, events) is called after every step.
  */
 export function playRun(seed, difficulty, bot = 'greedy', onTick = null) {
   const run = createRun(seed, difficulty);
@@ -74,8 +74,8 @@ export function playRun(seed, difficulty, bot = 'greedy', onTick = null) {
   const step = (orders) => {
     if (orders.length) log.push({ tick: run.tick, orders });
     stepSim(run, orders);
+    if (onTick) onTick(run, run.events);
     run.events.length = 0;
-    if (onTick) onTick(run);
   };
   for (let guard = 0; guard < 60 * 60 * 40; guard++) {
     if (run.phase === 'build') {

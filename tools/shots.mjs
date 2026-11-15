@@ -20,12 +20,15 @@ const COVER_WAVE = 4;
 let cover = { tick: -1, score: -1 };
 let draftTick = -1;
 let endTick = -1;
-const { result, log } = playRun(SEED, DIFF, BOT, (run) => {
+const floaters = []; // times of kills and bites: each leaves a floating number, opaque for 0.98 s
+const { result, log } = playRun(SEED, DIFF, BOT, (run, events) => {
+  for (const ev of events) if (ev.type === 'kill' || ev.type === 'bite') floaters.push(run.time);
   if (run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0) {
+    const opaque = floaters.filter((t) => run.time - t < 0.98).length;
     const burning = run.enemies.filter((e) => e.litPower > 0 && !e.shielded).length;
     const types = new Set(run.enemies.map((e) => e.type)).size;
-    const score = burning * 2 + types * 3 + Math.min(run.chain.count, 5) * 2 + (run.enemies.some((e) => e.shielded) ? 3 : 0) + Math.min(run.enemies.length, 16);
-    if (score > cover.score) cover = { tick: run.tick, score };
+    const score = opaque >= 3 ? burning * 2 + types * 3 + Math.min(opaque, 6) * 2 + (run.enemies.some((e) => e.shielded) ? 3 : 0) + Math.min(run.enemies.length, 20) : -1;
+    if (score > cover.score) cover = { tick: run.tick, score, opaque };
   }
   if (run.phase === 'draft' && run.waveIndex === COVER_WAVE + 1 && draftTick < 0) draftTick = run.tick;
   if ((run.phase === 'won' || run.phase === 'lost') && endTick < 0) endTick = run.tick;

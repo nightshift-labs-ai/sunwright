@@ -4,6 +4,9 @@
 import { NAMES } from '../config.js';
 import { QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
 
+/** Seconds a floating number lives (opaque for the first 70%). */
+export const FLOATER_LIFE = 1.4;
+
 export function createFx() {
   return { particles: [], texts: [], shake: 0, flash: 0, hurt: 0, seed: 12345, waveBanner: 0 };
 }
@@ -33,10 +36,11 @@ export function fxFromEvent(fx, ev) {
       fx.particles.push({ kind: 'quartz', x: x + k * 6, y, sx: x + k * 6, sy: y, vx: 0, vy: 0, life: 0.75 + k * 0.08, max: 0.75 + k * 0.08, size: 6, color: '#7FE8FF' });
     }
     const label = ev.mult > 1 ? `+${ev.points}  ${NAMES.combo} x${ev.mult}` : `+${ev.points}`;
-    fx.texts.push({ x, y: y - 18, text: label, life: 1.1, max: 1.1, color: ev.mult > 1 ? '#FFF2A8' : '#FFFFFF', size: ev.mult > 1 ? 22 : 17 });
+    fx.texts.push({ x, y: y - 18, text: label, life: FLOATER_LIFE, max: FLOATER_LIFE, color: ev.mult >= 4 ? '#FFFFFF' : '#F2C14E', size: 28 + (Math.min(ev.mult, 5) - 1) * 4 });
   } else if (ev.type === 'bite') {
     fx.shake = Math.min(14, fx.shake + 6 + ev.harm * 2);
     fx.hurt = 1;
+    fx.texts.push({ x: toScreenX(ev.x), y: toScreenY(ev.y) - 30, text: `-${ev.harm} ${NAMES.fountainShort}`, life: FLOATER_LIFE, max: FLOATER_LIFE, color: '#FF5C5C', size: 32 });
     burst(fx, toScreenX(ev.x), toScreenY(ev.y), 12, 'spark', '#FF5C5C', 120, 0.5, 3);
   } else if (ev.type === 'placed' || ev.type === 'lifted') {
     burst(fx, toScreenX(ev.c + 0.5), toScreenY(ev.r + 0.85), 12, 'smoke', 'rgba(232,196,140,', 50, 0.6, 7);
@@ -47,7 +51,7 @@ export function fxFromEvent(fx, ev) {
   } else if (ev.type === 'waveStart') {
     fx.waveBanner = 1;
   } else if (ev.type === 'denied' && ev.c !== undefined) {
-    fx.texts.push({ x: toScreenX(ev.c + 0.5), y: toScreenY(ev.r + 0.2), text: ev.reason, life: 1.2, max: 1.2, color: '#FF6B6B', size: 16 });
+    fx.texts.push({ x: toScreenX(ev.c + 0.5), y: toScreenY(ev.r + 0.2), text: ev.reason, life: 1.2, max: 1.2, color: '#FF6B6B', size: 20 });
   }
 }
 
@@ -76,7 +80,7 @@ export function updateFx(fx, run, dt) {
   fx.particles = fx.particles.filter((p) => p.life > 0);
   for (const t of fx.texts) {
     t.life -= dt;
-    t.y -= 30 * dt;
+    t.y -= 24 * dt;
   }
   fx.texts = fx.texts.filter((t) => t.life > 0);
   fx.shake = Math.max(0, fx.shake - dt * 30);
@@ -253,11 +257,16 @@ export function drawFx(ctx, fx) {
     }
   }
   ctx.textAlign = 'center';
+  ctx.lineJoin = 'round';
   for (const t of fx.texts) {
-    ctx.globalAlpha = Math.min(1, (t.life / t.max) * 2);
-    ctx.font = `800 ${t.size}px system-ui, sans-serif`;
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = 'rgba(60,20,40,0.85)';
+    // Full strength for 70% of its life, then fade; pops from 1.4x to 1x as it appears.
+    const k = t.life / t.max;
+    const age = t.max - t.life;
+    ctx.globalAlpha = k > 0.3 ? 1 : Math.max(0, k / 0.3);
+    const pop = age < 0.15 ? 1.4 - (age / 0.15) * 0.4 : 1;
+    ctx.font = `900 ${Math.round(t.size * pop)}px system-ui, sans-serif`;
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#3A1A08';
     ctx.strokeText(t.text, t.x, t.y);
     ctx.fillStyle = t.color;
     ctx.fillText(t.text, t.x, t.y);
