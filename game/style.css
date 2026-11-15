@@ -55,7 +55,8 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
    then reroll and how to pick (readable at 252 px wide). Each roundel owns a 400 px column. */
 #draft-screen { justify-content: flex-start; }
 .sunbanner { margin: 6px 0 0; padding: 0 30px 6px; width: max-content; white-space: nowrap; font: 900 112px system-ui, sans-serif; line-height: 1.05; letter-spacing: -1px; transform: scaleX(0.72); color: #ffe27a; -webkit-text-stroke: 3px #3b1247; paint-order: stroke fill; background: rgba(31, 63, 153, 0.94); border: 5px solid #f2c14e; border-radius: 18px; }
-.roundels { display: flex; gap: 164px; margin-top: 156px; }
+.draft-context { margin: 6px 0 0; padding: 0 22px 2px; font: 900 34px system-ui, sans-serif; line-height: 1.15; white-space: nowrap; color: #fff6df; -webkit-text-stroke: 3px #3b1247; paint-order: stroke fill; background: rgba(59, 18, 71, 0.82); border-radius: 12px; }
+.roundels { display: flex; gap: 164px; margin-top: 106px; }
 .roundel { position: relative; width: 236px; height: 236px; border-radius: 50%; padding: 0 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 7px solid #f2c14e; background: none; box-shadow: 0 10px 0 rgba(91, 58, 30, 0.5), 0 0 30px rgba(255, 210, 90, 0.45); }
 .roundel.rare { border-color: #fff6df; box-shadow: 0 0 0 6px #b0307a, 0 10px 0 6px rgba(91, 58, 30, 0.5), 0 0 40px rgba(255, 255, 220, 0.85); }
 .roundel .synergy { position: absolute; z-index: 2; bottom: -26px; white-space: nowrap; padding: 2px 12px; font: 900 20px system-ui, sans-serif; color: #3b1247; background: #7dffc4; border: 3px solid #f2c14e; border-radius: 14px; }

@@ -63,6 +63,7 @@ function registerKill(run, e) {
   run.feedback.quartzAt = run.time;
   if (chain.count >= 2) run.feedback.searAt = run.time;
   run.stats.kills++;
+  run.stats.sunKills++;
   if (e.def.boss) run.stats.titanSeconds = run.time - e.bornAt;
   run.events.push({ t: run.time, type: 'kill', x: e.x, y: e.y, enemy: e.type, points, chain: chain.count, mult, quartz, boss: !!e.def.boss });
   if (run.boons.includes('spreading') && (e.litPower > 0 || e.burn > 0)) {

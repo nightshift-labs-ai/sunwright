@@ -55,7 +55,7 @@ function floaterOverlaps(app) {
 function draftText() {
   const screen = document.getElementById('draft-screen');
   if (screen.classList.contains('hidden')) return null;
-  const boxes = [...screen.querySelectorAll('.sunbanner, .key, .effect, .synergy, .newchip, #draft-reroll, .draft-hint')]
+  const boxes = [...screen.querySelectorAll('.sunbanner, .draft-context, .key, .effect, .synergy, .newchip, #draft-reroll, .draft-hint')]
     .filter((n) => n.textContent.trim())
     .map((n) => ({ text: n.textContent.trim(), r: n.getBoundingClientRect() }));
   const bad = [];
@@ -66,7 +66,8 @@ function draftText() {
   // Each roundel owns a 400 px column; its effect line keeps a 12 px gutter inside it.
   for (const n of screen.querySelectorAll('.effect')) if (n.getBoundingClientRect().width > 388) bad.push(`${n.textContent.trim()} / wider than its column`);
   const all = (sel) => [...screen.querySelectorAll(sel)].map((n) => n.textContent.trim());
-  return { effects: all('.effect'), hint: all('.draft-hint')[0], reroll: all('#draft-reroll')[0], overlaps: bad };
+  const context = document.getElementById('draft-context');
+  return { effects: all('.effect'), hint: all('.draft-hint')[0], reroll: all('#draft-reroll')[0], context: context.textContent.trim(), contextPx: parseFloat(getComputedStyle(context).fontSize), overlaps: bad };
 }
 
 /** The results LAST 3 RUNS strip as shown: label, small lose title, chips, their type sizes, and any

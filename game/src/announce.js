@@ -72,6 +72,11 @@ export function currentBanner(run) {
   return `NEXT ${NAMES.sun}: ${sunApertureFor(run.seed, run.waveIndex + 1).phase.wallName} - REAIM GLASS`;
 }
 
+/** The draft's context line under its heading: the sun just held, what burned in it, the fountain. */
+export function draftContext(run) {
+  return `${NAMES.sun} ${run.stats.wavesCleared} HELD - ${run.stats.sunKills} burned - ${NAMES.fountainShort} ${run.shrineHp}/${run.shrineMax}`;
+}
+
 /** How to take a charm, under the draft roundels. */
 export function draftHint(run) {
   return `CLICK A ROUNDEL OR PRESS 1-${run.offer.length}`;

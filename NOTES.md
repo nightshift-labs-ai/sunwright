@@ -181,6 +181,11 @@
   `WIN: survive 9 suns - LOSE: the fountain runs dry` (gold, suns = WAVE_COUNT). check-shot-truth
   checks both lines and the ENTER hint (text, >= 34 px, unclipped). Demo courtyard at scale 0.565.
 
+- Benchmark 5 item 6: draft context line under the heading (34 px, plum band):
+  `SUN 5 HELD - 28 burned - FOUNTAIN 8/10` from announce.draftContext; "burned" is the sun just held
+  (new run.stats.sunKills, reset at each sun start; outcomes unchanged). Verdict plaque moved to y 200.
+  check-shot-truth compares the line with the replayed sim and checks its size.
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).

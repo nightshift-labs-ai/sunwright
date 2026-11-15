@@ -341,20 +341,20 @@ export function drawBeamGhost(ctx, trace, pathCellsLit, time, wall) {
       if (pass === 0 && !misses) break;
     }
   }
-  // The verdict sits on a plaque just under the draft heading, clear of the roundels.
+  // The verdict sits on a plaque under the draft heading and its context line, clear of the roundels.
   const label = `NEXT ${NAMES.sun} (${wall}): ${misses ? 'MISSES THE PATH' : `HITS ${pathCellsLit} PATH CELLS`}`;
   ctx.font = '900 30px system-ui, sans-serif';
   ctx.textAlign = 'center';
   const w = ctx.measureText(label).width + 36;
   ctx.fillStyle = 'rgba(31,63,153,0.92)';
   ctx.beginPath();
-  ctx.roundRect(640 - w / 2, 154, w, 44, 12);
+  ctx.roundRect(640 - w / 2, 200, w, 44, 12);
   ctx.fill();
   ctx.strokeStyle = color;
   ctx.lineWidth = 3;
   ctx.stroke();
   ctx.fillStyle = misses ? '#FF8A80' : '#FFE27A';
-  ctx.fillText(label, 640, 187);
+  ctx.fillText(label, 640, 233);
   ctx.restore();
 }
 

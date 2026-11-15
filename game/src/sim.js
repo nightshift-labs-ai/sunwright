@@ -45,7 +45,7 @@ export function createRun(seed, difficultyId = 'normal') {
     flareLeft: 0,
     chain: { count: 0, timer: 0, best: 0 },
     feedback: { searAt: -9, biteAt: -9, biteHarm: 0, quartzAt: -9 },
-    stats: { kills: 0, leaked: 0, wavesCleared: 0, offersSeen: 0 },
+    stats: { kills: 0, sunKills: 0, leaked: 0, wavesCleared: 0, offersSeen: 0 },
     events: [],
     endedAt: 0,
     layoutVersion: 0,
@@ -161,6 +161,7 @@ function startWave(run) {
   run.flareCharges = FLARE_CHARGES + (run.boons.includes('flare2') ? CHARM_FX.flare2.charges : 0);
   run.flareLeft = 0;
   run.waveNotes = new Set();
+  run.stats.sunKills = 0;
   refreshLight(run);
   emit(run, { type: 'waveStart', wave: run.waveIndex });
 }

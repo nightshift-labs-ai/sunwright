@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { ENEMIES, RESULT_LOSE_TITLE, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
-import { currentBanner, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
+import { currentBanner, draftContext, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
 import { rankFor } from '../game/src/combat.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
@@ -94,8 +94,9 @@ for (const shot of manifest.shots) {
   const d = shot.draftText;
   check(JSON.stringify(d.effects) === JSON.stringify(run.offer.map((id) => boonById(id).line)), `${shot.name} roundel effects: shown ${JSON.stringify(d.effects)} vs offer ${run.offer.join(',')}`);
   check(d.hint === draftHint(run), `${shot.name} pick hint: shown ${d.hint} vs ${draftHint(run)}`);
+  check(d.context === draftContext(run) && d.contextPx >= 34, `${shot.name} draft context: shown ${d.context} (${d.contextPx}px) vs ${draftContext(run)}`);
   check(d.overlaps.length === 0, `${shot.name} draft text collides: ${d.overlaps.join(' | ')}`);
-  console.log(`${shot.name}: roundels ${d.effects.join(' / ')}; ${d.hint}; ${d.overlaps.length} collisions`);
+  console.log(`${shot.name}: ${d.context}; roundels ${d.effects.join(' / ')}; ${d.hint}; ${d.overlaps.length} collisions`);
 }
 
 // Solved plan on the cover: >= 70% of the glass is lit, and every unlit piece is on the next sun's ghost.
