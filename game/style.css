@@ -46,6 +46,7 @@ kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 28px sys
 .howto-cols h3 { color: #ffe27a; font-size: 24px; margin: 10px 0 6px; }
 .howto-cols p { font-size: 18px; line-height: 1.45; margin: 0; }
 .howto-cols b { color: #ffe27a; }
+.howto-pic { display: block; width: 100%; height: auto; margin: 0 0 8px; border: 2px solid #f2c14e; border-radius: 8px; }
 
 /* Draft: one huge heading, three roundels with big keys, one footer line (readable at 252 px wide). */
 #draft-screen { justify-content: flex-start; }

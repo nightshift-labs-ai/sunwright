@@ -7,6 +7,7 @@ import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { rankFor } from '../combat.js';
 import { drawCharmGlyph } from '../render/charms.js';
+import { drawHowtoPicture } from '../render/howto.js';
 
 
 const SCREENS = ['title', 'howto', 'options', 'pause', 'draft', 'results'];
@@ -32,8 +33,9 @@ export function createMenus(intents) {
   return menus;
 }
 
-/** Show one overlay (or none with null). */
+/** Show one overlay (or none with null); the How to play pictures are drawn the first time. */
 export function showScreen(menus, name) {
+  if (name === 'howto') for (const c of document.querySelectorAll('.howto-pic')) drawHowtoPicture(c.getContext('2d'), c.dataset.pic);
   menus.current = name;
   for (const s of SCREENS) el(`${s}-screen`).classList.toggle('hidden', s !== name);
 }

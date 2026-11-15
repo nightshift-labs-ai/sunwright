@@ -153,6 +153,8 @@
 
 - M3: Options > Beam patterns (colour-blind): red prism light in long dashes, blue in dots (off by default).
 
+- M3: How to play has three code-drawn pictures (render/howto.js: build / burn / adapt).
+
 ## Next
 - Staging (benchmark 2 item 1, benchmark 1 item 6): cover wants >= 18 beetles, >= 4 burning, >= 3
   floaters, a Scuttler at the rim and a fresh -1 FOUNTAIN; draft and win at 6/10 (now 8/10).
@@ -169,7 +171,6 @@
   floaters and a floater-on-beam truth failure, Glassback not deflecting - reverted.
 - Benchmark 3 item 5 rest: board >= 58% of the cover (now ~52% incl. walls: needs a layout change),
   <= 3 type sizes in the HUD.
-- M3 leftover: illustrated How to play panels.
 
 ## Known bugs
 - Cover has 2 floaters (benchmark 1 asks >= 3) and 16 beetles (asks >= 18): staging needs work.
