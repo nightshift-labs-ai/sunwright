@@ -10,7 +10,7 @@ import { loadHistory } from './save.js';
 import { audioProbe } from './audio.js';
 import { squeezeReport } from './render/fit.js';
 import { bannerLayout } from './render/banner.js';
-import { buildIconCount } from './render/results.js';
+import { buildIconCount, lastSunChart } from './render/results.js';
 import { hudTextBoxes, lastFrieze, lastTitanBar } from './render/hud.js';
 import { beetleUnder, boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
 import { boardLabelBoxes, propBoxes, propsVisible } from './render/board.js';
@@ -103,6 +103,7 @@ function resultsText() {
     next: document.getElementById('results-next').textContent.trim(),
     runLine: document.getElementById('results-run').textContent.trim(),
     buildIcons: buildIconCount(),
+    chart: lastSunChart(),
     nineOfNine: [...screen.querySelectorAll('*')].filter((n) => !n.childElementCount && n.textContent.includes('9/9')).length,
     sub: document.getElementById('results-sub').textContent.trim(),
     ladder: (() => {

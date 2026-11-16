@@ -475,6 +475,13 @@
   4 screenshots, so the title shows the `A - ALMANAC` button and an `A ALMANAC` keycap (bar now 30 px,
   6 keys; overflow checked).
 
+- Results per-sun chart (left column, above YOUR BUILD): gold bars = beetles burned in each sun, cyan
+  line = the fountain at that sun's end (0-10), sun numbers under the bars, `BURNED PER SUN` and
+  `- FOUNTAIN` as the axis words; one bar per sun played (more in ECLIPSE). Data: run.stats.perSun (sim,
+  pushed at each sun's end and at a loss). check-shot-truth: drawn data = the replayed run's, bars add up
+  to BURNED (232). The Titan is drawn at 0.72 (still over 200 px) and TITAN BURNED IN 0:07 on one line to
+  make room; everything else on results is unchanged.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

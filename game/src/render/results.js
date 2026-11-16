@@ -1,7 +1,7 @@
 // The results hero art, drawn on the canvas beside the results plaque: the Hornback Titan flipped
 // on its back and smoking on a scorched patch (or the drained fountain on a defeat), the 9-sun
 // track with the skull crossed out, and the glass charms taken.
-import { NAMES, WAVE_COUNT } from '../config.js';
+import { FOUNTAIN_MAX, NAMES, WAVE_COUNT } from '../config.js';
 import { boonById } from '../draft.js';
 import { drawCharmBadge } from './charms.js';
 import { fitOption } from './fit.js';
@@ -198,16 +198,71 @@ function clock(seconds) {
 }
 
 /** Everything the results screen shows on the canvas (the DOM plaque sits to the right). */
+let chartDrawn = null;
+/** The per-sun chart as last drawn (for the screenshot checks). */
+export function lastSunChart() {
+  return chartDrawn;
+}
+
+/**
+ * Beetles burned per sun (gold bars) with the fountain at each sun's end (cyan line, 0-10), from the
+ * run's own record (stats.perSun): one bar per sun played, 9 or more in ECLIPSE.
+ */
+function drawSunChart(ctx, run, x, y, w, h) {
+  const suns = run.stats.perSun;
+  ctx.fillStyle = 'rgba(31,63,153,0.92)';
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, 14);
+  ctx.fill();
+  ctx.strokeStyle = '#F2C14E';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.textAlign = 'left';
+  ctx.font = '900 14px system-ui, sans-serif';
+  ctx.fillStyle = '#FFE27A';
+  ctx.fillText('BURNED PER SUN', x + 10, y + 18);
+  ctx.fillStyle = '#7FE8FF';
+  ctx.textAlign = 'right';
+  ctx.fillText('- FOUNTAIN', x + w - 10, y + 18);
+  const n = Math.max(suns.length, 1);
+  const top = y + 26;
+  const base = y + h - 18;
+  const left = x + 12;
+  const span = w - 24;
+  const slot = span / Math.max(n, WAVE_COUNT);
+  const most = Math.max(1, ...suns.map((s) => s.kills));
+  suns.forEach((s, k) => {
+    const bh = ((base - top) * s.kills) / most;
+    ctx.fillStyle = '#F2C14E';
+    ctx.fillRect(left + k * slot + 3, base - bh, slot - 6, bh);
+    ctx.fillStyle = '#FFF6DF';
+    ctx.textAlign = 'center';
+    ctx.font = '800 11px system-ui, sans-serif';
+    ctx.fillText(String(k + 1), left + k * slot + slot / 2, base + 13);
+  });
+  ctx.strokeStyle = '#7FE8FF';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  suns.forEach((s, k) => {
+    const px = left + k * slot + slot / 2;
+    const py = base - ((base - top) * s.fountain) / FOUNTAIN_MAX;
+    if (k === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+  chartDrawn = suns.map((s) => ({ kills: s.kills, fountain: s.fountain }));
+}
+
 export function drawResultsHero(ctx, run, time) {
   ctx.fillStyle = 'rgba(70,40,15,0.35)';
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
   const won = run.phase === 'won';
   if (won) {
     // A won run needs no sun track (SUNS 9/9 and the WON chip say it): the Titan takes the space.
-    drawTitanCarcass(ctx, HERO.x, HERO.y - 40, 0.82, time);
+    drawTitanCarcass(ctx, HERO.x, HERO.y - 56, 0.72, time);
     if (run.stats.titanSeconds !== undefined) {
-      caption(ctx, 'TITAN BURNED IN', 192, 448, 30, '#FFE27A');
-      caption(ctx, clock(run.stats.titanSeconds), 192, 492, 40, '#FFFFFF');
+      caption(ctx, 'TITAN BURNED IN', 140, 404, 22, '#FFE27A');
+      caption(ctx, clock(run.stats.titanSeconds), 304, 406, 32, '#FFFFFF');
     }
   } else {
     ctx.fillStyle = 'rgba(31,63,153,0.92)';
@@ -218,8 +273,9 @@ export function drawResultsHero(ctx, run, time) {
     ctx.lineWidth = 3;
     ctx.stroke();
     drawSunTrack(ctx, 48, 193, 36, 12, run.stats.wavesCleared, run.waveIndex);
-    drawDrainedFountain(ctx, HERO.x, HERO.y, 0.8);
+    drawDrainedFountain(ctx, HERO.x, HERO.y - 30, 0.7);
   }
+  drawSunChart(ctx, run, 24, 418, 336, 110);
   ctx.fillStyle = 'rgba(31,63,153,0.92)';
   ctx.beginPath();
   ctx.roundRect(24, 536, 336, 240, 16);

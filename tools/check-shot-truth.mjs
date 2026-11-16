@@ -304,6 +304,9 @@ for (const shot of manifest.shots) {
       const endRun = replayTo(shot.state.tick);
       check(strip.buildIcons === new Set(endRun.boons).size, `${shot.name} YOUR BUILD icons ${strip.buildIcons} vs ${new Set(endRun.boons).size} charms`);
       check(strip.nineOfNine <= 2, `${shot.name}: 9/9 shown ${strip.nineOfNine} times`);
+      check(JSON.stringify(strip.chart) === JSON.stringify(endRun.stats.perSun.map((s) => ({ kills: s.kills, fountain: s.fountain }))), `${shot.name} per-sun chart: drawn ${JSON.stringify(strip.chart)} vs run ${JSON.stringify(endRun.stats.perSun)}`);
+      check(strip.chart.reduce((a, s) => a + s.kills, 0) === endRun.stats.kills, `${shot.name} chart bars do not add up to BURNED`);
+      console.log(`${shot.name} chart: ${strip.chart.map((s) => `${s.kills}/${s.fountain}`).join(' ')}`);
       console.log(`${shot.name}: ${strip.sub}; ${strip.buildIcons} build icons; 9/9 x${strip.nineOfNine}`);
       check(strip.runLine === runLine(endRun, bestBefore), `${shot.name} run line: shown ${strip.runLine} vs ${runLine(endRun, bestBefore)}`);
       console.log(`${shot.name}: ${strip.runLine}`);

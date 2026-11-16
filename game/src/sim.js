@@ -47,7 +47,8 @@ export function createRun(seed, difficultyId = 'normal', mode = 'campaign') {
     flareLeft: 0,
     chain: { count: 0, timer: 0, best: 0 },
     feedback: { searAt: -9, biteAt: -9, biteHarm: 0, quartzAt: -9 },
-    stats: { kills: 0, sunHeal: 0, leaked: 0, wavesCleared: 0, offersSeen: 0 },
+    // perSun: one entry per sun played, { kills, fountain } at its end (the results chart).
+    stats: { kills: 0, sunHeal: 0, leaked: 0, wavesCleared: 0, offersSeen: 0, perSun: [], sunStartKills: 0 },
     // What this run has met, for the Almanac: beetle kinds spawned, glass placed, charms offered.
     met: { enemies: [], glass: [], charms: [] },
     events: [],
@@ -187,6 +188,7 @@ function startWave(run) {
   run.flareCharges = FLARE_CHARGES + (run.boons.includes('flare2') ? CHARM_FX.flare2.charges : 0);
   run.flareLeft = 0;
   run.waveNotes = new Set();
+  run.stats.sunStartKills = run.stats.kills;
   refreshLight(run);
   emit(run, { type: 'waveStart', wave: run.waveIndex });
 }
@@ -196,6 +198,7 @@ function finishWave(run) {
   const before = run.shrineHp;
   if (run.boons.includes('sunstone')) run.shrineHp = Math.min(run.shrineMax, run.shrineHp + CHARM_FX.sunstone.heal);
   run.stats.sunHeal = run.shrineHp - before;
+  run.stats.perSun.push({ kills: run.stats.kills - run.stats.sunStartKills, fountain: run.shrineHp });
   const bonus = waveClearBonus(run);
   run.score += bonus;
   run.quartz += ECONOMY.waveQuartz + ECONOMY.waveQuartzPerWave * run.waveIndex;
@@ -217,6 +220,7 @@ function finishWave(run) {
 }
 
 function endRun(run, outcome) {
+  if (outcome === 'lost') run.stats.perSun.push({ kills: run.stats.kills - run.stats.sunStartKills, fountain: run.shrineHp });
   run.phase = outcome;
   run.endedAt = run.time;
   run.enemies.length = outcome === 'lost' ? run.enemies.length : 0;
