@@ -364,6 +364,11 @@
   (under the buttons) on a props layer drawn only in play; the prop-vs-text check (hud.hudTextBoxes
   + visible overlay text) is back in check-shot-truth.
 
+- Restore item 3: results keep the S ladder (now `FOR S: 40,000 x  FOUNTAIN 9 x  TITAN 0:25 v`) and the
+  flavour line, and bring back the run line `NORMAL - seed 2013 - 4:29 - +14,830 over best` (24 px,
+  combat.runLine, checked against the save's best before the run) and the charm names (14 px short
+  names under 48 px icons). Spacing trimmed to fit the 24 px margin (rank ring 104 px).
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

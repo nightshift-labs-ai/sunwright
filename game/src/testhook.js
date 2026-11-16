@@ -100,6 +100,7 @@ function resultsText() {
     chips: [...strip.querySelectorAll('.chip')].map((n) => ({ text: n.textContent.trim(), won: n.classList.contains('won') })),
     featsLabel: document.querySelector('#results-feats b')?.textContent.trim() ?? '',
     next: document.getElementById('results-next').textContent.trim(),
+    runLine: document.getElementById('results-run').textContent.trim(),
     buildIcons: buildIconCount(),
     nineOfNine: [...screen.querySelectorAll('*')].filter((n) => !n.childElementCount && n.textContent.includes('9/9')).length,
     sub: document.getElementById('results-sub').textContent.trim(),

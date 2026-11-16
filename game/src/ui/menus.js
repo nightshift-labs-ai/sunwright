@@ -5,7 +5,7 @@ import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, FEATS, NAMES, PIECES, PIECE_OR
 import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
-import { rankFor, rankLadder } from '../combat.js';
+import { rankFor, rankLadder, runLine } from '../combat.js';
 import { runSummary } from '../sim.js';
 import { loadFeats } from '../save.js';
 import { draftContext, draftHeal, draftHint, historyChip, nextGoal, titleRules } from '../announce.js';
@@ -183,8 +183,10 @@ export function showResults(menus, run, record, history) {
   requestAnimationFrame(() => fitLabels(el('results-stats')));
   // Status line: what S still needs, a drawn mark per threshold (seed and "over best" live elsewhere).
   const ladder = rankLadder(run);
-  el('results-meta').innerHTML = `<span>${escapeHtml(ladder.head)}</span>` + (ladder.marks.length ? `<span>FOR S:</span>${ladder.marks.map((m) => `<span class="req">${escapeHtml(m.label)}${markSvg(m.ok)}</span>`).join('')}` : '');
+  el('results-meta').classList.toggle('hidden', !ladder.head);
+  el('results-meta').innerHTML = `<span>${escapeHtml(ladder.head)}</span>` + ladder.marks.map((m) => `<span class="req">${escapeHtml(m.label)}${markSvg(m.ok)}</span>`).join('');
   requestAnimationFrame(() => fitLadder(el('results-meta')));
+  el('results-run').textContent = runLine(run, record.previousBest);
   // LAST 3 RUNS strip: the label and one chip per run (a fallen run's red chip says LOST - Day d phase).
   el('results-history').innerHTML = history.length
     ? `<div class="strip-head"><b>LAST ${history.length} RUN${history.length > 1 ? 'S' : ''}</b></div>` +

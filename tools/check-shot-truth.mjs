@@ -12,7 +12,7 @@ import { bannerLayout } from '../game/src/render/banner.js';
 import { FLOATER_REACH, beamHitAnchor, createFx, fxFromEvent, updateFx } from '../game/src/render/fx.js';
 import { DT } from '../game/src/config.js';
 import { BOARD_W, BOARD_X, BOARD_Y, CELL } from '../game/src/render/layout.js';
-import { rankFor, rankLadder } from '../game/src/combat.js';
+import { rankFor, rankLadder, runLine } from '../game/src/combat.js';
 import { MAX_STARBURSTS, beamModsFor, bigStarbursts, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
 import { boonById } from '../game/src/draft.js';
@@ -260,6 +260,8 @@ for (const shot of manifest.shots) {
       check(strip.buildIcons === new Set(endRun.boons).size, `${shot.name} YOUR BUILD icons ${strip.buildIcons} vs ${new Set(endRun.boons).size} charms`);
       check(strip.nineOfNine <= 2, `${shot.name}: 9/9 shown ${strip.nineOfNine} times`);
       console.log(`${shot.name}: ${strip.sub}; ${strip.buildIcons} build icons; 9/9 x${strip.nineOfNine}`);
+      check(strip.runLine === runLine(endRun, bestBefore), `${shot.name} run line: shown ${strip.runLine} vs ${runLine(endRun, bestBefore)}`);
+      console.log(`${shot.name}: ${strip.runLine}`);
       const lad = rankLadder(replayTo(shot.state.tick));
       check(JSON.stringify({ head: strip.ladder.head, marks: strip.ladder.marks }) === JSON.stringify(lad), `${shot.name} S ladder: shown ${JSON.stringify(strip.ladder)} vs ${JSON.stringify(lad)}`);
       check(strip.ladder.px >= 28 && strip.ladder.fit >= 0.92 && strip.ladder.fits, `${shot.name} S ladder: ${strip.ladder.px}px, fit ${strip.ladder.fit}`);

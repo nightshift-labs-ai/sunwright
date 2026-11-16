@@ -150,28 +150,32 @@ function drawYourBuild(ctx, run) {
   ctx.font = '900 30px system-ui, sans-serif';
   ctx.fillStyle = '#FFE27A';
   ctx.fillText('YOUR BUILD', 40, 570);
-  // One 56 px icon per charm taken (4 + 3 grid), an xN badge on repeats; no name labels.
+  // One 48 px icon per charm taken (4 + 3 grid) with its short name, an xN badge on repeats.
   const counts = new Map();
   for (const id of run.boons) counts.set(id, (counts.get(id) ?? 0) + 1);
   const icons = [...counts].slice(0, 8);
   icons.forEach(([id, n], k) => {
     const row = Math.floor(k / 4);
     const inRow = Math.min(4, icons.length - row * 4);
-    const x = 192 + (k % 4 - (inRow - 1) / 2) * 74;
-    const y = 620 + row * 68;
-    drawCharmBadge(ctx, boonById(id), x, y, 28);
+    const x = 192 + (k % 4 - (inRow - 1) / 2) * 80;
+    const y = 608 + row * 76;
+    drawCharmBadge(ctx, boonById(id), x, y, 24);
+    // Its short name under it (Mend, Long Sear, ...).
+    ctx.font = '800 14px system-ui, sans-serif';
+    ctx.fillStyle = '#FFF6DF';
+    ctx.textAlign = 'center';
+    fitText(ctx, NAMES.charmShort[id], x, y + 41, 78);
     if (n > 1) {
       ctx.fillStyle = '#F2C14E';
       ctx.beginPath();
-      ctx.arc(x + 22, y - 20, 13, 0, Math.PI * 2);
+      ctx.arc(x + 20, y - 18, 13, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#3B1247';
       ctx.lineWidth = 2;
       ctx.stroke();
       ctx.font = '900 15px system-ui, sans-serif';
       ctx.fillStyle = '#3B1247';
-      ctx.textAlign = 'center';
-      ctx.fillText(`x${n}`, x + 22, y - 15);
+      ctx.fillText(`x${n}`, x + 20, y - 13);
     }
   });
   lastBuildIcons = icons.length;
