@@ -28,7 +28,7 @@ const HOTBAR = { y: 716, w: 104, h: 76, gap: 8 };
 const HOTBAR_X = 640 - (PIECE_ORDER.length * (HOTBAR.w + HOTBAR.gap) + 150 + 190) / 2;
 
 /** The pause, speed and sound buttons under the right panels: icons only (Esc / F / M on the keyboard). */
-const HUD_BUTTONS = ['pause', 'speed', 'mute'].map((id, k) => ({ id, x: RIGHT_X + 4 + k * 70, y: 650, w: 62, h: 50 }));
+const HUD_BUTTONS = ['pause', 'speed', 'mute'].map((id, k) => ({ id, x: RIGHT_X + 4 + k * 70, y: 444, w: 62, h: 50 }));
 
 /** Which HUD button (pause, speed, mute) is under the mouse, or null. */
 export function hudButtonHit(px, py) {
@@ -253,6 +253,9 @@ function drawLeftPanel(ctx, run) {
   ctx.lineTo(LEFT_X + PANEL_W - 12, 140);
   ctx.stroke();
   drawFountainPips(ctx, run, 166);
+  // INCOMING sits in the left gutter under the fountain.
+  panel(ctx, LEFT_X, 304, PANEL_W, 196);
+  drawIncoming(ctx, run, LEFT_X, 304);
 }
 
 /** The wide bar across the top: day, phase and sun count, then the 9-sun track. */
@@ -295,8 +298,7 @@ function drawQuartzGem(ctx, x, y) {
 }
 
 /** INCOMING: what this sun brings (or still has on the way) and the Titan waiting at sun 9. */
-function drawIncoming(ctx, run, y0) {
-  const x0 = RIGHT_X;
+function drawIncoming(ctx, run, x0, y0) {
   const inWave = run.phase === 'wave';
   text(ctx, inWave ? `INCOMING - ${enemiesRemaining(run)} LEFT` : `${NAMES.sun} ${run.waveIndex + 1} BRINGS`, x0 + 12, y0 + 22, 15, inWave ? '#FFB0D8' : INK, 'left', 900);
   const roster = waveRoster(run.waveIndex, run.diff);
@@ -384,24 +386,23 @@ function drawTooltip(ctx, run, ui, y0) {
 }
 
 
+/** Right column, 20 px apart: SCORE with BEST, QUARTZ, CHARMS, the GLASS legend (the buttons sit under it). */
 function drawRightPanel(ctx, run, ui) {
   const x0 = RIGHT_X;
-  panel(ctx, x0, 8, PANEL_W, 128);
+  panel(ctx, x0, 8, PANEL_W, 104);
   text(ctx, 'SCORE', x0 + 12, 30, 15, INK, 'left', 900);
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 32, '#FFF2A8', 'right', 900);
   // BEST from the save (a difficulty never finished says so: no "BEST 0").
-  text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
-  panel(ctx, x0, 142, PANEL_W, 62);
-  text(ctx, NAMES.currency, x0 + 12, 170, 15, INK, 'left', 900);
+  text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 92, 15, '#FFD9A0', 'right', 900);
+  panel(ctx, x0, 132, PANEL_W, 62);
+  text(ctx, NAMES.currency, x0 + 12, 160, 15, INK, 'left', 900);
   drawQuartzGem(ctx, QUARTZ_ANCHOR.x, QUARTZ_ANCHOR.y);
   const pulse = Math.max(0, 1 - (run.time - run.feedback.quartzAt) / 0.3);
-  text(ctx, String(run.quartz), x0 + PANEL_W - 10, 190, 32 + pulse * 8, pulse > 0 ? '#FFFFFF' : '#BDF4FF', 'right', 900);
-  panel(ctx, x0, 212, PANEL_W, 222);
-  drawIncoming(ctx, run, 212);
-  panel(ctx, x0, 442, PANEL_W, 82);
-  drawCharmRow(ctx, run, 442);
-  panel(ctx, x0, 532, PANEL_W, 108);
-  drawTooltip(ctx, run, ui, 532);
+  text(ctx, String(run.quartz), x0 + PANEL_W - 10, 180, 32 + pulse * 8, pulse > 0 ? '#FFFFFF' : '#BDF4FF', 'right', 900);
+  panel(ctx, x0, 214, PANEL_W, 82);
+  drawCharmRow(ctx, run, 214);
+  panel(ctx, x0, 316, PANEL_W, 108);
+  drawTooltip(ctx, run, ui, 316);
 }
 
 
@@ -676,18 +677,6 @@ function drawHotbar(ctx, run, ui) {
   }
 }
 
-/** The play HUD's panels and text rows (props and other decoration must keep clear of these). */
-export function hudTextBoxes() {
-  const top = BOARD_X - WALL;
-  return [
-    { text: 'left panel', x0: LEFT_X, y0: 8, x1: LEFT_X + PANEL_W, y1: 8 + LEFT_PANEL_H },
-    { text: 'sun bar', x0: top + 4, y0: 4, x1: top + BOARD_W + WALL * 2 - 4, y1: 62 },
-    { text: 'win pill', x0: top, y0: 68, x1: top + BOARD_W + WALL * 2, y1: 112 },
-    { text: 'right panels', x0: RIGHT_X, y0: 8, x1: RIGHT_X + PANEL_W, y1: 640 },
-    { text: 'hotbar and keys', x0: HOTBAR_X, y0: HOTBAR.y, x1: 1200, y1: HOTBAR.y + HOTBAR.h },
-    { text: 'pause, speed, sound', x0: RIGHT_X, y0: 646, x1: RIGHT_X + PANEL_W, y1: 704 },
-  ];
-}
 
 export function drawHud(ctx, run, ui) {
   drawSunBar(ctx, run);

@@ -72,7 +72,7 @@ audio = await page.evaluate(() => window.__test.audio());
 expect((await savedMuted()) === false && !audio.muted && (audio.gain === null || audio.gain > 0.3), `M again turns the sound back on (gain ${audio.gain})`);
 
 // The HUD buttons under the right panels: speed toggles x2, sound mutes (saved), pause opens the menu.
-const hudButton = (k) => ({ x: 1062 + 4 + k * 70 + 31, y: 675 });
+const hudButton = (k) => ({ x: 1062 + 4 + k * 70 + 31, y: 469 });
 await page.mouse.click(hudButton(1).x, hudButton(1).y);
 await frame();
 expect((await state()).fast === true, 'the speed button turns x2 on');

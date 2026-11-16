@@ -99,85 +99,6 @@ function drawStarTile(g, x, y, s) {
   g.fill();
 }
 
-/** A potted palm: terracotta pot, muted fronds (kept dimmer than any beam). */
-function drawPalm(g, x, y) {
-  g.fillStyle = 'rgba(91,58,30,0.3)';
-  g.beginPath();
-  g.ellipse(x + 10, y + 34, 34, 10, 0, 0, Math.PI * 2);
-  g.fill();
-  g.strokeStyle = '#5E7A44';
-  g.lineWidth = 7;
-  g.lineCap = 'round';
-  for (const [dx, dy] of [[-46, -30], [-30, -58], [0, -66], [30, -58], [46, -30], [-20, -40], [22, -42]]) {
-    g.beginPath();
-    g.moveTo(x, y - 8);
-    g.quadraticCurveTo(x + dx * 0.4, y - 8 + dy * 0.9, x + dx, y + dy * 0.6);
-    g.stroke();
-  }
-  g.fillStyle = '#B5603A';
-  g.beginPath();
-  g.moveTo(x - 22, y - 8);
-  g.lineTo(x + 22, y - 8);
-  g.lineTo(x + 16, y + 30);
-  g.lineTo(x - 16, y + 30);
-  g.closePath();
-  g.fill();
-  g.fillStyle = PALETTE.gold;
-  g.fillRect(x - 22, y - 8, 44, 5);
-}
-
-/** A lapis-glazed urn with a gold band. */
-function drawUrn(g, x, y) {
-  g.fillStyle = 'rgba(91,58,30,0.3)';
-  g.beginPath();
-  g.ellipse(x + 8, y + 30, 28, 8, 0, 0, Math.PI * 2);
-  g.fill();
-  g.fillStyle = '#3A64C8';
-  g.beginPath();
-  g.ellipse(x, y + 6, 24, 26, 0, 0, Math.PI * 2);
-  g.fill();
-  g.fillRect(x - 10, y - 30, 20, 16);
-  g.fillStyle = PALETTE.gold;
-  g.fillRect(x - 24, y + 2, 48, 5);
-  g.fillRect(x - 13, y - 32, 26, 4);
-  g.fillStyle = 'rgba(255,255,255,0.25)';
-  g.beginPath();
-  g.ellipse(x - 8, y - 2, 6, 12, 0, 0, Math.PI * 2);
-  g.fill();
-}
-
-/**
- * Life outside the walls: a palm and urns on the sand, placed in the gaps the play HUD leaves, so no
- * prop touches text. Only the play screen shows them (draft and results put text there).
- */
-const PROPS = [
-  { kind: 'palm', x: 92, y: 470 },
-  { kind: 'urn', x: 150, y: 640 },
-];
-
-/** Each prop's bounding box, shadow and fronds included. */
-export function propBoxes() {
-  return PROPS.map((p) => (p.kind === 'palm' ? { text: 'palm', x0: p.x - 50, x1: p.x + 50, y0: p.y - 48, y1: p.y + 44 } : { text: 'urn', x0: p.x - 24, x1: p.x + 36, y0: p.y - 32, y1: p.y + 38 }));
-}
-
-let propCanvas = null;
-let propsShown = false;
-
-/** The props layer, drawn after the walls on the play screen only. */
-export function drawProps(ctx) {
-  if (!propCanvas) {
-    propCanvas = makeCanvas(VIEW_W, VIEW_H);
-    const g = propCanvas.getContext('2d');
-    for (const p of PROPS) (p.kind === 'palm' ? drawPalm : drawUrn)(g, p.x, p.y);
-  }
-  ctx.drawImage(propCanvas, 0, 0);
-  propsShown = true;
-}
-
-/** Whether the last frame drew the props (for the screenshot checks). */
-export function propsVisible() {
-  return propsShown;
-}
 
 /** The static frame: warm surround, lapis side walls, the north wall's oblique front, the low south wall. */
 function buildWallTexture() {
@@ -367,7 +288,6 @@ function drawGodRays(ctx, ap, slot, time) {
 
 /** Floor, walls, the day's three sun windows (lit / next / shuttered), labels and the burrows. */
 export function drawCourtyard(ctx, run, time, allLit = false) {
-  propsShown = false;
   floorCanvas ??= buildFloorTexture();
   wallCanvas ??= buildWallTexture();
   ctx.drawImage(wallCanvas, 0, 0);

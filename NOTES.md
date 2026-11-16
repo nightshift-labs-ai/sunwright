@@ -340,6 +340,11 @@
   tags on the title demo; board tags get a 2 px dark outline. check-shot-truth: no covered tag on the
   cover and the title demo, <= 5 title-demo labels. Cover text items 58 -> 53 (cover tick 4801 again).
 
+- Bench7 item 8: cover columns rebalanced: INCOMING (unchanged) moved to the left gutter under the
+  fountain (x 6-218, y 304-500); the right column is SCORE + BEST, QUARTZ, CHARMS, the GLASS legend and
+  the pause / speed / sound buttons, 20 px apart (11 text items); the palm and urn props and their
+  whole layer are gone. Quartz particles fly to the moved gem. Cover text items stay 53.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

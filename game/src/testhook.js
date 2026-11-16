@@ -10,25 +10,11 @@ import { loadHistory } from './save.js';
 import { audioProbe } from './audio.js';
 import { squeezeReport } from './render/fit.js';
 import { bannerLayout } from './render/banner.js';
-import { propBoxes, propsVisible } from './render/board.js';
 import { buildIconCount } from './render/results.js';
-import { hudTextBoxes, lastWinPill } from './render/hud.js';
+import { lastWinPill } from './render/hud.js';
 import { boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
 import { boardLabelBoxes } from './render/board.js';
 
-/** Props (palms, urns) drawn this frame whose box touches HUD text or a visible overlay's text. */
-function propOverlaps(app) {
-  if (!propsVisible()) return [];
-  const texts = app.screen === 'play' ? hudTextBoxes() : [];
-  for (const n of document.querySelectorAll('#stage .overlay:not(.hidden) *')) {
-    if (n.childElementCount || !n.textContent.trim()) continue;
-    const r = n.getBoundingClientRect();
-    texts.push({ text: n.textContent.trim().slice(0, 30), x0: r.left, y0: r.top, x1: r.right, y1: r.bottom });
-  }
-  const bad = [];
-  for (const p of propBoxes()) for (const t of texts) if (p.x0 < t.x1 && t.x0 < p.x1 && p.y0 < t.y1 && t.y0 < p.y1) bad.push(`${p.text} / ${t.text}`);
-  return bad;
-}
 
 /** The banner pill's wall and box as drawn (render/banner.js), or null. */
 function bannerBox(run) {
@@ -155,9 +141,6 @@ export function installTestHook(app, api) {
     /** Floating numbers that overlap each other, a floor label or a beam core (measured boxes). */
     textOverlaps() {
       return floaterOverlaps(app);
-    },
-    propOverlaps() {
-      return propOverlaps(app);
     },
     /** Covered board tags on the play board, or on the title demo's courtyard; and how many tags it has. */
     tagOverlaps() {
