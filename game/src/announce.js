@@ -51,18 +51,18 @@ export function announceEvents(run, events) {
 
 /**
  * The title's rules table, one row per rule (icon, gold tag, line), numbers from config: what the
- * beetles want, the verb, the moving sun, the SEAR combo as the sim scores it, the boss, win, lose.
+ * beetles want, the verb, the moving sun, the SEAR combo as the sim scores it, the boss; last, one
+ * full-width row with WIN and LOSE.
  */
 export function titleRules() {
   const fountain = NAMES.fountainShort;
   return [
     { icon: 'goal', tag: 'GOAL', line: `Beetles drink the ${fountain}` },
-    { icon: 'build', tag: 'BUILD', line: 'Glass bends sunlight onto them' },
+    { icon: 'build', tag: 'BUILD', line: 'Glass bends light onto them' },
     { icon: 'sun', tag: NAMES.sun, line: `New gate each ${NAMES.sun.toLowerCase()} - re-aim` },
-    { icon: 'sear', tag: NAMES.combo, line: `Kills within ${SCORING.chainWindow}s: points up to x${SCORING.chainMaxMult}` },
-    { icon: 'titan', tag: 'TITAN', line: `${NAMES.sun[0]}${NAMES.sun.slice(1).toLowerCase()} ${WAVE_COUNT} boss: the Hornback Titan` },
-    { icon: 'win', tag: 'WIN', line: `survive ${WAVE_COUNT} ${NAMES.suns.toLowerCase()}` },
-    { icon: 'lose', tag: 'LOSE', line: `the ${fountain.toLowerCase()} runs dry` },
+    { icon: 'sear', tag: NAMES.combo, line: `Kills within ${SCORING.chainWindow}s: up to x${SCORING.chainMaxMult}` },
+    { icon: 'titan', tag: 'TITAN', line: `${NAMES.sun[0]}${NAMES.sun.slice(1).toLowerCase()} ${WAVE_COUNT} boss: ${NAMES.enemy.titan[0]}${NAMES.enemy.titan.slice(1).toLowerCase().replace(' t', ' T')}` },
+    { tag: 'WIN', line: `survive ${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`, tag2: 'LOSE', line2: `${fountain.toLowerCase()} dry` },
   ];
 }
 

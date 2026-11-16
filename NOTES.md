@@ -309,6 +309,11 @@
   `best` line are gone (the BEST chip shows the selected best); the keycap bar has 5 keys (1-5 GLASS,
   Q/E TURN, SPACE FLARE, X SELL, M MUTE) at 36 px. Playtest: ENTER starts the selected difficulty,
   arrows move it, M mutes and saves; check-shot-truth: BEST = saved best, nothing outside the card.
+- Bench7 item 4: title rules table 6 rows at 32 px: GOAL / BUILD `Glass bends light onto them` / SUN /
+  SEAR `Kills within 1s: up to x5` / TITAN `Sun 9 boss: Hornback Titan` (shortened to fit, numbers
+  and names from config), last one full-width row: gold WIN `survive 9 suns` + red LOSE `fountain dry`
+  (fit 0.96). Card moved up to close the gap. check-shot-truth: rows = titleRules(), >= 32 px, fit >=
+  92%, inside the table, WIN/LOSE last.
 
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,

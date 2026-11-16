@@ -64,9 +64,19 @@ export function showTitle(menus, bestFor, selected) {
   el('title-best').textContent = best.played ? `BEST ${best.score.toLocaleString('en-US')}` : 'NO BEST YET';
   // The rules table: icon, gold tag, one line per rule (announce.titleRules, numbers from config).
   el('title-rules').innerHTML = titleRules()
-    .map((r) => `<div class="rule rule-${r.icon}"><canvas width="36" height="36" data-icon="${r.icon}"></canvas><b>${escapeHtml(r.tag)}</b><span>${escapeHtml(r.line)}</span></div>`)
+    .map((r) =>
+      r.tag2
+        ? `<div class="rule rule-winlose"><span class="fit"><b>${escapeHtml(r.tag)}</b>${escapeHtml(r.line)}<b class="lose">${escapeHtml(r.tag2)}</b>${escapeHtml(r.line2)}</span></div>`
+        : `<div class="rule rule-${r.icon}"><canvas width="36" height="36" data-icon="${r.icon}"></canvas><b>${escapeHtml(r.tag)}</b><span class="fit">${escapeHtml(r.line)}</span></div>`,
+    )
     .join('');
   for (const c of el('title-rules').querySelectorAll('canvas')) drawRuleIcon(c.getContext('2d'), c.dataset.icon, 36);
+  requestAnimationFrame(() => {
+    for (const n of el('title-rules').querySelectorAll('.fit')) {
+      n.style.setProperty('--fit', '1');
+      n.style.setProperty('--fit', String(fitScale(n.textContent, n.scrollWidth, n.clientWidth)));
+    }
+  });
 }
 
 /** The draft: a huge "SUN MOVES WEST - PICK 1", three roundels each with its one-line effect, NEW chip, reroll and how to pick. */

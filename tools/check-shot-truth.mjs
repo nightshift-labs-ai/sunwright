@@ -102,9 +102,10 @@ for (const shot of manifest.shots) if (shot.propOverlaps) check(shot.propOverlap
 for (const shot of manifest.shots) {
   if (!shot.titleText) continue;
   const t = shot.titleText;
-  const want = titleRules().map((r) => ({ tag: r.tag, line: r.line }));
-  check(JSON.stringify(t.rows.map((r) => ({ tag: r.tag, line: r.line }))) === JSON.stringify(want), `${shot.name} rules table: shown ${JSON.stringify(t.rows)} vs ${JSON.stringify(want)}`);
-  for (const r of t.rows) check(r.px >= 28 && r.inside, `${shot.name} rule ${r.tag}: ${r.px}px, inside ${r.inside}`);
+  const want = titleRules().map((r) => [r.tag, r.line, r.tag2, r.line2].filter(Boolean).join(' '));
+  check(JSON.stringify(t.rows.map((r) => r.text)) === JSON.stringify(want), `${shot.name} rules table: shown ${JSON.stringify(t.rows)} vs ${JSON.stringify(want)}`);
+  check(/^WIN .* LOSE /.test(t.rows.at(-1).text), `${shot.name}: WIN/LOSE is not the last rules row`);
+  for (const r of t.rows) check(r.px >= 32 && r.fit >= 0.92 && r.inside, `${shot.name} rule ${r.text}: ${r.px}px, fit ${r.fit}, inside ${r.inside}`);
   check(t.hint === 'CLICK PLAY OR PRESS ENTER' && t.hintPx >= 34, `${shot.name} start hint: ${t.hint} (${t.hintPx}px)`);
   // FEATS on the title: every feat any saved run earned (the earlier runs and the staged one, all replayed).
   const runs = [...(manifest.history ?? []).map((h) => runSummary(replayTo(h.endTick + 2, h.seed, h.log))), runSummary(replayTo(manifest.shots.find((s) => s.name === '4-results.jpg').state.tick))];
@@ -114,7 +115,7 @@ for (const shot of manifest.shots) {
   const bestWant = `BEST ${Math.max(...runs.filter((r) => r.difficultyId === manifest.difficulty).map((r) => r.score)).toLocaleString('en-US')}`;
   check(t.best === bestWant, `${shot.name} ${t.best} vs ${bestWant}`);
   check(!t.cardOverflow || t.cardOverflow.length === 0, `${shot.name} outside the title card: ${t.cardOverflow}`);
-  console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.tag} ${r.line}`).join(' | ')}; ${t.hint}; ${t.best}; ${t.feats}`);
+  console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.text} (${r.fit.toFixed(2)})`).join(' | ')}; ${t.hint}; ${t.best}; ${t.feats}`);
 }
 
 // Draft: each roundel's effect line is its charm's line from config, the pick hint counts the offer,

@@ -22,10 +22,11 @@ button.big:hover { background: #cf3f93; }
 .rule { display: contents; }
 .rule canvas { width: 36px; height: 36px; }
 .rule b { font: 900 22px system-ui, sans-serif; line-height: 1.3; text-align: center; color: #3b1247; background: #f2c14e; border-radius: 8px; }
-.rule span { font: 900 28px system-ui, sans-serif; line-height: 1.2; white-space: nowrap; color: #fff6df; }
-.rule-win span { color: #ffe27a; }
-.rule-lose span { color: #ffb0a8; }
-.title-card { position: absolute; left: 24px; top: 522px; bottom: 66px; width: 680px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 8px 8px; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 18px; }
+.rule span { display: block; overflow: visible; font: 900 32px system-ui, sans-serif; line-height: 1.2; white-space: nowrap; color: #fff6df; transform: scaleX(var(--fit, 1)); transform-origin: left center; }
+.rule-winlose span { grid-column: 1 / 4; display: flex; align-items: center; gap: 10px; color: #ffe27a; }
+.rule-winlose span b { padding: 0 10px; }
+.rule-winlose span b.lose { margin-left: 14px; color: #fff6df; background: #d63c3c; }
+.title-card { position: absolute; left: 24px; top: 500px; bottom: 66px; width: 680px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 8px 8px; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 18px; }
 #play-button { font-size: 52px; padding: 0 44px; }
 .play-row { display: flex; align-items: center; gap: 14px; }
 .featcount { font: 900 24px system-ui, sans-serif; color: #3b1247; background: #ffe27a; border: 3px solid #b8862c; border-radius: 16px; padding: 4px 14px; white-space: nowrap; }

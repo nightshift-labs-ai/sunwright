@@ -89,7 +89,11 @@ manifest.shots.at(-1).titleText = await page.evaluate(() => {
   const rows = [...document.querySelectorAll('#title-rules .rule')].map((row) => {
     const line = row.querySelector('span');
     const r = line.getBoundingClientRect();
-    return { tag: row.querySelector('b').textContent.trim(), line: line.textContent.trim(), px: parseFloat(getComputedStyle(line).fontSize), inside: r.right <= table.right - 4 && r.bottom <= table.bottom };
+    const fit = parseFloat(line.style.getPropertyValue('--fit') || '1');
+    const walker = document.createTreeWalker(row, NodeFilter.SHOW_TEXT);
+    const parts = [];
+    while (walker.nextNode()) if (walker.currentNode.nodeValue.trim()) parts.push(walker.currentNode.nodeValue.trim());
+    return { text: parts.join(' '), px: parseFloat(getComputedStyle(line).fontSize), fit, inside: r.right <= table.right - 4 && r.bottom <= table.bottom && line.scrollWidth * fit <= line.clientWidth + 1 };
   });
   const hint = document.getElementById('start-hint');
   return { rows, hint: hint.textContent.trim(), hintPx: parseFloat(getComputedStyle(hint).fontSize), feats: document.getElementById('feats-count').textContent.trim(), best: document.getElementById('title-best').textContent.trim(), cardOverflow: (() => {
