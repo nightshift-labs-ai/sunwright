@@ -4,9 +4,9 @@
 // Also checks each screenshot file: JPEG, 1280x800, at most 256 KiB, and the shots sort the cover first.
 //   node tools/check-shot-truth.mjs
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { ENEMIES, FEATS, WAVE_COUNT } from '../game/src/config.js';
+import { ENEMIES, FEATS, PIECE_ORDER, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
-import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
+import { createRun, enemiesRemaining, pieceCost, pieceUnlocked, runSummary, stepSim } from '../game/src/sim.js';
 import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, nextGoal, titanStatus, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
 import { bannerLayout } from '../game/src/render/banner.js';
 import { FLOATER_REACH, beamHitAnchor, createFx, fxFromEvent, updateFx } from '../game/src/render/fx.js';
@@ -232,6 +232,10 @@ for (const shot of manifest.shots) {
   if (lit.length < 0.7 * glass.length || stray.length) console.log(`NOTE ${shot.name}: solved plan not met (${stray.length} stray panes)`);
   check(shot.state.shrineHp < shot.state.shrineMax, `${shot.name} fountain is full: no lose threat on the cover`);
   check(/Lv[23]/.test(shot.state.upgraded), `${shot.name}: no upgraded glass on the cover`);
+  const unlockedCards = PIECE_ORDER.filter((t) => pieceUnlocked(run, t));
+  const affordable = unlockedCards.filter((t) => run.quartz >= pieceCost(run, t)).length;
+  check(affordable >= 3 && affordable < unlockedCards.length, `${shot.name}: ${affordable} of ${unlockedCards.length} build cards affordable`);
+  console.log(`${shot.name}: ${affordable} of ${unlockedCards.length} build cards affordable at ${run.quartz} quartz`);
   console.log(`${shot.name}: upgraded glass ${shot.state.upgraded}`);
   console.log(`${shot.name}: ${lit.length}/${glass.length} glass lit, ${glass.length - lit.length - stray.length} on the next sun's ghost, ${stray.length} stray, fountain ${shot.state.shrineHp}/${shot.state.shrineMax}`);
 }

@@ -3,13 +3,13 @@
 // style loops can call planRun over many seeds without a browser.
 import { bestUpgrade, layoutValue, playRun } from './balance.mjs';
 import { boardTagOverlaps, createFx, floaterConflicts, fxFromEvent, updateFx } from '../game/src/render/fx.js';
-import { DT, UPGRADES, WAVE_COUNT } from '../game/src/config.js';
+import { DT, PIECE_ORDER, UPGRADES, WAVE_COUNT } from '../game/src/config.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
 import { routeCells } from '../game/src/pathing.js';
 import { carapaceOpen } from '../game/src/enemies.js';
 import { placementCheck, setPiece } from '../game/src/grid.js';
-import { pieceCost, upgradeCost } from '../game/src/sim.js';
+import { pieceCost, pieceUnlocked, upgradeCost } from '../game/src/sim.js';
 
 /** The sun the cover shows (index; 4 = sun 5, Day 2 noon). STAGE_COVER_WAVE overrides it for experiments. */
 export const COVER_WAVE = Number(process.env.STAGE_COVER_WAVE ?? 4);
@@ -172,6 +172,9 @@ export function makeDirector(K, scars = null) {
       upgradesDone += up.length;
       orders.push(...up);
     }
+    // During the cover sun, quartz above 9 goes into upgrades (most-lit glass), as a player who upgrades
+    // between kills would: the cover then shows some cards lit and the dearest one greyed by its cost.
+    if (process.env.STAGE_SPEND !== '0' && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.quartz >= Number(process.env.STAGE_SPEND_AT ?? 10)) orders.push(...upgradeOrders(run, 1));
     // STAGE_CHASE=1: on the cover sun, turn glass live onto the swarm (every half second at most).
     if (process.env.STAGE_CHASE === '1' && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.tick % 30 === 0) {
       const turn = bestChaseTurn(run);
@@ -228,7 +231,11 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT, scars = null) {
     // Only ticks the screenshot checks would pass: no floater on a label, beam or floater, no covered tag.
     const litLive = run.enemies.filter((e) => e.litPower > 0 && !e.shielded && e.hp > 0).length;
     const upgraded = process.env.STAGE_UPGRADES === '0' || run.grid.pieces.some((p) => p && (p.level ?? 1) > 1);
-    if (!scars && upgraded && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0 && floaterConflicts(fx, run) === 0 && boardTagOverlaps(run).length === 0 && (process.env.STAGE_AIM !== '1' || litLive >= 3)) {
+    // Cards: at least 3 of the build cards affordable, and at least one unlocked card greyed by its cost.
+    const unlockedCards = PIECE_ORDER.filter((t) => pieceUnlocked(run, t));
+    const affordable = unlockedCards.filter((t) => run.quartz >= pieceCost(run, t)).length;
+    const cards = process.env.STAGE_CARDS === '0' || (affordable >= 3 && affordable < unlockedCards.length);
+    if (!scars && upgraded && cards && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0 && floaterConflicts(fx, run) === 0 && boardTagOverlaps(run).length === 0 && (process.env.STAGE_AIM !== '1' || litLive >= 3)) {
       const opaque = floaterConflicts(fx, run) === 0 ? fx.texts.filter((t) => t.life / t.max > 0.3).length : 0;
       const freshBite = bites.some((t) => run.time - t < 0.9);
       const s = run.grid.shrine;

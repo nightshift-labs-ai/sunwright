@@ -54,7 +54,7 @@ function floaterOverlaps(app) {
   boxes.forEach((b, i) => {
     boxes.slice(i + 1).forEach((o) => hit(b, o) && bad.push(`${b.text} / ${o.text}`));
     boardTextBoxes(run).forEach((l) => hit(b, l) && bad.push(`${b.text} / label ${l.text}`));
-    if (boxTouchesBeam(b, run.trace.legs)) bad.push(`${b.text} / beam`);
+    if (!b.text.includes('SEAR') && boxTouchesBeam(b, run.trace.legs)) bad.push(`${b.text} / beam`);
     if (beetleUnder(b, run)) bad.push(`${b.text} / beetle`);
   });
   return bad;

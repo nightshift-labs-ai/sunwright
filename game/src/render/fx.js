@@ -106,7 +106,8 @@ export function floaterConflicts(fx, run) {
   fx.texts.forEach((t, i) => {
     const box = floaterBox(t);
     if (fx.texts.slice(i + 1).some((o) => overlaps(box, floaterBox(o)))) n++;
-    if (labels.some((l) => overlaps(box, l)) || boxTouchesBeam(box, run.trace.legs) || beetleUnder(poppedBox(t), run)) n++;
+    // A SEAR number may sit over a beam (its dark pill keeps it readable); a plain one may not.
+    if (labels.some((l) => overlaps(box, l)) || (!t.text.includes('SEAR') && boxTouchesBeam(box, run.trace.legs)) || beetleUnder(poppedBox(t), run)) n++;
   });
   return n;
 }

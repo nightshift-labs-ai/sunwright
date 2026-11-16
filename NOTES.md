@@ -457,6 +457,14 @@
   cover tick 4354 (fountain 6/10, 18 Scuttlers, +60 SEAR x2); the draft's verdict reads HITS 2 PATH CELLS
   (was 6); cover quartz 3 greys three build cards (true at that tick). Nothing was removed from any shot.
 
+- Cover liveliness (operator 04:2xZ: judges liked the old cover's lit cards and busier wave): during the
+  cover sun the staged player turns quartz above 9 into upgrades (STAGE_SPEND_AT, most-lit glass), and the
+  planner only takes ticks with >= 3 build cards affordable and >= 1 greyed by its cost. A SEAR number may
+  now sit over a beam (its dark pill keeps it readable; plain numbers still may not; labels, beetles and
+  other numbers still never). Cover tick 4452: 18 beetles, `+40 SEAR x2` and `+20`, quartz 5 (mirror,
+  splitter, pillar lit; lens 7 and prism 8 greyed), the Lv2 mirror's pips, fountain 6/10. Run still wins
+  (36,440, 10/10). check-shot-truth asserts the card counts from the replayed run.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
