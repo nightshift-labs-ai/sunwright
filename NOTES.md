@@ -488,6 +488,13 @@
   measure-shots 4/4, names OK, pack 1.16 MB, kit check (only transcripts_present). The kit takes exactly
   4 shots, so the Almanac shows on the title as its button and keycap. Nothing removed from any shot.
 
+- Feel-and-look pass (operator 04:3xZ: rivals beat us only on look; do not add systems or remove info).
+  Item 1, one frame: every HUD panel, the sun bar, the WIN/LOSE banner and the HUD buttons are recessed
+  terracotta (rgba(96,42,20,0.9)) with a sandstone rim and a top inner shadow, and everything outside the
+  courtyard walls sits under a terracotta wash (hud.drawFrame), so the court is the brightest area. March
+  chevrons 0.72 -> 0.42 alpha, the next-sun ghost line 0.8 -> 0.5. Same text everywhere. Cover mean
+  luminance 0.47 (gate 0.45). Fixed after: YOUR BUILD charm names 13 px (Quartz Pull squeezed to 89%).
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

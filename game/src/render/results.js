@@ -161,7 +161,7 @@ function drawYourBuild(ctx, run) {
     const y = 608 + row * 76;
     drawCharmBadge(ctx, boonById(id), x, y, 24);
     // Its short name under it (Mend, Long Sear, ...).
-    ctx.font = '800 14px system-ui, sans-serif';
+    ctx.font = '800 13px system-ui, sans-serif';
     ctx.fillStyle = '#FFF6DF';
     ctx.textAlign = 'center';
     fitText(ctx, NAMES.charmShort[id], x, y + 41, 78);
