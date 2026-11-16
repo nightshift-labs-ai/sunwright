@@ -404,6 +404,12 @@
   the drawn bar with the sim (`TITAN_SHOT=/tmp/x.jpg` saves that frame to look at). Seen: in seed 2013
   the Titan takes almost no damage until she reaches the hottest cell, then dies within 0.1 s.
 
+- Item 5, title air: wordmark 160 -> 172 px in a 1222 px banner; the rules table spans the width in two
+  columns (GOAL / BUILD, SUN / SEAR, TITAN / WIN + LOSE) at 28 px with icons drawn from the game's own
+  sprites (a Scuttler heading for a fountain drop, the mirror, the sun and flame charm glyphs, the Titan
+  skull); below, the menu card (PLAY, BEST, FEATS, ENTER hint, GENTLE / NORMAL best N / SCORCHED, HOW
+  TO PLAY, OPTIONS) and the whole demo courtyard (scale 0.52) side by side. Rules check floor now 28 px.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

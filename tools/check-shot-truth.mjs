@@ -112,14 +112,14 @@ for (const shot of manifest.shots) {
 // Props: no palm or vase box touches text on any shot.
 for (const shot of manifest.shots) if (shot.propOverlaps) check(shot.propOverlaps.length === 0, `${shot.name} prop touches text: ${shot.propOverlaps.join(' | ')}`);
 
-// Title: the rules table rows are announce.titleRules() (numbers from config), lines >= 28 px and unclipped.
+// Title: the rules table rows are announce.titleRules() (numbers from config), two columns, lines >= 28 px and unclipped.
 for (const shot of manifest.shots) {
   if (!shot.titleText) continue;
   const t = shot.titleText;
   const want = titleRules().map((r) => [r.tag, r.line, r.tag2, r.line2].filter(Boolean).join(' '));
   check(JSON.stringify(t.rows.map((r) => r.text)) === JSON.stringify(want), `${shot.name} rules table: shown ${JSON.stringify(t.rows)} vs ${JSON.stringify(want)}`);
   check(/^WIN .* LOSE /.test(t.rows.at(-1).text), `${shot.name}: WIN/LOSE is not the last rules row`);
-  for (const r of t.rows) check(r.px >= 32 && r.fit >= 0.92 && r.inside, `${shot.name} rule ${r.text}: ${r.px}px, fit ${r.fit}, inside ${r.inside}`);
+  for (const r of t.rows) check(r.px >= 28 && r.fit >= 0.92 && r.inside, `${shot.name} rule ${r.text}: ${r.px}px, fit ${r.fit}, inside ${r.inside}`);
   check(t.hint === 'CLICK PLAY OR PRESS ENTER' && t.hintPx >= 34, `${shot.name} start hint: ${t.hint} (${t.hintPx}px)`);
   // FEATS on the title: every feat any saved run earned (the earlier runs and the staged one, all replayed).
   const runs = [...(manifest.history ?? []).map((h) => runSummary(replayTo(h.endTick + 2, h.seed, h.log))), runSummary(replayTo(manifest.shots.find((s) => s.name === '4-results.jpg').state.tick))];

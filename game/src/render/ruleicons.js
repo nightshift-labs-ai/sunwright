@@ -2,6 +2,8 @@
 // the fountain droplet, a mirror, the sun, the SEAR flame, the Titan skull, a gold star, a dry drop.
 import { drawCharmGlyph } from './charms.js';
 import { drawPieceIcon, drawTitanSkull } from './hud.js';
+import { drawEnemy } from './beetles.js';
+import { ENEMIES } from '../config.js';
 
 function droplet(ctx, x, y, r, fill, stroke) {
   ctx.beginPath();
@@ -33,11 +35,20 @@ function star(ctx, x, y, r) {
   ctx.stroke();
 }
 
+const CELL_OFFSET = 0;
+
 /** Draw one rules-table icon centred in a size x size canvas. */
 export function drawRuleIcon(ctx, kind, size) {
   const c = size / 2;
   ctx.clearRect(0, 0, size, size);
-  if (kind === 'goal') droplet(ctx, c, c + 1, c - 3, '#3FD0E0', '#0D4F66');
+  if (kind === 'goal') {
+    // A Scuttler (the game's own sprite) heading for a fountain droplet.
+    droplet(ctx, c + 9, c + 3, c - 9, '#3FD0E0', '#0D4F66');
+    ctx.save();
+    ctx.translate(-CELL_OFFSET, 0);
+    drawEnemy(ctx, { id: 1, type: 'scuttler', def: { ...ENEMIES.scuttler, size: 0.22 }, heading: 0, hp: 1, maxHp: 1, litPower: 0, age: 0, x: (c - 7) / 60 - 250 / 60 + CELL_OFFSET / 60, y: c / 60 - 140 / 60, burn: 0, slow: 0 }, 0, false);
+    ctx.restore();
+  }
   else if (kind === 'lose') droplet(ctx, c, c + 1, c - 3, null, '#FF6B5E');
   else if (kind === 'win') star(ctx, c, c + 1, c - 2);
   else if (kind === 'titan') drawTitanSkull(ctx, c, c, c * 0.62, false, '#FF6B5E');

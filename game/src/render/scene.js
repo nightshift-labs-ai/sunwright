@@ -28,8 +28,8 @@ function drawCellCursor(ctx, cell, ok) {
   }
 }
 
-/** Where the title's demo courtyard sits: whole, right of the rules table, above HOW TO PLAY / OPTIONS. */
-const TITLE_DEMO = { x: 986, y: 434, scale: 0.649, bottom: 736 };
+/** Where the title's demo courtyard sits: whole, right of the menu card, under the two-column rules. */
+const TITLE_DEMO = { x: 982, y: 568, scale: 0.52, bottom: 736 };
 
 const nextCache = { run: null, version: -1, value: null };
 
