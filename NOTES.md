@@ -286,6 +286,13 @@
   blue/gold prism light, red-orange for red light (red + gold lighten to orange, never lilac); tinted
   core 9.5 px (cap 11) and a 3 px white-hot centre; +8% while a SEAR combo is live. Kept: no white
   cell squares, lit panes glow on the sprite. Cover: 0 blown 32 px blocks.
+- The three cues the A/B missed are back: BEST under SCORE (NO BEST YET before a first finished run),
+  BEST beside PLAY on the title (the selected difficulty's saved best: BEST 33,090, with FEATS 4/6),
+  DRY = RUN LOST under the fountain drops, NEXT GOAL under the FEATS row on results
+  (announce.nextGoal). Same commit drops duplicates on the cover: the dial's N/W/E letters (the wall
+  tags say SUN - N/W/E) and the flare panel's SPACE (the key line says SPACE flare). Cover canvas text
+  items 60 -> 58. check-shot-truth: NEXT GOAL vs the replayed run, title BEST vs the saved runs, and
+  nothing in the title card sticks out of it.
 
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,

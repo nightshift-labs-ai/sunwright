@@ -8,7 +8,7 @@ import { waveRoster } from '../waves.js';
 import { rankFor } from '../combat.js';
 import { runSummary } from '../sim.js';
 import { loadFeats } from '../save.js';
-import { draftContext, draftHeal, draftHint, historyChip, titleRules } from '../announce.js';
+import { draftContext, draftHeal, draftHint, historyChip, nextGoal, titleRules } from '../announce.js';
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
 import { drawRuleIcon } from '../render/ruleicons.js';
@@ -62,6 +62,8 @@ export function showTitle(menus, bestFor, selected) {
   }).join('');
   el('rule-scope').textContent = SCOPE_LINE;
   el('feats-count').textContent = `FEATS ${loadFeats().length}/${FEATS.length}`;
+  const best = bestFor(selected);
+  el('title-best').textContent = best.played ? `BEST ${best.score.toLocaleString('en-US')}` : 'NO BEST YET';
   // The rules table: icon, gold tag, one line per rule (announce.titleRules, numbers from config).
   el('title-rules').innerHTML = titleRules()
     .map((r) => `<div class="rule rule-${r.icon}"><canvas width="36" height="36" data-icon="${r.icon}"></canvas><b>${escapeHtml(r.tag)}</b><span>${escapeHtml(r.line)}</span></div>`)
@@ -168,6 +170,7 @@ export function showResults(menus, run, record, history) {
     : '';
   // FEATS this run earned, as gold medals (config FEATS, tested on the finished run).
   const earned = runSummary(run).feats;
+  el('results-next').textContent = nextGoal(run);
   el('results-feats').innerHTML = `<b>FEATS ${earned.length}/${FEATS.length}</b>` + earned.map((id) => `<span class="feat"><i></i>${escapeHtml(FEATS.find((f) => f.id === id).name)}</span>`).join('');
 }
 

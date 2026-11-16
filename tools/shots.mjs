@@ -92,7 +92,10 @@ manifest.shots.at(-1).titleText = await page.evaluate(() => {
     return { tag: row.querySelector('b').textContent.trim(), line: line.textContent.trim(), px: parseFloat(getComputedStyle(line).fontSize), inside: r.right <= table.right - 4 && r.bottom <= table.bottom };
   });
   const hint = document.getElementById('start-hint');
-  return { rows, hint: hint.textContent.trim(), hintPx: parseFloat(getComputedStyle(hint).fontSize), feats: document.getElementById('feats-count').textContent.trim() };
+  return { rows, hint: hint.textContent.trim(), hintPx: parseFloat(getComputedStyle(hint).fontSize), feats: document.getElementById('feats-count').textContent.trim(), best: document.getElementById('title-best').textContent.trim(), cardOverflow: (() => {
+    const card = document.querySelector('.title-card').getBoundingClientRect();
+    return [...document.querySelectorAll('.title-card button, .title-card span, .title-card p')].filter((n) => { const r = n.getBoundingClientRect(); return r.left < card.left || r.right > card.right; }).map((n) => n.textContent.trim().slice(0, 20));
+  })() };
 });
 manifest.log = log;
 writeFileSync('tools/shots-manifest.json', JSON.stringify(manifest));

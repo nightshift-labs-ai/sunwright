@@ -26,9 +26,9 @@ button.big:hover { background: #cf3f93; }
 .rule-win span { color: #ffe27a; }
 .rule-lose span { color: #ffb0a8; }
 .title-card { position: absolute; left: 24px; top: 522px; bottom: 66px; width: 680px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 8px 14px; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 18px; }
-#play-button { font-size: 52px; padding: 0 80px; }
-.play-row { display: flex; align-items: center; gap: 18px; }
-.featcount { font: 900 26px system-ui, sans-serif; color: #3b1247; background: #ffe27a; border: 3px solid #b8862c; border-radius: 16px; padding: 4px 14px; white-space: nowrap; }
+#play-button { font-size: 52px; padding: 0 44px; }
+.play-row { display: flex; align-items: center; gap: 14px; }
+.featcount { font: 900 24px system-ui, sans-serif; color: #3b1247; background: #ffe27a; border: 3px solid #b8862c; border-radius: 16px; padding: 4px 14px; white-space: nowrap; }
 .start-hint { margin: 0; font: 900 34px system-ui, sans-serif; color: #ffe27a; white-space: nowrap; letter-spacing: 0; }
 .picker { display: flex; gap: 8px; width: 100%; }
 .diff { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 6px 2px; background: #2d5bd0; border-radius: 16px; letter-spacing: 0; }
@@ -89,7 +89,7 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
 .results-head { position: absolute; left: 24px; right: 24px; top: 24px; height: 126px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(#2d5bd0, #1f3f99); border: 5px solid #f2c14e; border-radius: 18px; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
 #results-title { margin: 0; width: max-content; white-space: nowrap; font: 900 104px system-ui, sans-serif; line-height: 1; letter-spacing: -1px; color: #ffe27a; -webkit-text-stroke: 3px #3b1247; paint-order: stroke fill; transform: scaleX(var(--fit, 1)); }
 .lost #results-title { color: #ff8a8a; }
-.sheet.results { position: absolute; right: 24px; top: 164px; width: 876px; box-sizing: border-box; margin: 0; padding: 10px 18px 12px; gap: 8px; background: linear-gradient(#fdf0d0, #f0d39c); border: 5px solid #f2c14e; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
+.sheet.results { position: absolute; right: 24px; top: 164px; width: 876px; box-sizing: border-box; margin: 0; padding: 8px 18px 10px; gap: 4px; background: linear-gradient(#fdf0d0, #f0d39c); border: 5px solid #f2c14e; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
 .lost .sheet.results { border-color: #ff8a8a; }
 .results .sub { margin: 0; font-size: 34px; font-weight: 900; color: #3b1247; text-shadow: none; }
 .score { font: 900 76px system-ui, sans-serif; line-height: 1; color: #7a2e14; display: flex; align-items: center; gap: 18px; }
@@ -101,7 +101,8 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
 .stats div { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4px 6px; background: #2d5bd0; border: 3px solid #f2c14e; border-radius: 12px; overflow: hidden; }
 .stats small { display: inline-block; font-size: 30px; font-weight: 900; color: #ffe27a; line-height: 1.1; white-space: nowrap; transform: scaleX(var(--fit, 1)); }
 .stats b { font-size: 38px; font-weight: 900; color: #fff6df; line-height: 1.05; white-space: nowrap; }
-.meta { margin: 0; font: 900 30px system-ui, sans-serif; color: #3b1247; white-space: nowrap; }
+.meta, .next-goal { margin: 0; font: 900 30px system-ui, sans-serif; color: #3b1247; white-space: nowrap; }
+.next-goal { color: #7a2e14; }
 .feats { display: flex; align-items: center; justify-content: center; gap: 7px; }
 .feats b { font: 900 24px system-ui, sans-serif; color: #7a2e14; white-space: nowrap; }
 .feats .feat { display: flex; align-items: center; gap: 5px; padding: 1px 9px 1px 4px; font: 900 20px system-ui, sans-serif; color: #3b1247; background: #ffe27a; border: 3px solid #b8862c; border-radius: 16px; white-space: nowrap; }

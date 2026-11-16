@@ -20,8 +20,8 @@ const INK = '#FFF6DF';
 const GOLD = '#F2C14E';
 const FONT = 'system-ui, "Segoe UI", sans-serif';
 const PANEL_W = 212;
-/** The left panel: sun dial, then the FOUNTAIN pips (the next sun and the lose rule are said once, elsewhere). */
-const LEFT_PANEL_H = 250;
+/** The left panel: sun dial, then the FOUNTAIN pips with DRY = RUN LOST under them (the next sun is the pill's). */
+const LEFT_PANEL_H = 282;
 const LEFT_X = 6;
 const RIGHT_X = VIEW_W - PANEL_W - 6;
 
@@ -200,7 +200,6 @@ function drawSunDial(ctx, run, cx, cy) {
       ctx.stroke();
       ctx.setLineDash([]);
     }
-    text(ctx, wall[0].toUpperCase(), gx, gy + (wall === 'north' ? -22 : 30), 15, INK, 'center', 900);
   }
 }
 
@@ -241,6 +240,7 @@ function drawFountainPips(ctx, run, y) {
       ctx.stroke();
     }
   }
+  fitLine(ctx, ['EMPTY = RUN LOST', 'DRY = RUN LOST'], LEFT_X + PANEL_W / 2, y + 100, PANEL_W - 20, 20, '#FFB0B0', 'center');
 }
 
 
@@ -396,6 +396,8 @@ function drawRightPanel(ctx, run, ui) {
   panel(ctx, x0, 8, PANEL_W, 128);
   text(ctx, 'SCORE', x0 + 12, 30, 15, INK, 'left', 900);
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 32, '#FFF2A8', 'right', 900);
+  // BEST from the save (a difficulty never finished says so: no "BEST 0").
+  text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
   drawComboLine(ctx, run, x0, 120);
   panel(ctx, x0, 142, PANEL_W, 62);
   text(ctx, NAMES.currency, x0 + 12, 170, 15, INK, 'left', 900);
@@ -642,10 +644,10 @@ function drawHotbar(ctx, run, ui) {
     ctx.arc(fx + 30, HOTBAR.y + 38, 24, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (run.flareLeft / BEAM.flareSeconds));
     ctx.stroke();
   }
-  text(ctx, 'SPACE', fx + 62, HOTBAR.y + 26, 15, GOLD, 'left', 900);
-  text(ctx, NAMES.flare, fx + 62, HOTBAR.y + 48, 20, INK, 'left', 900);
+  // The key is in the key line (SPACE flare); the panel says what and whether it is ready.
+  text(ctx, NAMES.flare, fx + 62, HOTBAR.y + 36, 20, INK, 'left', 900);
   const flareState = run.flareLeft > 0 ? 'BURNING' : ready ? 'READY' : run.phase === 'wave' ? 'USED' : 'NEXT SUN';
-  text(ctx, flareState, fx + 62, HOTBAR.y + 69, 15, ready ? '#7DFFC4' : '#FFF2A8', 'left', 900);
+  text(ctx, flareState, fx + 62, HOTBAR.y + 60, 15, ready ? '#7DFFC4' : '#FFF2A8', 'left', 900);
   ctx.globalAlpha = 1;
   if (run.phase === 'build') {
     const bx = fx + 150;

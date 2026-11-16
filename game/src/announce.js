@@ -1,6 +1,6 @@
 // The courtyard's voice: turns notable sim events into the three-line event log and the big
 // banner over the board. Pure sim state (no DOM), so screenshots can be checked against it.
-import { NAMES, SCORING, WAVE_COUNT } from './config.js';
+import { DIFFICULTIES, DIFFICULTY_ORDER, NAMES, SCORING, WAVE_COUNT } from './config.js';
 import { sunApertureFor } from './sun.js';
 
 const LOG_LINES = 3;
@@ -106,4 +106,11 @@ export function draftHint(run) {
 /** One RUN HISTORY chip on the results screen, from a saved run summary. */
 export function historyChip(h) {
   return h.outcome === 'won' ? `WON ${h.suns}/${WAVE_COUNT}` : `LOST - Day ${h.day} ${h.phase.toLowerCase()}`;
+}
+
+/** What to aim for next, from a finished run's outcome and difficulty (the results' NEXT GOAL line). */
+export function nextGoal(run) {
+  if (run.phase !== 'won') return `NEXT GOAL: hold ${run.stats.wavesCleared + 1} ${NAMES.suns.toLowerCase()}`;
+  const harder = DIFFICULTY_ORDER[DIFFICULTY_ORDER.indexOf(run.difficultyId) + 1];
+  return harder ? `NEXT GOAL: win on ${DIFFICULTIES[harder].name}` : `NEXT GOAL: beat ${run.score.toLocaleString('en-US')}`;
 }

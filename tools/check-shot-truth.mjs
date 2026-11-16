@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { ENEMIES, FEATS, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
-import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
+import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, nextGoal, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
 import { bannerLayout } from '../game/src/render/banner.js';
 import { FLOATER_REACH, beamHitAnchor, createFx, fxFromEvent, updateFx } from '../game/src/render/fx.js';
 import { DT } from '../game/src/config.js';
@@ -110,7 +110,11 @@ for (const shot of manifest.shots) {
   const runs = [...(manifest.history ?? []).map((h) => runSummary(replayTo(h.endTick + 2, h.seed, h.log))), runSummary(replayTo(manifest.shots.find((s) => s.name === '4-results.jpg').state.tick))];
   const featsWant = `FEATS ${new Set(runs.flatMap((r) => r.feats)).size}/${FEATS.length}`;
   check(t.feats === featsWant, `${shot.name} ${t.feats} vs ${featsWant}`);
-  console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.tag} ${r.line}`).join(' | ')}; ${t.hint}; ${t.feats}`);
+  // BEST beside PLAY: the selected difficulty's best saved score (the staging plays Normal).
+  const bestWant = `BEST ${Math.max(...runs.filter((r) => r.difficultyId === manifest.difficulty).map((r) => r.score)).toLocaleString('en-US')}`;
+  check(t.best === bestWant, `${shot.name} ${t.best} vs ${bestWant}`);
+  check(!t.cardOverflow || t.cardOverflow.length === 0, `${shot.name} outside the title card: ${t.cardOverflow}`);
+  console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.tag} ${r.line}`).join(' | ')}; ${t.hint}; ${t.best}; ${t.feats}`);
 }
 
 // Draft: each roundel's effect line is its charm's line from config, the pick hint counts the offer,
@@ -218,7 +222,8 @@ for (const shot of manifest.shots) {
       if (shot.state.phase === 'won') check(strip.capElsewhere === 0, `${shot.name} lose title shown outside the strip on a win`);
       const featWant = runSummary(replayTo(shot.state.tick)).feats.map((id) => FEATS.find((f) => f.id === id).name);
       check(JSON.stringify(strip.feats) === JSON.stringify(featWant) && strip.featsLabel === `FEATS ${featWant.length}/${FEATS.length}`, `${shot.name} FEATS: shown ${strip.featsLabel} ${strip.feats} vs ${featWant}`);
-      console.log(`${shot.name} ${strip.featsLabel}: ${strip.feats.join(', ')}`);
+      check(strip.next === nextGoal(replayTo(shot.state.tick)), `${shot.name} next goal: shown ${strip.next} vs ${nextGoal(replayTo(shot.state.tick))}`);
+      console.log(`${shot.name} ${strip.featsLabel}: ${strip.feats.join(', ')}; ${strip.next}`);
       console.log(`${shot.name} strip: ${strip.label} (${strip.labelPx}px) ${strip.cap} (${strip.capPx}px) | ${strip.chips.map((c) => c.text).join(' | ')}`);
     }
     console.log(`${shot.name} RUN HISTORY: ${expected.map((h) => `${h.outcome} day ${h.day} ${h.phase} ${h.score}`).join(' | ')}; BEST before ${bestBefore}`);
