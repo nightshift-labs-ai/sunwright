@@ -294,6 +294,12 @@
   items 60 -> 58. check-shot-truth: NEXT GOAL vs the replayed run, title BEST vs the saved runs, and
   nothing in the title card sticks out of it.
 
+- Bench7 item 1: results status line is the S ladder (combat.rankLadder from RANK_THRESHOLDS[0]):
+  `NORMAL 4:29  FOR S: 40,000 x  FOUNTAIN 9 x  TITAN 0:25 v` at 28 px with drawn SVG marks (green
+  tick / red cross); TOP RANK - S on an S run; NORMAL - m:ss on a loss. Seed and "over best" dropped
+  (S - SAME SEED and NEW BEST say them). Fitted at 93% (904 px natural in 842). check-shot-truth
+  recomputes the head and each mark from the replayed run and checks size and fit.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

@@ -5,7 +5,7 @@ import { DIFFICULTY_ORDER, DIFFICULTIES, ENEMIES, FEATS, NAMES, PIECES, PIECE_OR
 import { boonById, rerollCost } from '../draft.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
-import { rankFor } from '../combat.js';
+import { rankFor, rankLadder } from '../combat.js';
 import { runSummary } from '../sim.js';
 import { loadFeats } from '../save.js';
 import { draftContext, draftHeal, draftHint, historyChip, nextGoal, titleRules } from '../announce.js';
@@ -112,6 +112,18 @@ function synergyTag(run, id) {
   return partner && run.boons.includes(partner) ? `<span class="synergy">+ pairs with ${escapeHtml(boonById(partner).name)}</span>` : '';
 }
 
+/** A drawn mark for the S ladder: green circle with a tick, or red circle with a cross. */
+function markSvg(ok) {
+  const sign = ok ? '<path d="M6.5 12.5l3.6 3.6 7.4-8.2" />' : '<path d="M7.5 7.5l9 9M16.5 7.5l-9 9" />';
+  return `<svg class="mark ${ok ? 'ok' : 'no'}" data-ok="${ok}" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="${ok ? '#2BB673' : '#E0453A'}"/><g stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round">${sign}</g></svg>`;
+}
+
+/** Squeeze the ladder line to its plaque, never under 92% (render/fit.js). */
+function fitLadder(node) {
+  node.style.setProperty('--fit', '1');
+  node.style.setProperty('--fit', String(fitScale(node.textContent, node.scrollWidth, node.parentElement.clientWidth - 24)));
+}
+
 /** Fit each stat label to its tile on one line, never squeezed under 92% (needs the overlay shown). */
 function fitLabels(root) {
   for (const label of root.querySelectorAll('.stats small')) {
@@ -161,8 +173,10 @@ export function showResults(menus, run, record, history) {
   ];
   el('results-stats').innerHTML = tiles.map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join('');
   requestAnimationFrame(() => fitLabels(el('results-stats')));
-  const delta = run.score - record.previousBest;
-  el('results-meta').textContent = `${run.diff.name} - seed ${run.seed} - ${clock(run.time)} - ${delta >= 0 ? `+${delta.toLocaleString('en-US')} over best` : `${(-delta).toLocaleString('en-US')} under best`}`;
+  // Status line: what S still needs, a drawn mark per threshold (seed and "over best" live elsewhere).
+  const ladder = rankLadder(run);
+  el('results-meta').innerHTML = `<span>${escapeHtml(ladder.head)}</span>` + (ladder.marks.length ? `<span>FOR S:</span>${ladder.marks.map((m) => `<span class="req">${escapeHtml(m.label)}${markSvg(m.ok)}</span>`).join('')}` : '');
+  requestAnimationFrame(() => fitLadder(el('results-meta')));
   // LAST 3 RUNS strip: the label and one chip per run (a fallen run's red chip says LOST - Day d phase).
   el('results-history').innerHTML = history.length
     ? `<div class="strip-head"><b>LAST ${history.length} RUN${history.length > 1 ? 'S' : ''}</b></div>` +

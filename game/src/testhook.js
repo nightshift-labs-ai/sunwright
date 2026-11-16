@@ -98,6 +98,19 @@ function resultsText() {
     chips: [...strip.querySelectorAll('.chip')].map((n) => ({ text: n.textContent.trim(), won: n.classList.contains('won') })),
     featsLabel: document.querySelector('#results-feats b')?.textContent.trim() ?? '',
     next: document.getElementById('results-next').textContent.trim(),
+    ladder: (() => {
+      const meta = document.getElementById('results-meta');
+      const spans = [...meta.children].filter((n) => n.tagName === 'SPAN');
+      return {
+        head: spans[0]?.textContent.trim() ?? '',
+        marks: [...meta.querySelectorAll('.req')].map((n) => ({ label: n.textContent.trim(), ok: n.querySelector('svg')?.dataset.ok === 'true' })),
+        px: parseFloat(getComputedStyle(meta).fontSize),
+        fit: parseFloat(meta.style.getPropertyValue('--fit') || '1'),
+        fits: meta.scrollWidth * 0.92 <= meta.parentElement.clientWidth - 24,
+        natural: meta.scrollWidth,
+        room: meta.parentElement.clientWidth - 24,
+      };
+    })(),
     feats: [...document.querySelectorAll('#results-feats .feat')].map((n) => n.textContent.trim()),
   };
 }

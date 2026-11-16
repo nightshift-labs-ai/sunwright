@@ -89,7 +89,7 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
 .results-head { position: absolute; left: 24px; right: 24px; top: 24px; height: 126px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(#2d5bd0, #1f3f99); border: 5px solid #f2c14e; border-radius: 18px; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
 #results-title { margin: 0; width: max-content; white-space: nowrap; font: 900 104px system-ui, sans-serif; line-height: 1; letter-spacing: -1px; color: #ffe27a; -webkit-text-stroke: 3px #3b1247; paint-order: stroke fill; transform: scaleX(var(--fit, 1)); }
 .lost #results-title { color: #ff8a8a; }
-.sheet.results { position: absolute; right: 24px; top: 164px; width: 876px; box-sizing: border-box; margin: 0; padding: 8px 18px 10px; gap: 4px; background: linear-gradient(#fdf0d0, #f0d39c); border: 5px solid #f2c14e; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
+.sheet.results { position: absolute; right: 24px; top: 164px; width: 876px; box-sizing: border-box; margin: 0; padding: 8px 12px 10px; gap: 4px; background: linear-gradient(#fdf0d0, #f0d39c); border: 5px solid #f2c14e; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
 .lost .sheet.results { border-color: #ff8a8a; }
 .results .sub { margin: 0; font-size: 34px; font-weight: 900; color: #3b1247; text-shadow: none; }
 .score { font: 900 76px system-ui, sans-serif; line-height: 1; color: #7a2e14; display: flex; align-items: center; gap: 18px; }
@@ -102,6 +102,9 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
 .stats small { display: inline-block; font-size: 30px; font-weight: 900; color: #ffe27a; line-height: 1.1; white-space: nowrap; transform: scaleX(var(--fit, 1)); }
 .stats b { font-size: 38px; font-weight: 900; color: #fff6df; line-height: 1.05; white-space: nowrap; }
 .meta, .next-goal { margin: 0; font: 900 30px system-ui, sans-serif; color: #3b1247; white-space: nowrap; }
+.meta { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 28px; width: max-content; transform: scaleX(var(--fit, 1)); }
+.meta .req { display: inline-flex; align-items: center; gap: 3px; }
+.meta .mark { width: 24px; height: 24px; flex: none; }
 .next-goal { color: #7a2e14; }
 .feats { display: flex; align-items: center; justify-content: center; gap: 7px; }
 .feats b { font: 900 24px system-ui, sans-serif; color: #7a2e14; white-space: nowrap; }

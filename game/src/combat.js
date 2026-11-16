@@ -110,6 +110,32 @@ export function rankFor(run) {
   return tier ? tier.rank : 'C';
 }
 
+function clockText(seconds) {
+  const s = Math.max(0, Math.round(seconds));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+/**
+ * The results status line. A won run short of S lists what S needs (RANK_THRESHOLDS[0]) with a mark
+ * each: { head: 'NORMAL 4:29', marks: [{ label: '40,000', ok }, ...] }; an S run { head: 'TOP RANK - S' };
+ * a lost run { head: 'NORMAL - m:ss' }.
+ */
+export function rankLadder(run) {
+  const time = clockText(run.time);
+  if (run.phase !== 'won') return { head: `${run.diff.name} - ${time}`, marks: [] };
+  if (rankFor(run) === 'S') return { head: 'TOP RANK - S', marks: [] };
+  const s = RANK_THRESHOLDS[0];
+  const titan = run.stats.titanSeconds ?? Infinity;
+  return {
+    head: `${run.diff.name} ${time}`,
+    marks: [
+      { label: s.score.toLocaleString('en-US'), ok: run.score >= s.score },
+      { label: `FOUNTAIN ${s.fountain}`, ok: run.shrineHp >= s.fountain },
+      { label: `TITAN ${clockText(s.titanSeconds)}`, ok: titan <= s.titanSeconds },
+    ],
+  };
+}
+
 /** End-of-wave bonus: points for every Sun Fountain HP left plus a clear bonus that grows each wave. */
 export function waveClearBonus(run) {
   return run.shrineHp * SCORING.perShrineHp + SCORING.waveClear * (run.waveIndex + 1);
