@@ -450,6 +450,13 @@
   the gentle seeds that win go on to suns 10, 13, 14. Playtest: E locked does nothing; unlocked starts an
   eclipse run. check-shot-truth: title line from the replayed runs.
 
+- READY FOR A/B (scale pass, 03:56 UTC): glass upgrades + ECLIPSE; README features and keys updated.
+  Verified on a fresh re-shoot (identical to the commit): shot truth OK, playtest 35/35, measure-shots 4/4,
+  names OK, pack 1.15 MB, kit check (only transcripts_present). The staged run changed with the sun-1
+  upgrades: score 33,090 -> 36,460, FOUNTAIN 10/10, FEATS 5/6, Titan 0:07, ladder FOUNTAIN 9 now OK;
+  cover tick 4354 (fountain 6/10, 18 Scuttlers, +60 SEAR x2); the draft's verdict reads HITS 2 PATH CELLS
+  (was 6); cover quartz 3 greys three build cards (true at that tick). Nothing was removed from any shot.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

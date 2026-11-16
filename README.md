@@ -12,11 +12,15 @@ evening from the west, so glass that burned the swarm at noon can miss it in the
 - **Win:** hold the courtyard for 3 days, 9 suns; the last sun brings the Hornback Titan.
 - **Lose:** the swarm drains the Sun Fountain (10 HP) to empty.
 - Between suns pick 1 of 3 glass charms; quick kills build a SEAR multiplier; 3 difficulties.
+- Upgrade placed glass with quartz (U): Lv2 for 4, Lv3 for 7. Mirrors lose less light, splitter halves keep
+  more, lenses focus harder (x2.5 -> x2.8 -> x3.1), prism branches keep more.
+- ECLIPSE: win once on any difficulty to unlock an endless mode (E). After sun 9 the suns keep moving and the
+  swarms keep growing; your deepest eclipse sun is saved.
 
 ## Controls
-- Title: **Enter** starts the selected difficulty, **Up / Down** pick it
+- Title: **Enter** starts the selected difficulty, **Up / Down** pick it, **E** starts ECLIPSE once unlocked
 - **1-5** pick glass, **click** sand to place, **Q / E** or the wheel to turn (also during a sun)
-- **X** sells the glass under the mouse, **Enter** starts the sun, **Space** fires the Flare
+- **X** sells the glass under the mouse, **U** upgrades it, **Enter** starts the sun, **Space** fires the Flare
 - **R** twice restarts a run, **Esc** pauses, **M** mutes, **F** fast-forwards
 - Draft: **1-3** pick a charm, **X** reroll; results: **R** run again, **S** same seed
 
