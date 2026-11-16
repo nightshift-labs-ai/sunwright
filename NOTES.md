@@ -506,6 +506,13 @@
   already in. Cover tick now 4484: three numbers (+120 SEAR x4, +40 SEAR x2, +20), ash puffs, SEAR x4,
   quartz 7 (4 of 5 cards lit, prism greyed), run still wins.
 
+- Item 4 (results part): the per-sun chart is 336 x 156 (was 110 tall) with 17 px axis words, 14 px sun
+  numbers and a 5 px fountain line, so the bars read in the 252 px results cell; the Titan is drawn at 0.62
+  (about 200 px) and TITAN BURNED IN 0:07 moved up to make room. Big grade ring and score and the 4-tile
+  stat grid were already there. Not done this run: a larger title rules table (28 px two-column rows do not
+  fit at 30 px) and the draft card restyle; item 5's "selected glass tooltip on the cover" would replace the
+  GLASS legend there (removed info), so the build cards keep their effect line instead.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

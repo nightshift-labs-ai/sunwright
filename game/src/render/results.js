@@ -218,15 +218,15 @@ function drawSunChart(ctx, run, x, y, w, h) {
   ctx.lineWidth = 3;
   ctx.stroke();
   ctx.textAlign = 'left';
-  ctx.font = '900 14px system-ui, sans-serif';
+  ctx.font = '900 17px system-ui, sans-serif';
   ctx.fillStyle = '#FFE27A';
-  ctx.fillText('BURNED PER SUN', x + 10, y + 18);
+  ctx.fillText('BURNED PER SUN', x + 10, y + 21);
   ctx.fillStyle = '#7FE8FF';
   ctx.textAlign = 'right';
-  ctx.fillText('- FOUNTAIN', x + w - 10, y + 18);
+  ctx.fillText('- FOUNTAIN', x + w - 10, y + 21);
   const n = Math.max(suns.length, 1);
-  const top = y + 26;
-  const base = y + h - 18;
+  const top = y + 30;
+  const base = y + h - 20;
   const left = x + 12;
   const span = w - 24;
   const slot = span / Math.max(n, WAVE_COUNT);
@@ -237,11 +237,11 @@ function drawSunChart(ctx, run, x, y, w, h) {
     ctx.fillRect(left + k * slot + 3, base - bh, slot - 6, bh);
     ctx.fillStyle = '#FFF6DF';
     ctx.textAlign = 'center';
-    ctx.font = '800 11px system-ui, sans-serif';
-    ctx.fillText(String(k + 1), left + k * slot + slot / 2, base + 13);
+    ctx.font = '800 14px system-ui, sans-serif';
+    ctx.fillText(String(k + 1), left + k * slot + slot / 2, base + 16);
   });
   ctx.strokeStyle = '#7FE8FF';
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 5;
   ctx.beginPath();
   suns.forEach((s, k) => {
     const px = left + k * slot + slot / 2;
@@ -259,10 +259,10 @@ export function drawResultsHero(ctx, run, time) {
   const won = run.phase === 'won';
   if (won) {
     // A won run needs no sun track (SUNS 9/9 and the WON chip say it): the Titan takes the space.
-    drawTitanCarcass(ctx, HERO.x, HERO.y - 56, 0.72, time);
+    drawTitanCarcass(ctx, HERO.x, HERO.y - 70, 0.62, time);
     if (run.stats.titanSeconds !== undefined) {
-      caption(ctx, 'TITAN BURNED IN', 140, 404, 22, '#FFE27A');
-      caption(ctx, clock(run.stats.titanSeconds), 304, 406, 32, '#FFFFFF');
+      caption(ctx, 'TITAN BURNED IN', 140, 362, 22, '#FFE27A');
+      caption(ctx, clock(run.stats.titanSeconds), 304, 364, 32, '#FFFFFF');
     }
   } else {
     ctx.fillStyle = 'rgba(31,63,153,0.92)';
@@ -275,7 +275,7 @@ export function drawResultsHero(ctx, run, time) {
     drawSunTrack(ctx, 48, 193, 36, 12, run.stats.wavesCleared, run.waveIndex);
     drawDrainedFountain(ctx, HERO.x, HERO.y - 30, 0.7);
   }
-  drawSunChart(ctx, run, 24, 418, 336, 110);
+  drawSunChart(ctx, run, 24, 374, 336, 156);
   ctx.fillStyle = 'rgba(31,63,153,0.92)';
   ctx.beginPath();
   ctx.roundRect(24, 536, 336, 240, 16);
