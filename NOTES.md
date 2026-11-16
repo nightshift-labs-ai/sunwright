@@ -295,6 +295,12 @@
   nothing in the title card sticks out of it.
 
 ## Next
+- READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
+  INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
+  shot truth OK, playtest 32/32, measure-shots 4/4, pack 1.14 MB, kit check (only
+  transcripts_present fails: the operator bundles transcripts). Cover canvas text items: 58.
+- Open: cover staging (17 beetles, 0 lit, 2 floaters vs >= 18 / >= 4 / >= 3), Bench3-3 solved plan
+  (6 stray panes), Bench3-5 board >= 58% of the cover.
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.
 - Idea not yet tried: a director that builds (not turns) one mirror line across the swarm's path
