@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { ENEMIES, FEATS, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
-import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, nextGoal, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
+import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, nextGoal, historyChip, titleRules, winHeadline } from '../game/src/announce.js';
 import { bannerLayout } from '../game/src/render/banner.js';
 import { FLOATER_REACH, beamHitAnchor, createFx, fxFromEvent, updateFx } from '../game/src/render/fx.js';
 import { DT } from '../game/src/config.js';
@@ -55,7 +55,7 @@ function hudFacts(run) {
     kills: run.stats.kills,
     banner: currentBanner(run),
     bannerBox: JSON.stringify(bannerBox(run)),
-    headline: winLoseHeadline(run),
+    headline: winHeadline(run),
     log: run.log.join(' | '),
     sunsHeld: run.stats.wavesCleared,
     offersSeen: run.stats.offersSeen,
@@ -81,6 +81,20 @@ for (const shot of manifest.shots) {
   const shown = { ...shot.state, boons: shot.state.boons.join(','), bannerBox: JSON.stringify(shot.state.bannerBox ?? null) };
   for (const [key, value] of Object.entries(truth)) check(shown[key] === value, `${shot.name} ${key}: shown ${shown[key]} vs sim ${value}`);
   console.log(`${shot.name}: tick ${shot.state.tick} ${truth.phase} day ${truth.day} ${truth.sun} wave ${truth.wave}/${truth.waves} score ${truth.score} quartz ${truth.quartz} hp ${truth.shrineHp}/${truth.shrineMax}`);
+}
+
+// The WIN pill: <= 55% of the board wide, clear of the live north gate and its SUN tag.
+for (const shot of manifest.shots) {
+  const p = shot.state.winPill;
+  if (!p || shot.state.screen !== 'play' || !['wave', 'build'].includes(shot.state.phase)) continue;
+  check(p.x1 - p.x0 <= 0.55 * BOARD_W, `${shot.name} WIN pill ${p.x1 - p.x0} px wide`);
+  const ap = replayTo(shot.state.tick).aperture;
+  if (ap.wall === 'north') {
+    const g0 = BOARD_X + ap.c * CELL - 4;
+    const g1 = BOARD_X + (ap.c + 1) * CELL + 84;
+    check(p.x1 <= g0 || p.x0 >= g1, `${shot.name} WIN pill covers the live gate or its tag`);
+  }
+  console.log(`${shot.name}: WIN pill ${Math.round(p.x0)}-${Math.round(p.x1)}, ${shot.state.headline}`);
 }
 
 for (const shot of manifest.shots) if (shot.tagOverlaps) check(shot.tagOverlaps.length === 0, `${shot.name} board tag covered: ${shot.tagOverlaps.join(' | ')}`);

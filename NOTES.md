@@ -326,6 +326,12 @@
   the same mirror the greedy bot would; seed 2013's sun 5 never has more than 1 lit live beetle (beetles
   in the light die within about a second), so no cover tick with >= 3. Both flags off by default.
 
+- Bench7 item 6 (needs the operator's A/B vs 9052725 before shipping): the full-width WIN/LOSE frieze
+  is a pill on the north wall, `WIN: 5 more suns` (announce.winHeadline, 30 px cream), <= 55% of the
+  board, on the wider side of the live north gate and its SUN tag (cover: 698-1026, gate 546-694);
+  the lose rule stays as DRY = RUN LOST. The top wall and the N gate show again. check-shot-truth:
+  width and clear of the gate; the drawn box is read after the frames render.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

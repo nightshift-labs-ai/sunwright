@@ -7,7 +7,7 @@ import { boonById } from '../draft.js';
 import { beamModsFor } from '../beams.js';
 import { chainMultiplier, chainWindow } from '../combat.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
-import { winLoseHeadline } from '../announce.js';
+import { winHeadline } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
 import { nextSunPreview, waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
@@ -421,17 +421,43 @@ function drawComboLine(ctx, run, x0, y) {
 }
 
 
-/** The win and lose rule, inscribed along the north wall under the banner. */
-function drawWinLoseFrieze(ctx, run) {
-  const line = winLoseHeadline(run);
-  const x = BOARD_X - WALL;
-  const w = BOARD_W + WALL * 2;
-  ctx.fillStyle = 'rgba(31,63,153,0.96)';
-  ctx.fillRect(x, 68, w, 38);
+/** The WIN pill's box as last drawn (for the screenshot checks). */
+let winPillBox = null;
+export function lastWinPill() {
+  return winPillBox;
+}
+
+/**
+ * WIN: n more suns, a pill on the north wall (<= 55% of the board wide), on the wider side of the live
+ * north gate and its SUN tag so the gate and its beam stay in view; the lose rule is DRY = RUN LOST.
+ */
+function drawWinPill(ctx, run) {
+  const str = winHeadline(run);
+  ctx.font = `900 30px ${FONT}`;
+  let w = Math.min(BOARD_W * 0.55, ctx.measureText(str).width + 32);
+  const h = 40;
+  let cx = BOARD_X + BOARD_W / 2;
+  const ap = run.aperture;
+  if (ap.wall === 'north') {
+    const gate0 = BOARD_X + ap.c * CELL - 4;
+    const gate1 = BOARD_X + (ap.c + 1) * CELL + 84;
+    const left = gate0 - BOARD_X;
+    const right = BOARD_X + BOARD_W - gate1;
+    const room = Math.max(left, right) - 8;
+    w = Math.min(w, room);
+    cx = left >= right ? gate0 - 4 - room / 2 : gate1 + 4 + room / 2;
+  }
+  const x = Math.round(cx - w / 2);
+  const y = 70;
+  ctx.fillStyle = 'rgba(31,63,153,0.94)';
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, h / 2);
+  ctx.fill();
   ctx.strokeStyle = GOLD;
-  ctx.lineWidth = 2;
-  ctx.strokeRect(x + 1, 69, w - 2, 36);
-  fitLine(ctx, line, 640, 99, w - 24, 32, '#FFF2A8', 'center');
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  fitLine(ctx, str, x + w / 2, y + 31, w - 20, 30, INK, 'center');
+  winPillBox = { x0: x, y0: y, x1: x + w, y1: y + h };
 }
 
 /**
@@ -671,7 +697,7 @@ export function hudTextBoxes() {
   return [
     { text: 'left panel', x0: LEFT_X, y0: 8, x1: LEFT_X + PANEL_W, y1: 8 + LEFT_PANEL_H },
     { text: 'sun bar', x0: top + 4, y0: 4, x1: top + BOARD_W + WALL * 2 - 4, y1: 62 },
-    { text: 'frieze', x0: top, y0: 68, x1: top + BOARD_W + WALL * 2, y1: 106 },
+    { text: 'win pill', x0: top, y0: 68, x1: top + BOARD_W + WALL * 2, y1: 112 },
     { text: 'right panels', x0: RIGHT_X, y0: 8, x1: RIGHT_X + PANEL_W, y1: 640 },
     { text: 'hotbar and keys', x0: HOTBAR_X, y0: HOTBAR.y, x1: 1200, y1: HOTBAR.y + HOTBAR.h },
     { text: 'pause, speed, sound', x0: RIGHT_X, y0: 646, x1: RIGHT_X + PANEL_W, y1: 704 },
@@ -680,7 +706,7 @@ export function hudTextBoxes() {
 
 export function drawHud(ctx, run, ui) {
   drawSunBar(ctx, run);
-  drawWinLoseFrieze(ctx, run);
+  drawWinPill(ctx, run);
   drawEventBanner(ctx, run, ui);
   drawLeftPanel(ctx, run);
   drawRightPanel(ctx, run, ui);

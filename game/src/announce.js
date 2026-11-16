@@ -66,10 +66,10 @@ export function titleRules() {
   ];
 }
 
-/** The run's win and lose conditions with the real count of suns still to hold (current included). */
-export function winLoseHeadline(run) {
+/** The win rule with the real count of suns still to hold (current included); DRY = RUN LOST says the lose rule. */
+export function winHeadline(run) {
   const left = WAVE_COUNT - run.stats.wavesCleared;
-  return `WIN: ${left} more ${left === 1 ? NAMES.sun.toLowerCase() : NAMES.suns.toLowerCase()} - LOSE: the ${NAMES.fountainShort.toLowerCase()} runs dry`;
+  return `WIN: ${left} more ${left === 1 ? NAMES.sun.toLowerCase() : NAMES.suns.toLowerCase()}`;
 }
 
 /** The banner shown now: a fresh event, else advice about the next sun. */

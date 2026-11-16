@@ -5,14 +5,14 @@ import { ENEMIES, WAVE_COUNT } from './config.js';
 import { nextSunPreview } from './waves.js';
 import { enemiesRemaining } from './sim.js';
 import { rankFor } from './combat.js';
-import { currentBanner, winLoseHeadline } from './announce.js';
+import { currentBanner, winHeadline } from './announce.js';
 import { loadHistory } from './save.js';
 import { audioProbe } from './audio.js';
 import { squeezeReport } from './render/fit.js';
 import { bannerLayout } from './render/banner.js';
 import { propBoxes, propsVisible } from './render/board.js';
 import { buildIconCount } from './render/results.js';
-import { hudTextBoxes } from './render/hud.js';
+import { hudTextBoxes, lastWinPill } from './render/hud.js';
 import { boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
 
 /** Props (palms, urns) drawn this frame whose box touches HUD text or a visible overlay's text. */
@@ -212,7 +212,8 @@ export function installTestHook(app, api) {
         kills: run.stats.kills,
         banner: currentBanner(run),
         bannerBox: bannerBox(run),
-        headline: winLoseHeadline(run),
+        winPill: lastWinPill(),
+        headline: winHeadline(run),
         log: run.log.join(' | '),
         sunsHeld: run.stats.wavesCleared,
         offersSeen: run.stats.offersSeen,
