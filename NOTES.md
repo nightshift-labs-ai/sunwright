@@ -315,6 +315,9 @@
   (fit 0.96). Card moved up to close the gap. check-shot-truth: rows = titleRules(), >= 32 px, fit >=
   92%, inside the table, WIN/LOSE last.
 
+- CHECKPOINT A (Bench7 items 1-4, 02:12 UTC): shot truth OK, playtest 32/32, measure-shots 4/4, shots
+  refreshed (seed 2013 staging unchanged; cover untouched by items 1-4).
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
