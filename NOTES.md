@@ -345,6 +345,12 @@
   the pause / speed / sound buttons, 20 px apart (11 text items); the palm and urn props and their
   whole layer are gone. Quartz particles fly to the moved gem. Cover text items stay 53.
 
+- READY FOR A/B (Bench7, 02:22 UTC): items 1-4 (checkpoint A a59692d), 5 fell back to (c), 6 (WIN pill:
+  ship only if the A/B vs 9052725 does not lose), 7, 8; 9 held: draft differs from 9052725 by 40 px
+  (an edge of the SUN - N tag under the context line), logo unchanged. Verified: shot truth OK (incl.
+  144/144 SEAR numbers over the staged run), playtest 33/33, measure-shots 4/4, names OK, pack 1.12 MB,
+  kit check (only transcripts_present). Cover canvas text items 58 -> 53.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
