@@ -430,6 +430,15 @@
   run lose later (it is a rare greedy-bot win); STAGE_UPGRADES=1 (+ STAGE_UPGRADE_TICK / _COUNT) keeps
   that experiment; off by default, so the cover has no upgraded glass yet.
 
+- Cover shows upgraded glass (truthfully): the stage director now spends quartz during sun 1 on the
+  most-lit glass (two upgrades; UPGRADE_PLAN, STAGE_UPGRADES=0 to switch off). Seed 2013 still wins
+  (36,460, fountain 10/10, FEATS 5/6); upgrades during sun 5 made it lose (see above). Cover tick 4354:
+  `+60 SEAR x2` and `+30`, 18 Scuttlers, fountain 6/10, a Lv2 mirror with 2 gold pips (pips are drawn
+  above the light on a dark backing). Planner: a visible SEAR number scores +40, and its beetle test uses
+  the popped (as-drawn) floater size, like check-shot-truth. Fixed: the results FEATS row overflowed its
+  plaque with 5 feats (smaller chips when there are more than 4). check-shot-truth requires >= 1 Lv2/Lv3
+  piece on the cover.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

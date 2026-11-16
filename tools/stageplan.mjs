@@ -13,8 +13,8 @@ import { pieceCost, upgradeCost } from '../game/src/sim.js';
 
 /** The sun the cover shows (index; 4 = sun 5, Day 2 noon). STAGE_COVER_WAVE overrides it for experiments. */
 export const COVER_WAVE = Number(process.env.STAGE_COVER_WAVE ?? 4);
-/** The staged upgrades: from this tick of the cover sun, this many (Lv2, then Lv3) on the most-lit glass. */
-const UPGRADE_PLAN = { tick: Number(process.env.STAGE_UPGRADE_TICK ?? 4700), count: Number(process.env.STAGE_UPGRADE_COUNT ?? 2) };
+/** The staged upgrades: during this sun (sun 1), from this tick, this many on the most-lit glass (Lv2, Lv3). */
+const UPGRADE_PLAN = { wave: Number(process.env.STAGE_UPGRADE_WAVE ?? 0), tick: Number(process.env.STAGE_UPGRADE_TICK ?? 0), count: Number(process.env.STAGE_UPGRADE_COUNT ?? 2) };
 const DIFF = 'normal';
 const BOT = 'greedy';
 
@@ -167,7 +167,7 @@ export function makeDirector(K, scars = null) {
   const director = (run) => {
     const orders = [];
     // During the cover sun, spend quartz as it comes on the most-lit glass, up to Lv3 (the cover shows its pips).
-    if (run.phase === 'wave' && run.waveIndex === COVER_WAVE && process.env.STAGE_UPGRADES === '1' && upgradesDone < UPGRADE_PLAN.count && run.tick >= UPGRADE_PLAN.tick) {
+    if (run.phase === 'wave' && run.waveIndex === UPGRADE_PLAN.wave && process.env.STAGE_UPGRADES !== '0' && upgradesDone < UPGRADE_PLAN.count && run.tick >= UPGRADE_PLAN.tick) {
       const up = upgradeOrders(run, 1);
       upgradesDone += up.length;
       orders.push(...up);
@@ -227,7 +227,7 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT, scars = null) {
     updateFx(fx, run, DT);
     // Only ticks the screenshot checks would pass: no floater on a label, beam or floater, no covered tag.
     const litLive = run.enemies.filter((e) => e.litPower > 0 && !e.shielded && e.hp > 0).length;
-    const upgraded = process.env.STAGE_UPGRADES !== '1' || run.grid.pieces.some((p) => p && (p.level ?? 1) > 1);
+    const upgraded = process.env.STAGE_UPGRADES === '0' || run.grid.pieces.some((p) => p && (p.level ?? 1) > 1);
     if (!scars && upgraded && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0 && floaterConflicts(fx, run) === 0 && boardTagOverlaps(run).length === 0 && (process.env.STAGE_AIM !== '1' || litLive >= 3)) {
       const opaque = floaterConflicts(fx, run) === 0 ? fx.texts.filter((t) => t.life / t.max > 0.3).length : 0;
       const freshBite = bites.some((t) => run.time - t < 0.9);
@@ -236,7 +236,7 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT, scars = null) {
       const burning = run.enemies.filter((e) => e.litPower > 0 && !e.shielded).length;
       const types = new Set(run.enemies.map((e) => e.type)).size;
       const hurt = run.shrineHp < run.shrineMax;
-      const score = Math.min(run.enemies.length, 24) * 2 + Math.min(burning, 8) * 6 + types * 4 + Math.min(opaque, 6) * 3 + (opaque >= 3 ? 30 : 0) + (freshBite ? 12 : 0) + (atRim ? 12 : 0) + (hurt ? 20 : 0) + (run.shrineHp === 7 ? 25 : 0) + (run.enemies.some((e) => e.shielded) ? 4 : 0) + (run.chain.count >= 2 ? 15 : 0);
+      const score = Math.min(run.enemies.length, 24) * 2 + Math.min(burning, 8) * 6 + types * 4 + Math.min(opaque, 6) * 3 + (opaque >= 3 ? 30 : 0) + (freshBite ? 12 : 0) + (atRim ? 12 : 0) + (hurt ? 20 : 0) + (run.shrineHp === 7 ? 25 : 0) + (run.enemies.some((e) => e.shielded) ? 4 : 0) + (run.chain.count >= 2 ? 15 : 0) + (fx.texts.some((t) => t.text.includes('SEAR') && t.life / t.max > 0.3) ? 40 : 0);
       if (process.env.STAGE_DUMP === '1') console.error(JSON.stringify({ tick: run.tick, score, hp: run.shrineHp, enemies: run.enemies.length, burning, opaque, chain: run.chain.count }));
       if (score > cover.score) cover = { tick: run.tick, score, hp: run.shrineHp, enemies: run.enemies.length, burning, types, opaque, freshBite, atRim };
     }

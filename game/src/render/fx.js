@@ -82,6 +82,13 @@ export function floaterBox(t, rising = false) {
   return { x0: t.x - w / 2, x1: t.x + w / 2, y0: t.y - t.size * 1.15 - (rising ? 24 * t.life : 0), y1: t.y + t.size * 0.3 };
 }
 
+/** A floater's box as drawn right now: a new number pops in at up to 1.4x its size (drawFx). */
+function poppedBox(t) {
+  const age = t.max - t.life;
+  const pop = age < 0.15 ? 1.4 - (age / 0.15) * 0.4 : 1;
+  return floaterBox({ ...t, size: t.size * pop });
+}
+
 /** Does a box cover a live beetle's sprite? */
 export function beetleUnder(box, run) {
   return run.enemies.some((e) => {
@@ -99,7 +106,7 @@ export function floaterConflicts(fx, run) {
   fx.texts.forEach((t, i) => {
     const box = floaterBox(t);
     if (fx.texts.slice(i + 1).some((o) => overlaps(box, floaterBox(o)))) n++;
-    if (labels.some((l) => overlaps(box, l)) || boxTouchesBeam(box, run.trace.legs) || beetleUnder(box, run)) n++;
+    if (labels.some((l) => overlaps(box, l)) || boxTouchesBeam(box, run.trace.legs) || beetleUnder(poppedBox(t), run)) n++;
   });
   return n;
 }

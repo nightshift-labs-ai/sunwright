@@ -198,6 +198,7 @@ export function showResults(menus, run, record, history) {
   // FEATS this run earned, as gold medals (config FEATS, tested on the finished run).
   const earned = runSummary(run).feats;
   el('results-next').textContent = nextGoal(run);
+  el('results-feats').classList.toggle('many', earned.length > 4);
   el('results-feats').innerHTML = `<b>FEATS ${earned.length}/${FEATS.length}</b>` + earned.map((id) => `<span class="feat"><i></i>${escapeHtml(FEATS.find((f) => f.id === id).name)}</span>`).join('');
 }
 

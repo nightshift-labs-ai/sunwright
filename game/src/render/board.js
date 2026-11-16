@@ -648,7 +648,6 @@ export function drawPieces(ctx, grid, shadow, time, lit = null, next = null) {
       if (!p) continue;
       const litNow = !!lit && lit[i] > 0 && p.type !== 'pillar';
       drawPiece(ctx, p, c, r, shadow, time, 1, litNow);
-      drawLevelPips(ctx, p, c, r);
       if (!lit || p.type === 'pillar' || litNow) continue;
       const x = BOARD_X + c * CELL;
       const y = BOARD_Y + r * CELL;
@@ -671,22 +670,32 @@ export function drawPieces(ctx, grid, shadow, time, lit = null, next = null) {
   }
 }
 
+/** Every upgraded piece's pips, drawn above the light so a beam never hides them. */
+export function drawAllLevelPips(ctx, grid) {
+  grid.pieces.forEach((p, i) => p && drawLevelPips(ctx, p, i % grid.cols, Math.floor(i / grid.cols)));
+}
+
 /** Upgraded glass (Lv2, Lv3) shows that many gold pips along its plinth's front. */
 export function drawLevelPips(ctx, piece, c, r) {
   const level = piece.level ?? 1;
   if (level < 2) return;
   const cx = BOARD_X + c * CELL + CELL / 2;
-  const y = BOARD_Y + r * CELL + CELL - 8;
+  const y = BOARD_Y + r * CELL + CELL - 9;
+  const w = level * 16 + 6;
+  ctx.fillStyle = 'rgba(42,22,8,0.85)';
+  ctx.beginPath();
+  ctx.roundRect(cx - w / 2, y - 10, w, 20, 10);
+  ctx.fill();
   for (let k = 0; k < level; k++) {
-    const x = cx + (k - (level - 1) / 2) * 12;
-    ctx.fillStyle = PALETTE.gold;
-    ctx.strokeStyle = '#2A1608';
-    ctx.lineWidth = 2;
+    const x = cx + (k - (level - 1) / 2) * 16;
+    ctx.fillStyle = '#FFD34D';
+    ctx.strokeStyle = '#FFF6DF';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(x, y - 6);
-    ctx.lineTo(x + 5, y);
-    ctx.lineTo(x, y + 6);
-    ctx.lineTo(x - 5, y);
+    ctx.moveTo(x, y - 7);
+    ctx.lineTo(x + 6, y);
+    ctx.lineTo(x, y + 7);
+    ctx.lineTo(x - 6, y);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
