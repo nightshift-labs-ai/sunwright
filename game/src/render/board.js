@@ -494,6 +494,13 @@ export function drawBlockShadow(ctx, x, y, w, d, height, shadow) {
   ctx.restore();
 }
 
+/** The courtyard's light by time of day: rose in the morning, white-gold at noon, warm amber in the evening. */
+const DAYLIGHT = { morning: 'rgba(255,150,150,0.13)', noon: 'rgba(255,246,210,0.08)', evening: 'rgba(255,150,50,0.15)' };
+export function drawDaylight(ctx, phaseId) {
+  ctx.fillStyle = DAYLIGHT[phaseId] ?? DAYLIGHT.noon;
+  ctx.fillRect(BOARD_X, BOARD_Y, BOARD_W, BOARD_H);
+}
+
 /** The sun's light pooling on the stones it reaches: a warm wash under the beams (play screen). */
 export function drawLitFloor(ctx, trace, cols) {
   ctx.save();

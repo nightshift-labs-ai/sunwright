@@ -495,6 +495,11 @@
   chevrons 0.72 -> 0.42 alpha, the next-sun ghost line 0.8 -> 0.5. Same text everywhere. Cover mean
   luminance 0.47 (gate 0.45). Fixed after: YOUR BUILD charm names 13 px (Quartz Pull squeezed to 89%).
 
+- Item 2, time of day: the courtyard floor takes a light tint per sun phase (board.drawDaylight:
+  morning rose 0.13, noon white-gold 0.08, evening amber 0.15; never dark), and cast shadows are 1.35x
+  long at morning/evening, 0.85x at noon, still thrown away from the live sun. The floor was already
+  darkened in the earlier lighting pass; cover mean luminance stays 0.47.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
