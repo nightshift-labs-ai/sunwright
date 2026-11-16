@@ -129,6 +129,11 @@ for (const shot of manifest.shots) {
   // BEST beside PLAY: the selected difficulty's best saved score (the staging plays Normal).
   const bestWant = `BEST ${Math.max(...runs.filter((r) => r.difficultyId === manifest.difficulty).map((r) => r.score)).toLocaleString('en-US')}`;
   check(t.best === bestWant, `${shot.name} ${t.best} vs ${bestWant}`);
+  // ECLIPSE line: unlocked by any saved win; best = most suns held in an eclipse run (none staged).
+  const unlocked = runs.some((r) => r.outcome === 'won');
+  const eclBest = Math.max(0, ...runs.filter((r) => r.mode === 'eclipse').map((r) => r.suns));
+  const eclWant = !unlocked ? 'ECLIPSE (endless) - unlocked after a win' : eclBest > 0 ? `E - ECLIPSE (endless) best: SUN ${eclBest}` : 'E - ECLIPSE (endless) unlocked - not played yet';
+  check(t.eclipse === eclWant, `${shot.name} eclipse line: ${t.eclipse} vs ${eclWant}`);
   check(t.pillBest === bestWant.toLowerCase(), `${shot.name} selected pill: ${t.pillBest} vs ${bestWant.toLowerCase()}`);
   check(!t.cardOverflow || t.cardOverflow.length === 0, `${shot.name} outside the title card: ${t.cardOverflow}`);
   console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.text} (${r.fit.toFixed(2)})`).join(' | ')}; ${t.hint}; ${t.best}; ${t.feats}`);

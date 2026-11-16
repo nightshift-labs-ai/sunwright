@@ -70,6 +70,7 @@ export function titleRules() {
 /** The win and lose rules for the top banner, with the real count of suns still to hold (current included). */
 export function winLoseParts(run) {
   const left = WAVE_COUNT - run.stats.wavesCleared;
+  if (run.mode === 'eclipse') return { win: `ECLIPSE: ${run.stats.wavesCleared} suns held`, lose: `LOSE: the ${NAMES.fountainShort.toLowerCase()} runs dry` };
   return {
     win: `WIN: ${left} more ${left === 1 ? NAMES.sun.toLowerCase() : NAMES.suns.toLowerCase()}`,
     lose: `LOSE: the ${NAMES.fountainShort.toLowerCase()} runs dry`,
@@ -120,6 +121,7 @@ export function historyChip(h) {
 
 /** What to aim for next, from a finished run's outcome and difficulty (the results' NEXT GOAL line). */
 export function nextGoal(run) {
+  if (run.mode === 'eclipse') return `NEXT GOAL: hold ${run.stats.wavesCleared + 1} eclipse ${NAMES.suns.toLowerCase()}`;
   if (run.phase !== 'won') return `NEXT GOAL: hold ${run.stats.wavesCleared + 1} ${NAMES.suns.toLowerCase()}`;
   const harder = DIFFICULTY_ORDER[DIFFICULTY_ORDER.indexOf(run.difficultyId) + 1];
   return harder ? `NEXT GOAL: win on ${DIFFICULTIES[harder].name}` : `NEXT GOAL: beat ${run.score.toLocaleString('en-US')}`;

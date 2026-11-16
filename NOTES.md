@@ -439,6 +439,17 @@
   plaque with 5 feats (smaller chips when there are more than 4). check-shot-truth requires >= 1 Lv2/Lv3
   piece on the cover.
 
+- ECLIPSE (endless), unlocked by a win on any difficulty (save: eclipseUnlocked, or a won run in the
+  history): E on the title (selected difficulty) or on a win's results starts it. Same 9 suns, then the
+  suns go on: eclipse sun n (n >= 10) sends campaign sun 7 / 8 / 9's swarm in turn (no Titan) with counts
+  x (1 + 0.15 (n - 9)) and HP x (1 + 0.12 (n - 9)) (config ECLIPSE, waves.waveGroups). Score keeps
+  counting; best depth saved (eclipseBest). HUD `ECLIPSE SUN n`, banner `ECLIPSE: k suns held - LOSE:
+  ...`, results sub / SUNS tile / NEXT GOAL in eclipse terms. Title line: `ECLIPSE (endless) - unlocked
+  after a win` / `E - ECLIPSE (endless) unlocked - not played yet` / `E - ECLIPSE (endless) best: SUN n`;
+  a won results screen: `ECLIPSE UNLOCKED - press E` pill. Sim (BALANCE_MODE=eclipse, greedy, 40 seeds):
+  the gentle seeds that win go on to suns 10, 13, 14. Playtest: E locked does nothing; unlocked starts an
+  eclipse run. check-shot-truth: title line from the replayed runs.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

@@ -13,13 +13,15 @@ import { buildFlowField } from './pathing.js';
 import { createGrid, pieceAt, placementCheck, setPiece } from './grid.js';
 import { createRng } from './rng.js';
 
-export function createRun(seed, difficultyId = 'normal') {
+/** mode: 'campaign' (win by holding 9 suns) or 'eclipse' (endless: the suns go on until the fountain runs dry). */
+export function createRun(seed, difficultyId = 'normal', mode = 'campaign') {
   const diff = DIFFICULTIES[difficultyId];
   const grid = createGrid();
   const run = {
     seed,
     difficultyId,
     diff,
+    mode,
     rng: createRng(seed ^ 0x5eed),
     tick: 0,
     time: 0,
@@ -198,7 +200,7 @@ function finishWave(run) {
   run.chain.count = 0;
   run.chain.timer = 0;
   emit(run, { type: 'waveClear', wave: run.waveIndex, bonus });
-  if (run.waveIndex === WAVE_COUNT - 1) {
+  if (run.waveIndex === WAVE_COUNT - 1 && run.mode !== 'eclipse') {
     endRun(run, 'won');
     return;
   }
@@ -221,7 +223,7 @@ function stepWave(run) {
   run.waveTime += DT;
   while (run.spawnCursor < run.schedule.length && run.schedule[run.spawnCursor].t <= run.waveTime) {
     const s = run.schedule[run.spawnCursor++];
-    spawnEnemy(run, s.type, s.gate);
+    spawnEnemy(run, s.type, s.gate, s.hpMul);
     if (s.type === 'titan') emit(run, { type: 'boss' });
   }
   moveEnemies(run, DT);
@@ -247,7 +249,7 @@ export function stepSim(run, orders) {
 /** What the save keeps of a finished run (also shown in the results' RUN HISTORY). */
 export function runSummary(run) {
   const feats = FEATS.filter((f) => f.test(run)).map((f) => f.id);
-  return { difficultyId: run.difficultyId, outcome: run.phase, score: run.score, suns: run.stats.wavesCleared, day: run.aperture.day, phase: run.aperture.phase.name, feats };
+  return { difficultyId: run.difficultyId, mode: run.mode, outcome: run.phase, score: run.score, suns: run.stats.wavesCleared, day: run.aperture.day, phase: run.aperture.phase.name, feats };
 }
 
 /** Waves still to spawn plus beetles on the board, for the HUD's remaining bar. */

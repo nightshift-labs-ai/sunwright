@@ -4,10 +4,10 @@
 import { BOARD, DX, DY, ENEMIES, TITAN_CARAPACE, VEER_DAZZLE, VEER_LURE, TINT_EFFECTS } from './config.js';
 import { flowDirectionAt } from './pathing.js';
 
-export function spawnEnemy(run, type, gateIndex) {
+export function spawnEnemy(run, type, gateIndex, hpMul = 1) {
   const def = ENEMIES[type];
   const gate = run.grid.gates[gateIndex % run.grid.gates.length];
-  const hp = Math.round(def.hp * run.diff.hpMul);
+  const hp = Math.round(def.hp * run.diff.hpMul * hpMul);
   const enemy = {
     id: run.nextEnemyId++,
     type,

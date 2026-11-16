@@ -1,14 +1,24 @@
 // Wave makeup: turn the WAVES table into a timed spawn list for one wave and difficulty,
 // plus the roster shown in the INCOMING panel and the draft's next-wave preview.
-import { ENEMY_ORDER, WAVES } from './config.js';
+import { ECLIPSE, ENEMY_ORDER, WAVES } from './config.js';
 
-/** Sorted spawns [{ t, type, gate }] for a wave (0-based). */
+/** The wave table for a sun: the campaign's, or past sun 9 (ECLIPSE) a grown copy of sun 7, 8 or 9 (no Titan). */
+export function waveGroups(waveIndex) {
+  if (waveIndex < WAVES.length) return { groups: WAVES[waveIndex], hpMul: 1 };
+  const depth = waveIndex + 1 - WAVES.length;
+  const base = WAVES[ECLIPSE.rosters[(depth - 1) % ECLIPSE.rosters.length]].filter((g) => g[0] !== 'titan');
+  const grow = 1 + ECLIPSE.countGrowth * depth;
+  return { groups: base.map(([type, count, ...rest]) => [type, Math.round(count * grow), ...rest]), hpMul: 1 + ECLIPSE.hpGrowth * depth };
+}
+
+/** Sorted spawns [{ t, type, gate, hpMul }] for a wave (0-based). */
 export function buildWaveSchedule(waveIndex, diff) {
   const spawns = [];
-  for (const [type, count, gate, first, interval] of WAVES[waveIndex]) {
+  const { groups, hpMul } = waveGroups(waveIndex);
+  for (const [type, count, gate, first, interval] of groups) {
     const n = type === 'titan' ? count : Math.max(1, Math.round(count * diff.countMul));
     const gap = interval * (count / n);
-    for (let k = 0; k < n; k++) spawns.push({ t: first + k * gap, type, gate: gate === 2 ? k % 2 : gate });
+    for (let k = 0; k < n; k++) spawns.push({ t: first + k * gap, type, gate: gate === 2 ? k % 2 : gate, hpMul });
   }
   spawns.sort((a, b) => a.t - b.t || ENEMY_ORDER.indexOf(a.type) - ENEMY_ORDER.indexOf(b.type));
   return spawns;

@@ -7,7 +7,7 @@ import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { rankFor, rankLadder, runLine } from '../combat.js';
 import { runSummary } from '../sim.js';
-import { loadFeats } from '../save.js';
+import { loadEclipse, loadFeats } from '../save.js';
 import { draftContext, draftHeal, draftHint, historyChip, nextGoal, titleRules } from '../announce.js';
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
@@ -63,6 +63,9 @@ export function showTitle(menus, bestFor, selected) {
   }).join('');
   el('rule-scope').textContent = SCOPE_LINE;
   el('feats-count').textContent = `FEATS ${loadFeats().length}/${FEATS.length}`;
+  const ecl = loadEclipse();
+  el('eclipse-line').textContent = !ecl.unlocked ? 'ECLIPSE (endless) - unlocked after a win' : ecl.best > 0 ? `E - ECLIPSE (endless) best: ${NAMES.sun} ${ecl.best}` : 'E - ECLIPSE (endless) unlocked - not played yet';
+  el('eclipse-line').classList.toggle('locked', !ecl.unlocked);
   const best = bestFor(selected);
   el('title-best').textContent = best.played ? `BEST ${best.score.toLocaleString('en-US')}` : 'NO BEST YET';
   // The rules table: icon, gold tag, one line per rule (announce.titleRules, numbers from config).
@@ -173,12 +176,14 @@ export function showResults(menus, run, record, history) {
   fitHeading(title, 104, 1180);
   el('results-sub').textContent = won
     ? `The ${NAMES.fountainShort.toLowerCase()} still runs. The courtyard is yours.`
-    : `Fell on Day ${run.aperture.day} ${run.aperture.phase.name.toLowerCase()} - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`;
+    : run.mode === 'eclipse'
+      ? `Fell on Day ${run.aperture.day} ${run.aperture.phase.name.toLowerCase()} - ECLIPSE: ${run.stats.wavesCleared} ${NAMES.suns.toLowerCase()} held`
+      : `Fell on Day ${run.aperture.day} ${run.aperture.phase.name.toLowerCase()} - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`;
   const rank = rankFor(run);
   el('results-score').innerHTML = `<span class="rank rank-${rank}">${rank}</span>${run.score.toLocaleString('en-US')}${record.isBest ? '<em>NEW BEST</em>' : ''}`;
   const tiles = [
     ['BURNED', run.stats.kills],
-    [NAMES.suns, `${run.stats.wavesCleared}/${WAVE_COUNT}`],
+    [NAMES.suns, run.mode === 'eclipse' ? `${run.stats.wavesCleared}` : `${run.stats.wavesCleared}/${WAVE_COUNT}`],
     [NAMES.fountainShort, `${run.shrineHp}/${run.shrineMax}`],
     [`BEST ${NAMES.combo}`, `x${run.chain.best}`],
   ];
@@ -198,6 +203,9 @@ export function showResults(menus, run, record, history) {
   // FEATS this run earned, as gold medals (config FEATS, tested on the finished run).
   const earned = runSummary(run).feats;
   el('results-next').textContent = nextGoal(run);
+  // A won campaign unlocks ECLIPSE (endless): say so and how to start it.
+  el('results-eclipse').textContent = won ? 'ECLIPSE UNLOCKED - press E' : '';
+  el('results-eclipse').classList.toggle('hidden', !won);
   el('results-feats').classList.toggle('many', earned.length > 4);
   el('results-feats').innerHTML = `<b>FEATS ${earned.length}/${FEATS.length}</b>` + earned.map((id) => `<span class="feat"><i></i>${escapeHtml(FEATS.find((f) => f.id === id).name)}</span>`).join('');
 }

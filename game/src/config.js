@@ -158,6 +158,13 @@ export const UPGRADES = {
   lens: { multAdd: [0, 0.3, 0.6] },
   prism: { shareAdd: [0, 0.1, 0.2] },
 };
+/**
+ * ECLIPSE (endless, unlocked by winning any difficulty): after sun 9 the suns go on. Eclipse sun n (n >= 10)
+ * sends the swarm of campaign sun 7, 8 or 9 in turn (no Titan), with
+ * counts x (1 + countGrowth * (n - 9)) and beetle HP x (1 + hpGrowth * (n - 9)).
+ */
+export const ECLIPSE = { rosters: [6, 7, 8], countGrowth: 0.15, hpGrowth: 0.12 };
+
 export const ECONOMY = { waveQuartz: 5, waveQuartzPerWave: 1, rerollCost: 3, oldPieceRefund: 0.5 };
 export const SCORING = { perShrineHp: 50, waveClear: 100, chainWindow: 1, chainMaxMult: 5 };
 /** A won run's rank: the best tier whose score, fountain left and Titan burn time it all meets (else C). */

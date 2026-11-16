@@ -37,9 +37,17 @@ export function recordRun(summary) {
   const isBest = summary.score > old.score;
   data.best[summary.difficultyId] = { score: Math.max(old.score, summary.score), waves: Math.max(old.waves, summary.suns) };
   data.history = [...(data.history ?? []), summary].slice(-HISTORY_KEEP);
+  if (summary.outcome === 'won') data.eclipseUnlocked = true;
+  if (summary.mode === 'eclipse') data.eclipseBest = Math.max(data.eclipseBest ?? 0, summary.suns);
   data.feats = [...new Set([...(data.feats ?? []), ...(summary.feats ?? [])])];
   writeSave(data);
   return { isBest, previousBest: old.score };
+}
+
+/** ECLIPSE: { unlocked (any win, any difficulty), best (most suns held in an eclipse run, 0 if none) }. */
+export function loadEclipse() {
+  const data = readSave();
+  return { unlocked: !!data.eclipseUnlocked || (data.history ?? []).some((h) => h.outcome === 'won'), best: data.eclipseBest ?? 0 };
 }
 
 /** Every FEAT id any finished run has earned. */

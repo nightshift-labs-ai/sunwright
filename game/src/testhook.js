@@ -125,8 +125,8 @@ function resultsText() {
 export function installTestHook(app, api) {
   app.manual = true;
   window.__test = {
-    start(seed, difficulty) {
-      api.startRun(seed, difficulty);
+    start(seed, difficulty, mode = 'campaign') {
+      api.startRun(seed, difficulty, mode);
     },
     advance(ticks) {
       for (let i = 0; i < ticks; i++) api.tick();
@@ -205,6 +205,7 @@ export function installTestHook(app, api) {
         phase: run.phase,
         seed: run.seed,
         difficulty: run.diff.name,
+        mode: run.mode,
         day: run.aperture.day,
         sun: run.aperture.phase.name,
         wall: run.aperture.phase.wallName,

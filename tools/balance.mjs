@@ -84,8 +84,8 @@ export function bestUpgrade(run, careful) {
   return best;
 }
 
-export function playRun(seed, difficulty, bot = 'greedy', onTick = null, director = null) {
-  const run = createRun(seed, difficulty);
+export function playRun(seed, difficulty, bot = 'greedy', onTick = null, director = null, mode = 'campaign') {
+  const run = createRun(seed, difficulty, mode);
   const careful = bot.startsWith('careful');
   const log = [];
   const step = (orders) => {
@@ -132,7 +132,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const bot = process.argv[3] ?? 'greedy';
   for (const difficulty of DIFFICULTY_ORDER) {
     const rows = [];
-    for (let k = 0; k < n; k++) rows.push(playRun(1000 + k * 7919, difficulty, bot).result);
+    for (let k = 0; k < n; k++) rows.push(playRun(1000 + k * 7919, difficulty, bot, null, null, process.env.BALANCE_MODE ?? 'campaign').result);
     const wins = rows.filter((r) => r.phase === 'won').length;
     const mean = rows.reduce((s, r) => s + r.waves, 0) / n;
     console.log(`${bot} ${difficulty.padEnd(8)} wins ${wins}/${n}  mean waves ${mean.toFixed(1)}/${WAVE_COUNT}  waves: ${rows.map((r) => r.waves).join(' ')}  scores: ${rows.map((r) => r.score).join(' ')}`);

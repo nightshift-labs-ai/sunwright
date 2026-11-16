@@ -40,6 +40,21 @@ expect(music === 0.3, 'the music slider saves its setting');
 await page.click('#options-screen button[data-action="closeOptions"]');
 await frame();
 expect(await visible('title-screen'), 'Back returns to the title');
+// ECLIPSE: E does nothing while it is locked; once a win is saved, E starts an endless run.
+await page.keyboard.press('KeyE');
+await frame();
+expect((await state()).screen !== 'play', 'E on the title does nothing while ECLIPSE is locked');
+await page.evaluate(() => {
+  const data = JSON.parse(localStorage.getItem('sunwright.save.v1') ?? '{}');
+  data.eclipseUnlocked = true;
+  localStorage.setItem('sunwright.save.v1', JSON.stringify(data));
+});
+await page.keyboard.press('KeyE');
+await frame();
+let ecl = await state();
+expect(ecl.screen === 'play' && ecl.mode === 'eclipse', `E starts an ECLIPSE run once unlocked (${ecl.mode})`);
+await page.evaluate(() => window.__test.ui('menu'));
+await frame();
 // ENTER starts the selected difficulty; the arrow keys move the selection.
 await page.click('#difficulty-picker button[data-arg="scorched"]');
 await frame();

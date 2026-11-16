@@ -3,7 +3,7 @@
 import { DIFFICULTIES, DIFFICULTY_ORDER, DT, PIECES, PIECE_ORDER } from './config.js';
 import { createRun, pieceCost, pieceUnlocked, runSummary, stepSim } from './sim.js';
 import { playSfx, playSizzle, setBeamHum, setVolume, unlockAudio, updateMusic } from './audio.js';
-import { loadBest, loadHistory, loadSettings, recordRun, saveSettings } from './save.js';
+import { loadBest, loadEclipse, loadHistory, loadSettings, recordRun, saveSettings } from './save.js';
 import { drawFrame } from './render/scene.js';
 import { createFx, fxFromEvent, updateFx } from './render/fx.js';
 import { hotbarHit, hudButtonHit } from './render/hud.js';
@@ -57,8 +57,10 @@ function fitStage() {
   ctx.setTransform(canvas.width / VIEW_W, 0, 0, canvas.height / VIEW_H, 0, 0);
 }
 
-function startRun(seed = freshSeed(), difficulty = app.settings.difficulty) {
-  app.run = createRun(seed, difficulty);
+/** mode 'eclipse' starts the endless run (only once a win has unlocked it). */
+function startRun(seed = freshSeed(), difficulty = app.settings.difficulty, mode = 'campaign') {
+  if (mode === 'eclipse' && !loadEclipse().unlocked) return;
+  app.run = createRun(seed, difficulty, mode);
   app.screen = 'play';
   app.paused = false;
   app.fx = createFx();
@@ -146,8 +148,9 @@ function handleUiAction(action, arg) {
     case 'menu': goTitle(); break;
     case 'pick': order({ type: 'pick', index: Number(arg) }); break;
     case 'reroll': order({ type: 'reroll' }); break;
-    case 'runAgain': startRun(undefined, run?.difficultyId); break;
-    case 'sameSeed': startRun(run.seed, run.difficultyId); break;
+    case 'runAgain': startRun(undefined, run?.difficultyId, run?.mode); break;
+    case 'sameSeed': startRun(run.seed, run.difficultyId, run.mode); break;
+    case 'eclipse': startRun(undefined, run?.difficultyId ?? app.settings.difficulty, 'eclipse'); break;
     default: break;
   }
 }
@@ -170,6 +173,7 @@ function handleKeyInPlay(code) {
   if (over) {
     if (code === 'KeyR') restartRun(input.intents, false);
     else if (code === 'KeyS') restartRun(input.intents, true);
+    else if (code === 'KeyE') startRun(undefined, app.run.difficultyId, 'eclipse');
     return;
   }
   if (code === 'KeyR') {
@@ -232,6 +236,7 @@ function handleIntent(it) {
   } else if (it.kind === 'key') {
     // Title: ENTER (or SPACE) starts the selected difficulty; the arrows move the selection.
     if (it.code === 'Enter' || it.code === 'NumpadEnter' || it.code === 'Space') startRun();
+    else if (it.code === 'KeyE' && app.screen === 'title') startRun(undefined, app.settings.difficulty, 'eclipse');
     else if ((it.code === 'ArrowUp' || it.code === 'ArrowDown') && app.screen === 'title') {
       const i = DIFFICULTY_ORDER.indexOf(app.settings.difficulty);
       const step = it.code === 'ArrowDown' ? 1 : DIFFICULTY_ORDER.length - 1;

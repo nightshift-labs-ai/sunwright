@@ -268,7 +268,8 @@ function drawSunBar(ctx, run) {
   const w = BOARD_W + WALL * 2 - 8;
   panel(ctx, x, 4, w, 58);
   const trackX = x + w - 26 - 8 * 36;
-  fitLine(ctx, `DAY ${day} - ${phase.name} - ${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`, x + 16, 44, trackX - x - 46, 32, INK);
+  const sunText = run.mode === 'eclipse' ? `ECLIPSE ${NAMES.sun} ${run.waveIndex + 1}` : `${NAMES.sun} ${run.waveIndex + 1}/${WAVE_COUNT}`;
+  fitLine(ctx, [`DAY ${day} - ${phase.name} - ${sunText}`, `DAY ${day} - ${sunText}`], x + 16, 44, trackX - x - 46, 32, INK);
   drawSunTrack(ctx, trackX, 33, 36, 13, run.stats.wavesCleared, run.waveIndex);
 }
 
@@ -469,10 +470,10 @@ function drawWinLoseFrieze(ctx, run) {
     ctx.lineWidth = 2;
     ctx.strokeRect(a + 1, 69, b - a - 2, 36);
   }
-  if (!notch) fitLine(ctx, `${win} - ${lose}`, 640, 99, w - 24, 32, '#FFF2A8', 'center');
+  const loses = [lose, lose.replace('the ', ''), lose.replace('the ', '').replace(' runs', '')];
+  if (!notch) fitLine(ctx, loses.map((l) => `${win} - ${l}`), 640, 99, w - 24, [32, 28, 26], '#FFF2A8', 'center');
   else {
     const [[l0, l1], [r0, r1]] = segs;
-    const loses = [lose, lose.replace('the ', ''), lose.replace('the ', '').replace(' runs', '')];
     const fits = (str, room) => ctx.measureText(str).width * 0.92 <= room - 20;
     let pick = null;
     search: for (const size of [32, 28, 26, 24]) {
