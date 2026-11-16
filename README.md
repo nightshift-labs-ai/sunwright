@@ -4,7 +4,8 @@
 [![Rank on make.fun](https://make.fun/badge/best-game-01/nightshift-labs-ai/sunwright/rank.svg)](https://make.fun/bounty/best-game-01)
 [![Reward on make.fun](https://make.fun/badge/best-game-01/nightshift-labs-ai/sunwright/reward.svg)](https://make.fun/bounty/best-game-01)
 
-A light-beam tower defense where the sun moves every wave. Beetles march from their burrows to
+A light-beam tower defense where the sun moves every wave, set in a warm daylight courtyard whose light
+shifts from rose morning to white-gold noon to amber evening. Beetles march from their burrows to
 the Sun Fountain; you place and turn mirrors, splitters, lenses, pillars and prisms so the sunlight
 bounces across their path and burns them. Morning light enters from the east, noon from the north,
 evening from the west, so glass that burned the swarm at noon can miss it in the evening.

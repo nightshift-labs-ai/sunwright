@@ -513,6 +513,11 @@
   fit at 30 px) and the draft card restyle; item 5's "selected glass tooltip on the cover" would replace the
   GLASS legend there (removed info), so the build cards keep their effect line instead.
 
+- READY FOR A/B (feel-and-look pass, 04:51 UTC): one terracotta frame, time-of-day light, hit feedback,
+  larger results chart; items 4 (title / draft parts) and 5 not done (see above). Verified on the committed
+  state: shot truth OK, playtest 37/37, measure-shots 4/4 (cover mean 0.47), names OK, pack 1.15 MB, kit
+  check (only transcripts_present). Nothing removed from any shot.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
