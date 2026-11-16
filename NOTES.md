@@ -332,6 +332,14 @@
   the lose rule stays as DRY = RUN LOST. The top wall and the N gate show again. check-shot-truth:
   width and clear of the gate; the drawn box is read after the frames render.
 
+- Bench7 item 7: one label per thing: the score panel's SEAR line is gone (every combo kill now always
+  shows its SEAR number: beam hit, else where it died; when no clean spot exists it takes the nearest
+  one, clearing plain numbers, even over a beam, last of all slid into the court; check-shot-truth
+  replays the whole staged run: 144 combo kills, 144 SEAR numbers); only the live gate keeps its SUN
+  tag; one SWARM tag; no NEXT: line under INCOMING (the draft chip says it); no ARMOUR / DEFLECTS
+  tags on the title demo; board tags get a 2 px dark outline. check-shot-truth: no covered tag on the
+  cover and the title demo, <= 5 title-demo labels. Cover text items 58 -> 53 (cover tick 4801 again).
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

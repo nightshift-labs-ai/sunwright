@@ -98,6 +98,7 @@ for (const shot of manifest.shots) {
 }
 
 for (const shot of manifest.shots) if (shot.tagOverlaps) check(shot.tagOverlaps.length === 0, `${shot.name} board tag covered: ${shot.tagOverlaps.join(' | ')}`);
+for (const shot of manifest.shots) if (shot.titleLabels !== undefined) check(shot.titleLabels <= 5, `${shot.name}: ${shot.titleLabels} board labels on the title demo`);
 for (const shot of manifest.shots) if (shot.textOverlaps) check(shot.textOverlaps.length === 0, `${shot.name} text on text: ${shot.textOverlaps.join(' | ')}`);
 for (const shot of manifest.shots) if (shot.floaters !== undefined) console.log(`${shot.name}: ${shot.floaters} floating numbers, ${shot.textOverlaps.length} overlaps`);
 for (const shot of manifest.shots) if (shot.textOutside) check(shot.textOutside.length === 0, `${shot.name} text outside its plaque: ${shot.textOutside.join(' | ')}`);
@@ -174,6 +175,25 @@ for (const shot of manifest.shots) {
   check(JSON.stringify(shot.floaterList) === JSON.stringify(want), `${shot.name} floaters: shown ${JSON.stringify(shot.floaterList)} vs replay ${JSON.stringify(want)}`);
   for (const t of shot.floaterList) check(Math.hypot(t.sx - t.ax, t.sy - t.ay) <= FLOATER_REACH + 0.5, `${shot.name} ${t.text} spawned ${Math.round(Math.hypot(t.sx - t.ax, t.sy - t.ay))} px from its hit`);
   console.log(`${shot.name}: floaters ${shot.floaterList.map((t) => `${t.text} (${Math.round(Math.hypot(t.sx - t.ax, t.sy - t.ay))} px from its ${t.kind === 'kill' ? 'beam hit' : 'bite'})`).join(' | ')}`);
+}
+
+// SEAR numbers: replay the whole staged run with the fx code; every combo kill (x2+) shows its number.
+{
+  const end = manifest.shots.find((s) => s.name === '4-results.jpg')?.state.tick;
+  if (end) {
+    const run = createRun(manifest.seed, manifest.difficulty);
+    const fx = createFx();
+    let k = 0;
+    while (run.tick < end) {
+      const orders = k < manifest.log.length && manifest.log[k].tick === run.tick ? manifest.log[k++].orders : [];
+      stepSim(run, orders);
+      for (const ev of run.events) fxFromEvent(fx, ev, run);
+      updateFx(fx, run, DT);
+      run.events.length = 0;
+    }
+    check(fx.searKills > 0 && fx.searKills === fx.searFloaters, `SEAR numbers: ${fx.searFloaters} for ${fx.searKills} combo kills`);
+    console.log(`staged run: ${fx.searKills} combo kills, ${fx.searFloaters} SEAR numbers`);
+  }
 }
 
 // Starbursts: at most 6 big ones, each where the light hits a beetle or a prism splits (replayed).

@@ -5,11 +5,10 @@
 import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, WAVE_COUNT, enemyRuleTag } from '../config.js';
 import { boonById } from '../draft.js';
 import { beamModsFor } from '../beams.js';
-import { chainMultiplier, chainWindow } from '../combat.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
 import { winHeadline } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
-import { nextSunPreview, waveRoster } from '../waves.js';
+import { waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
 import { drawCharmBadge } from './charms.js';
 import { fitSized } from './fit.js';
@@ -323,12 +322,6 @@ function drawIncoming(ctx, run, y0) {
   drawTitanSkull(ctx, x0 + 22, y, 9, titanLeft === 0, '#FF6B5E');
   fitLine(ctx, [`${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, `${NAMES.sun} ${WAVE_COUNT}: THE TITAN`, `${NAMES.sun} ${WAVE_COUNT}: TITAN`], x0 + 38, y + 5, PANEL_W - 104, 15, '#FFB0B0');
   text(ctx, enemyRuleTag(ENEMIES.titan), x0 + PANEL_W - 10, y + 7, 20, '#FF8A8A', 'right', 900);
-  const preview = nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name);
-  if (preview) {
-    // Shorter wordings of the same preview: drop SUN, then keep only the first change.
-    const parts = preview.replace(`NEXT ${NAMES.sun}: `, '').split(', ');
-    fitLine(ctx, [preview, `NEXT: ${parts.join(', ')}`, `NEXT: ${parts[0]}`, parts[0]], x0 + 12, y + 32, PANEL_W - 20, 15, '#FFE27A');
-  }
 }
 
 /**
@@ -398,7 +391,6 @@ function drawRightPanel(ctx, run, ui) {
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 32, '#FFF2A8', 'right', 900);
   // BEST from the save (a difficulty never finished says so: no "BEST 0").
   text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
-  drawComboLine(ctx, run, x0, 120);
   panel(ctx, x0, 142, PANEL_W, 62);
   text(ctx, NAMES.currency, x0 + 12, 170, 15, INK, 'left', 900);
   drawQuartzGem(ctx, QUARTZ_ANCHOR.x, QUARTZ_ANCHOR.y);
@@ -412,13 +404,6 @@ function drawRightPanel(ctx, run, ui) {
   drawTooltip(ctx, run, ui, 532);
 }
 
-/** SEAR combo under the score: the live multiplier (popping on each step) and the run's longest. */
-function drawComboLine(ctx, run, x0, y) {
-  const mult = chainMultiplier(run.chain.count);
-  const active = run.chain.count >= 2;
-  const pop = Math.max(0, 1 - (run.time - run.feedback.searAt) / 0.25);
-  text(ctx, `${NAMES.combo} x${active ? mult : 1}`, x0 + PANEL_W - 10, y + 8, active ? 26 + pop * 8 : 20, active ? '#FFF2A8' : 'rgba(255,246,223,0.7)', 'right', 900);
-}
 
 
 /** The WIN pill's box as last drawn (for the screenshot checks). */

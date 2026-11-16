@@ -103,6 +103,8 @@ manifest.shots.at(-1).titleText = await page.evaluate(() => {
     return [...document.querySelectorAll('.title-card button, .title-card span, .title-card p')].filter((n) => { const r = n.getBoundingClientRect(); return r.left < card.left || r.right > card.right; }).map((n) => n.textContent.trim().slice(0, 20));
   })() };
 });
+manifest.shots.at(-1).tagOverlaps = await page.evaluate(() => window.__test.tagOverlaps());
+manifest.shots.at(-1).titleLabels = await page.evaluate(() => window.__test.titleLabels());
 manifest.log = log;
 writeFileSync('tools/shots-manifest.json', JSON.stringify(manifest));
 console.log(errors.length ? `console errors: ${errors.join(' | ')}` : 'no console errors');

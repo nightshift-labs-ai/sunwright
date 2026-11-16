@@ -109,7 +109,7 @@ function drawFlames(ctx, x, y, size, t) {
   ctx.restore();
 }
 
-export function drawEnemy(ctx, e, time) {
+export function drawEnemy(ctx, e, time, labels = true) {
   const x = toScreenX(e.x);
   const y = toScreenY(e.y);
   const size = e.def.size * CELL;
@@ -222,7 +222,7 @@ export function drawEnemy(ctx, e, time) {
     ctx.stroke();
   }
   drawHeatBar(ctx, e, x, y - size - 12, Math.max(30, size * 1.6));
-  const tag = e.shielded ? `ARMOUR ${armourOf(e)}` : e.deflecting ? 'DEFLECTS' : '';
+  const tag = !labels ? '' : e.shielded ? `ARMOUR ${armourOf(e)}` : e.deflecting ? 'DEFLECTS' : '';
   if (tag) {
     ctx.font = '900 15px system-ui, sans-serif';
     ctx.textAlign = 'center';
@@ -236,8 +236,9 @@ export function drawEnemy(ctx, e, time) {
 
 }
 
-export function drawEnemies(ctx, run, time) {
+/** labels false (the title demo): no ARMOUR / DEFLECTS tags under the beetles. */
+export function drawEnemies(ctx, run, time, labels = true) {
   // Walkers first, flyers above them.
-  for (const e of run.enemies) if (!e.def.flies) drawEnemy(ctx, e, time);
-  for (const e of run.enemies) if (e.def.flies) drawEnemy(ctx, e, time);
+  for (const e of run.enemies) if (!e.def.flies) drawEnemy(ctx, e, time, labels);
+  for (const e of run.enemies) if (e.def.flies) drawEnemy(ctx, e, time, labels);
 }

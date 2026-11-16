@@ -14,6 +14,7 @@ import { propBoxes, propsVisible } from './render/board.js';
 import { buildIconCount } from './render/results.js';
 import { hudTextBoxes, lastWinPill } from './render/hud.js';
 import { boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
+import { boardLabelBoxes } from './render/board.js';
 
 /** Props (palms, urns) drawn this frame whose box touches HUD text or a visible overlay's text. */
 function propOverlaps(app) {
@@ -158,8 +159,17 @@ export function installTestHook(app, api) {
     propOverlaps() {
       return propOverlaps(app);
     },
+    /** Covered board tags on the play board, or on the title demo's courtyard; and how many tags it has. */
     tagOverlaps() {
-      return app.run ? boardTagOverlaps(app.run) : [];
+      const run = app.screen === 'play' ? app.run : app.demo.run;
+      return run ? boardTagOverlaps(run) : [];
+    },
+    titleLabels() {
+      return boardLabelBoxes(app.demo.run).length + 1;
+    },
+    /** Combo kills (SEAR x2+) this run and the SEAR numbers they spawned. */
+    sear() {
+      return { kills: app.fx.searKills ?? 0, floaters: app.fx.searFloaters ?? 0 };
     },
     draftText() {
       return draftText();

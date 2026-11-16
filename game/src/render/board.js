@@ -303,7 +303,8 @@ const FOUNTAIN_TAG_SPOTS = [[0, 46], [-78, 34], [78, 34], [0, -46], [-86, -10], 
  * FOUNTAIN at the first spot round the basin that no beam core or beetle covers.
  */
 export function boardLabelBoxes(run) {
-  const labels = run.grid.gates.map((g) => tagBox('SWARM', BOARD_X + g.c * CELL + CELL / 2 + 66, BOARD_Y + BOARD_H + 19));
+  // One SWARM tag (at the first burrow): one label per thing on the board.
+  const labels = run.grid.gates.slice(0, 1).map((g) => tagBox('SWARM', BOARD_X + g.c * CELL + CELL / 2 + 66, BOARD_Y + BOARD_H + 19));
   const s = run.grid.shrine;
   const fx = BOARD_X + s.c * CELL + CELL / 2;
   const fy = BOARD_Y + s.r * CELL + CELL / 2;
@@ -325,6 +326,10 @@ export function drawBoardTags(ctx, run) {
     ctx.beginPath();
     ctx.roundRect(t.x0, t.y0 - 2, t.x1 - t.x0, t.y1 - t.y0 + 4, 7);
     ctx.fill();
+    // A 2 px dark outline round the gold rim, so the tag reads above sprites and beams.
+    ctx.strokeStyle = '#2A1608';
+    ctx.lineWidth = 6;
+    ctx.stroke();
     ctx.strokeStyle = PALETTE.gold;
     ctx.lineWidth = 2;
     ctx.stroke();
@@ -415,7 +420,8 @@ export function drawCourtyard(ctx, run, time, allLit = false) {
     ctx.strokeStyle = next ? '#FFFFFF' : PALETTE.gold;
     ctx.lineWidth = next ? 3 : 2;
     ctx.stroke();
-    drawWindowLabel(ctx, ap, slot, lit);
+    // Only the live gate keeps its SUN tag (the NEXT SUN pill marks the next one).
+    if (ap.wall === now.wall) drawWindowLabel(ctx, ap, slot, lit);
   }
   // Burrows: violet arches in the low south wall.
   for (const g of run.grid.gates) {

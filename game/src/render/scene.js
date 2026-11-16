@@ -85,7 +85,7 @@ export function drawFrame(ctx, frame) {
   } else if (ui.hoverCell && (phase === 'build' || phase === 'wave')) {
     drawCellCursor(ctx, ui.hoverCell, true);
   }
-  drawEnemies(ctx, run, time);
+  drawEnemies(ctx, run, time, !frame.titleTraces);
   if (phase === 'draft' || phase === 'lost') {
     ctx.fillStyle = 'rgba(70,40,15,0.35)';
     ctx.fillRect(BOARD_X - WALL, BOARD_Y - WALL_FRONT - WALL, BOARD_W + WALL * 2, BOARD_H + WALL_FRONT + WALL * 2);

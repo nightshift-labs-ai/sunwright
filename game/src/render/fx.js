@@ -152,9 +152,11 @@ export function beamHitAnchor(ev, run) {
 
 /** Place a floating number at the first spot within 1.5 cells of its anchor that keeps clear of other
  *  floaters, the floor labels and the beam cores, inside the courtyard; drop it if there is none. */
-function placeFloater(fx, t, run) {
+function placeFloater(fx, t, run, force = false) {
   const labels = run ? boardTextBoxes(run) : [];
   const legs = run?.trace?.legs ?? [];
+  let fallback = null;
+  let lastResort = null;
   for (const [dx, dy] of FLOATER_SPOTS) {
     const cand = { ...t, x: t.x + dx, y: t.y + dy };
     if (Math.hypot(cand.x - t.ax, cand.y - t.ay) > FLOATER_REACH) continue;
@@ -163,11 +165,31 @@ function placeFloater(fx, t, run) {
     const box = floaterBox(cand);
     const path = floaterBox(cand, true);
     if (path.x0 < BOARD_X + 4 || path.x1 > BOARD_X + BOARD_W - 4 || path.y0 < BOARD_Y + 4 || box.y1 > BOARD_Y + BOARD_H - 4) continue;
+    if (labels.some((l) => overlaps(path, l))) continue;
+    lastResort ??= cand;
+    if (boxTouchesBeam(box, legs)) continue;
+    fallback ??= cand;
     if (fx.texts.some((o) => overlaps(box, floaterBox(o)))) continue;
-    if (labels.some((l) => overlaps(path, l)) || boxTouchesBeam(box, legs)) continue;
     fx.texts.push(cand);
-    return;
+    return true;
   }
+  // A SEAR number always shows: it takes the nearest clean spot and clears the plain numbers in its way.
+  // (inside dense light every nearby spot crosses a beam: then it may sit on one).
+  let pick = force ? fallback ?? lastResort : null;
+  if (force && !pick) {
+    // Last of all: its own spot, slid inside the courtyard.
+    const w = t.text.length * t.size * 0.62 * 1.1;
+    const x = Math.min(Math.max(t.x, BOARD_X + 4 + w / 2), BOARD_X + BOARD_W - 4 - w / 2);
+    const y = Math.min(Math.max(t.y, BOARD_Y + 4 + t.size * 1.15 + 24 * t.life), BOARD_Y + BOARD_H - 4 - t.size * 0.3);
+    pick = { ...t, x, y, sx: x, sy: y };
+  }
+  if (pick) {
+    const box = floaterBox(pick);
+    fx.texts = fx.texts.filter((o) => !overlaps(box, floaterBox(o)));
+    fx.texts.push(pick);
+    return true;
+  }
+  return false;
 }
 
 /** Turn one sim event into effects (run gives the beams and labels floaters must avoid). */
@@ -182,8 +204,15 @@ export function fxFromEvent(fx, ev, run = null) {
       fx.particles.push({ kind: 'quartz', x: x + k * 6, y, sx: x + k * 6, sy: y, vx: 0, vy: 0, life: 0.75 + k * 0.08, max: 0.75 + k * 0.08, size: 6, color: '#7FE8FF' });
     }
     const label = ev.mult > 1 ? `+${ev.points}  ${NAMES.combo} x${ev.mult}` : `+${ev.points}`;
-    const hit = beamHitAnchor(ev, run);
-    if (hit) placeFloater(fx, { x: hit.x, y: hit.y - 18, ax: hit.x, ay: hit.y, kind: 'kill', text: label, life: FLOATER_LIFE, max: FLOATER_LIFE, color: ev.mult >= 4 ? '#FFFFFF' : '#F2C14E', size: 28 + (Math.min(ev.mult, 5) - 1) * 4 }, run);
+    // A combo kill (SEAR x2+) always gets its number (the HUD no longer repeats SEAR): at the beam hit,
+    // else where it died; a plain kill only beside a live beam hit.
+    const combo = ev.mult >= 2;
+    const hit = beamHitAnchor(ev, run) ?? (combo ? { x, y } : null);
+    const placed = hit && placeFloater(fx, { x: hit.x, y: hit.y - 18, ax: hit.x, ay: hit.y, kind: 'kill', text: label, life: FLOATER_LIFE, max: FLOATER_LIFE, color: ev.mult >= 4 ? '#FFFFFF' : '#F2C14E', size: 28 + (Math.min(ev.mult, 5) - 1) * 4 }, run, combo);
+    if (combo) {
+      fx.searKills = (fx.searKills ?? 0) + 1;
+      if (placed) fx.searFloaters = (fx.searFloaters ?? 0) + 1;
+    }
   } else if (ev.type === 'bite') {
     fx.shake = Math.min(14, fx.shake + 6 + ev.harm * 2);
     fx.hurt = 1;
