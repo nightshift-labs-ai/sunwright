@@ -280,6 +280,13 @@
   a FEATS n/6 chip beside PLAY. The title is now shot last (after the staged run is saved): FEATS 4/6,
   NORMAL best 33,090. check-shot-truth replays both from the runs.
 
+- A/B 00:50Z (61673e1 vs d1c1363, 2-2): the 00b9096 beams were too thin at 252 px. Bold beams again:
+  outer warm glow (26 px per unit of power, cap 36, 36% alpha) and inner glow (15/18 px, 60%) drawn
+  with 'lighten' on the beam layer (overlaps keep one glow, no additive glare), gold for sunlight and
+  blue/gold prism light, red-orange for red light (red + gold lighten to orange, never lilac); tinted
+  core 9.5 px (cap 11) and a 3 px white-hot centre; +8% while a SEAR combo is live. Kept: no white
+  cell squares, lit panes glow on the sprite. Cover: 0 blown 32 px blocks.
+
 ## Next
 - Field benchmark 5: items 1-11 all committed (21:45 UTC). Open from older sections: staging below,
   Bench3-3 solved plan (6 stray panes on the cover), Bench3-5 board >= 58%.

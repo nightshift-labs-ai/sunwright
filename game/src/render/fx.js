@@ -266,10 +266,18 @@ function drawStarburst(ctx, x, y, r, alpha) {
 }
 
 /**
- * A beam's passes: [width per unit of power, cap px, alpha]: a soft halo (<= 12 px, 35%), the tinted
- * core (<= 6 px: orange sunlight, red or blue prism light) and a 2 px white centre line.
+ * A beam's passes on its own layer: two warm halos (gold whatever the tint, so red and blue light
+ * crossing never turns lilac; 'lighten' so overlaps keep one glow instead of adding up to glare),
+ * then the tinted core (8-10 px: orange sunlight, red / blue / gold prism light) and a white-hot centre.
+ * width: px per unit of power, capped; halo: [sunlight, focused, red prism light] (red keeps a red glow,
+ * blue and gold light glow gold), else colour index `tint` of TINT_COLORS.
  */
-const BEAM_PASSES = [[7, 12, 0.35], [3.5, 6, 0.95], [2, 2, 0.95]];
+const BEAM_PASSES = [
+  { halo: ['rgba(255,190,50,', 'rgba(255,140,40,', 'rgba(255,96,60,'], width: 26, cap: 36, alpha: 0.36, blend: 'lighten' },
+  { halo: ['rgba(255,150,30,', 'rgba(255,120,30,', 'rgba(255,80,50,'], width: 15, cap: 18, alpha: 0.6, blend: 'lighten' },
+  { tint: 1, width: 9.5, cap: 11, alpha: 0.95, blend: 'source-over' },
+  { tint: 2, width: 2.8, cap: 3, alpha: 0.95, blend: 'source-over' },
+];
 /** Glow / halo / core colours per tint: sunlight, red (1), blue (2), gold (4). */
 const TINT_COLORS = {
   0: ['rgba(255,197,49,', 'rgba(255,128,24,', 'rgba(255,251,230,'],
@@ -286,30 +294,32 @@ const FOCUS_COLORS = ['rgba(255,120,40,', 'rgba(255,160,60,', 'rgba(255,251,230,
  */
 export function drawBeams(ctx, trace, opts) {
   const alpha = opts.alpha ?? 1;
-  const surge = 1 + (opts.flare ?? 0) * 0.3;
-  // Beams go onto their own layer with normal blending, so crossings keep a gold glow, an orange
-  // edge and a white core instead of adding up to a white blot; the layer then lies over the scene.
+  // A Flare surges every beam; a live SEAR combo makes them a little bolder too.
+  const surge = (1 + (opts.flare ?? 0) * 0.3) * (opts.sear ? 1.08 : 1);
+  // Beams go onto their own layer (halos lightened, cores laid over), so crossings keep a gold glow,
+  // an orange edge and a white core instead of adding up to a white blot; the layer then lies over the scene.
   const layer = beamLayer(ctx);
   const g = layer.getContext('2d');
   g.setTransform(1, 0, 0, 1, 0, 0);
   g.clearRect(0, 0, layer.width, layer.height);
   g.setTransform(ctx.getTransform());
   g.lineCap = 'round';
-  for (let pass = 0; pass < 3; pass++) {
-    const [width, cap, a] = BEAM_PASSES[pass];
+  for (const pass of BEAM_PASSES) {
+    g.globalCompositeOperation = pass.blend;
     for (const leg of trace.legs) {
       const w = Math.min(1.7, Math.max(0.5, Math.sqrt(leg.power / 10))) * surge;
-      const colors = leg.focused && pass < 2 ? FOCUS_COLORS : TINT_COLORS[leg.tint] ?? TINT_COLORS[0];
-      g.strokeStyle = `${colors[pass]}${a})`;
-      g.lineWidth = Math.min(cap, width * w);
+      const color = pass.halo ? pass.halo[leg.tint === 1 ? 2 : leg.focused ? 1 : 0] : (leg.focused && pass.tint === 1 ? FOCUS_COLORS : TINT_COLORS[leg.tint] ?? TINT_COLORS[0])[pass.tint];
+      g.strokeStyle = `${color}${pass.alpha})`;
+      g.lineWidth = Math.min(pass.cap, pass.width * w);
       // Colour-blind option: prism light also differs by pattern (red long dashes, blue dots).
-      g.setLineDash(opts.patterns && pass >= 1 ? TINT_DASHES[leg.tint] ?? [] : []);
+      g.setLineDash(opts.patterns && !pass.halo ? TINT_DASHES[leg.tint] ?? [] : []);
       g.beginPath();
       g.moveTo(toScreenX(leg.x0), toScreenY(leg.y0));
       g.lineTo(toScreenX(leg.x1), toScreenY(leg.y1));
       g.stroke();
     }
   }
+  g.globalCompositeOperation = 'source-over';
   // Photons: bright dashes flowing along each leg, away from the sun.
   g.setLineDash([5, 23]);
   g.lineDashOffset = -(opts.time ?? 0) * 140;
