@@ -5,13 +5,13 @@ import { ENEMIES, WAVE_COUNT } from './config.js';
 import { nextSunPreview } from './waves.js';
 import { enemiesRemaining } from './sim.js';
 import { rankFor } from './combat.js';
-import { currentBanner, winHeadline } from './announce.js';
+import { currentBanner, winLoseHeadline } from './announce.js';
 import { loadHistory } from './save.js';
 import { audioProbe } from './audio.js';
 import { squeezeReport } from './render/fit.js';
 import { bannerLayout } from './render/banner.js';
 import { buildIconCount } from './render/results.js';
-import { lastWinPill } from './render/hud.js';
+import { lastFrieze } from './render/hud.js';
 import { boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
 import { boardLabelBoxes } from './render/board.js';
 
@@ -205,8 +205,8 @@ export function installTestHook(app, api) {
         kills: run.stats.kills,
         banner: currentBanner(run),
         bannerBox: bannerBox(run),
-        winPill: lastWinPill(),
-        headline: winHeadline(run),
+        frieze: lastFrieze(),
+        headline: winLoseHeadline(run),
         log: run.log.join(' | '),
         sunsHeld: run.stats.wavesCleared,
         offersSeen: run.stats.offersSeen,

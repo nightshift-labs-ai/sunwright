@@ -6,7 +6,7 @@ import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, WAVE_COUNT, enemyRuleTag } f
 import { boonById } from '../draft.js';
 import { beamModsFor } from '../beams.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
-import { winHeadline } from '../announce.js';
+import { winLoseParts } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
 import { waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
@@ -407,43 +407,50 @@ function drawRightPanel(ctx, run, ui) {
 
 
 
-/** The WIN pill's box as last drawn (for the screenshot checks). */
-let winPillBox = null;
-export function lastWinPill() {
-  return winPillBox;
+/** The WIN + LOSE banner's band segments as last drawn (for the screenshot checks). */
+let friezeBox = null;
+export function lastFrieze() {
+  return friezeBox;
 }
 
 /**
- * WIN: n more suns, a pill on the north wall (<= 55% of the board wide), on the wider side of the live
- * north gate and its SUN tag so the gate and its beam stay in view; the lose rule is DRY = RUN LOST.
+ * The win and lose rules across the north wall, full width. When the live sun is in the north wall the
+ * band opens around that gate and its SUN tag (gate and beam stay in view): WIN left, LOSE right, both
+ * at the largest size that fits (LOSE may shorten).
  */
-function drawWinPill(ctx, run) {
-  const str = winHeadline(run);
-  ctx.font = `900 30px ${FONT}`;
-  let w = Math.min(BOARD_W * 0.55, ctx.measureText(str).width + 32);
-  const h = 40;
-  let cx = BOARD_X + BOARD_W / 2;
+function drawWinLoseFrieze(ctx, run) {
+  const { win, lose } = winLoseParts(run);
+  const x = BOARD_X - WALL;
+  const w = BOARD_W + WALL * 2;
   const ap = run.aperture;
-  if (ap.wall === 'north') {
-    const gate0 = BOARD_X + ap.c * CELL - 4;
-    const gate1 = BOARD_X + (ap.c + 1) * CELL + 84;
-    const left = gate0 - BOARD_X;
-    const right = BOARD_X + BOARD_W - gate1;
-    const room = Math.max(left, right) - 8;
-    w = Math.min(w, room);
-    cx = left >= right ? gate0 - 4 - room / 2 : gate1 + 4 + room / 2;
+  const notch = ap.wall === 'north' ? [BOARD_X + ap.c * CELL - 4, BOARD_X + (ap.c + 1) * CELL + 84] : null;
+  const segs = notch ? [[x, notch[0]], [notch[1], x + w]] : [[x, x + w]];
+  for (const [a, b] of segs) {
+    ctx.fillStyle = 'rgba(31,63,153,0.96)';
+    ctx.fillRect(a, 68, b - a, 38);
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(a + 1, 69, b - a - 2, 36);
   }
-  const x = Math.round(cx - w / 2);
-  const y = 70;
-  ctx.fillStyle = 'rgba(31,63,153,0.94)';
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, h / 2);
-  ctx.fill();
-  ctx.strokeStyle = GOLD;
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  fitLine(ctx, str, x + w / 2, y + 31, w - 20, 30, INK, 'center');
-  winPillBox = { x0: x, y0: y, x1: x + w, y1: y + h };
+  if (!notch) fitLine(ctx, `${win} - ${lose}`, 640, 99, w - 24, 32, '#FFF2A8', 'center');
+  else {
+    const [[l0, l1], [r0, r1]] = segs;
+    const loses = [lose, lose.replace('the ', ''), lose.replace('the ', '').replace(' runs', '')];
+    let pick = { size: 24, lose: loses[2] };
+    search: for (const size of [32, 28, 26, 24]) {
+      ctx.font = `900 ${size}px ${FONT}`;
+      if (ctx.measureText(win).width * 0.92 > l1 - l0 - 20) continue;
+      for (const l of loses) {
+        if (ctx.measureText(l).width * 0.92 <= r1 - r0 - 20) {
+          pick = { size, lose: l };
+          break search;
+        }
+      }
+    }
+    fitLine(ctx, win, (l0 + l1) / 2, 98, l1 - l0 - 20, pick.size, '#FFF2A8', 'center');
+    fitLine(ctx, pick.lose, (r0 + r1) / 2, 98, r1 - r0 - 20, pick.size, '#FFB0B0', 'center');
+  }
+  friezeBox = { segs, notch };
 }
 
 /**
@@ -680,7 +687,7 @@ function drawHotbar(ctx, run, ui) {
 
 export function drawHud(ctx, run, ui) {
   drawSunBar(ctx, run);
-  drawWinPill(ctx, run);
+  drawWinLoseFrieze(ctx, run);
   drawEventBanner(ctx, run, ui);
   drawLeftPanel(ctx, run);
   drawRightPanel(ctx, run, ui);

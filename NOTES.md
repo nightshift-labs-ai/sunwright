@@ -351,6 +351,13 @@
   144/144 SEAR numbers over the staged run), playtest 33/33, measure-shots 4/4, names OK, pack 1.12 MB,
   kit check (only transcripts_present). Cover canvas text items 58 -> 53.
 
+- A/B 02:23Z (d8d2149 vs 9052725: 2 of 6, margins 1): the de-clutter lost information the judges
+  liked; restoring it on the new layout. Item 1: the full-width WIN + LOSE banner is back across the
+  north wall (announce.winLoseParts / winLoseHeadline); when the live sun is in the north wall the band
+  opens around that gate and its SUN tag, WIN left and LOSE right at the largest common size that fits
+  (cover: `WIN: 5 more suns` | gate | `LOSE: fountain dry`, 32 px). check-shot-truth: the segments
+  never cover the live gate.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
