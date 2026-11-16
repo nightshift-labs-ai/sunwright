@@ -128,6 +128,7 @@ for (const shot of manifest.shots) {
   // BEST beside PLAY: the selected difficulty's best saved score (the staging plays Normal).
   const bestWant = `BEST ${Math.max(...runs.filter((r) => r.difficultyId === manifest.difficulty).map((r) => r.score)).toLocaleString('en-US')}`;
   check(t.best === bestWant, `${shot.name} ${t.best} vs ${bestWant}`);
+  check(t.pillBest === bestWant.toLowerCase(), `${shot.name} selected pill: ${t.pillBest} vs ${bestWant.toLowerCase()}`);
   check(!t.cardOverflow || t.cardOverflow.length === 0, `${shot.name} outside the title card: ${t.cardOverflow}`);
   console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.text} (${r.fit.toFixed(2)})`).join(' | ')}; ${t.hint}; ${t.best}; ${t.feats}`);
 }

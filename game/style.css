@@ -32,8 +32,9 @@ button.big:hover { background: #cf3f93; }
 .featcount { font: 900 24px system-ui, sans-serif; color: #3b1247; background: #ffe27a; border: 3px solid #b8862c; border-radius: 16px; padding: 4px 14px; white-space: nowrap; }
 .start-hint { margin: 0; font: 900 34px system-ui, sans-serif; color: #ffe27a; white-space: nowrap; letter-spacing: 0; }
 .picker { display: flex; gap: 6px; width: 100%; }
-.diff { flex: 1 1 auto; display: flex; justify-content: center; align-items: center; padding: 2px 4px; background: #2d5bd0; border-radius: 16px; letter-spacing: -1px; }
+.diff { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2px 4px; background: #2d5bd0; border-radius: 16px; letter-spacing: -1px; }
 .diff b { font-size: 40px; line-height: 1.1; }
+.diff small { font: 800 20px system-ui, sans-serif; letter-spacing: 0; line-height: 1.1; }
 .diff.on { background: #f2c14e; color: #3b1247; border-color: #fff6df; }
 .title-links { position: absolute; left: 716px; right: 24px; top: 664px; display: flex; justify-content: center; gap: 12px; }
 .title-links button { font-size: 30px; padding: 2px 18px; }

@@ -98,7 +98,7 @@ manifest.shots.at(-1).titleText = await page.evaluate(() => {
     return { text: parts.join(' '), px: parseFloat(getComputedStyle(line).fontSize), fit, inside: r.right <= table.right - 4 && r.bottom <= table.bottom && line.scrollWidth * fit <= line.clientWidth + 1 };
   });
   const hint = document.getElementById('start-hint');
-  return { rows, hint: hint.textContent.trim(), hintPx: parseFloat(getComputedStyle(hint).fontSize), feats: document.getElementById('feats-count').textContent.trim(), best: document.getElementById('title-best').textContent.trim(), cardOverflow: (() => {
+  return { rows, hint: hint.textContent.trim(), hintPx: parseFloat(getComputedStyle(hint).fontSize), feats: document.getElementById('feats-count').textContent.trim(), best: document.getElementById('title-best').textContent.trim(), pillBest: document.querySelector('#difficulty-picker .diff.on small')?.textContent.trim() ?? '', cardOverflow: (() => {
     const card = document.querySelector('.title-card').getBoundingClientRect();
     return [...document.querySelectorAll('.title-card button, .title-card span, .title-card p')].filter((n) => { const r = n.getBoundingClientRect(); return r.left < card.left || r.right > card.right; }).map((n) => n.textContent.trim().slice(0, 20));
   })() };

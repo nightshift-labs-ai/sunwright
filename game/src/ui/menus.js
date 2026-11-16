@@ -56,7 +56,10 @@ export function renderOptions(settings) {
 /** Difficulty buttons (one word each; the BEST chip shows the selected one's best), the scope line, the rules table. */
 export function showTitle(menus, bestFor, selected) {
   el('difficulty-picker').innerHTML = DIFFICULTY_ORDER.map((id) => {
-    return `<button class="diff ${id === selected ? 'on' : ''}" data-action="difficulty" data-arg="${id}"><b>${DIFFICULTIES[id].name}</b></button>`;
+    // The selected difficulty also shows its saved best under its name.
+    const best = id === selected ? bestFor(id) : null;
+    const line = best?.played ? `<small>best ${best.score.toLocaleString('en-US')}</small>` : '';
+    return `<button class="diff ${id === selected ? 'on' : ''}" data-action="difficulty" data-arg="${id}"><b>${DIFFICULTIES[id].name}</b>${line}</button>`;
   }).join('');
   el('rule-scope').textContent = SCOPE_LINE;
   el('feats-count').textContent = `FEATS ${loadFeats().length}/${FEATS.length}`;

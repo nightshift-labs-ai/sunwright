@@ -369,6 +369,9 @@
   combat.runLine, checked against the save's best before the run) and the charm names (14 px short
   names under 48 px icons). Spacing trimmed to fit the 24 px margin (rank ring 104 px).
 
+- Restore item 4: title keeps the 6-row rules table and one-word difficulty buttons; the selected one
+  shows `best 33,090` under its name (20 px; checked against the save and the title-card bounds).
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
