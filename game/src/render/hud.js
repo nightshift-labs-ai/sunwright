@@ -485,7 +485,7 @@ function drawWinLoseFrieze(ctx, run) {
     } else {
       // A gate near one end leaves one side too narrow: the wider side carries the whole sentence.
       const [a, b] = l1 - l0 >= r1 - r0 ? [l0, l1] : [r0, r1];
-      fitLine(ctx, loses.map((l) => `${win} - ${l}`), (a + b) / 2, 98, b - a - 20, [32, 28, 26, 24, 22], '#FFF2A8', 'center');
+      fitLine(ctx, loses.map((l) => `${win} - ${l}`), (a + b) / 2, 98, b - a - 20, [32, 28, 26, 24, 22, 20, 18], '#FFF2A8', 'center');
     }
   }
   friezeBox = { segs, notch };
