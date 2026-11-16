@@ -5,10 +5,11 @@
 import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, WAVE_COUNT, enemyRuleTag } from '../config.js';
 import { boonById } from '../draft.js';
 import { beamModsFor } from '../beams.js';
+import { chainMultiplier } from '../combat.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
 import { winLoseParts } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
-import { waveRoster } from '../waves.js';
+import { nextSunPreview, waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
 import { drawCharmBadge } from './charms.js';
 import { fitSized } from './fit.js';
@@ -21,6 +22,8 @@ const FONT = 'system-ui, "Segoe UI", sans-serif';
 const PANEL_W = 212;
 /** The left panel: sun dial, then the FOUNTAIN pips with DRY = RUN LOST under them (the next sun is the pill's). */
 const LEFT_PANEL_H = 282;
+/** INCOMING under it: kind rows, the Titan row and the NEXT SUN preview. */
+const INCOMING_H = 226;
 const LEFT_X = 6;
 const RIGHT_X = VIEW_W - PANEL_W - 6;
 
@@ -28,7 +31,7 @@ const HOTBAR = { y: 716, w: 104, h: 76, gap: 8 };
 const HOTBAR_X = 640 - (PIECE_ORDER.length * (HOTBAR.w + HOTBAR.gap) + 150 + 190) / 2;
 
 /** The pause, speed and sound buttons under the right panels: icons only (Esc / F / M on the keyboard). */
-const HUD_BUTTONS = ['pause', 'speed', 'mute'].map((id, k) => ({ id, x: RIGHT_X + 4 + k * 70, y: 444, w: 62, h: 50 }));
+const HUD_BUTTONS = ['pause', 'speed', 'mute'].map((id, k) => ({ id, x: RIGHT_X + 4 + k * 70, y: 468, w: 62, h: 50 }));
 
 /** Which HUD button (pause, speed, mute) is under the mouse, or null. */
 export function hudButtonHit(px, py) {
@@ -254,7 +257,7 @@ function drawLeftPanel(ctx, run) {
   ctx.stroke();
   drawFountainPips(ctx, run, 166);
   // INCOMING sits in the left gutter under the fountain.
-  panel(ctx, LEFT_X, 304, PANEL_W, 196);
+  panel(ctx, LEFT_X, 304, PANEL_W, INCOMING_H);
   drawIncoming(ctx, run, LEFT_X, 304);
 }
 
@@ -324,6 +327,12 @@ function drawIncoming(ctx, run, x0, y0) {
   drawTitanSkull(ctx, x0 + 22, y, 9, titanLeft === 0, '#FF6B5E');
   fitLine(ctx, [`${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, `${NAMES.sun} ${WAVE_COUNT}: THE TITAN`, `${NAMES.sun} ${WAVE_COUNT}: TITAN`], x0 + 38, y + 5, PANEL_W - 104, 15, '#FFB0B0');
   text(ctx, enemyRuleTag(ENEMIES.titan), x0 + PANEL_W - 10, y + 7, 20, '#FF8A8A', 'right', 900);
+  const preview = nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name);
+  if (preview) {
+    // Shorter wordings of the same preview: drop SUN, then keep only the first change.
+    const parts = preview.replace(`NEXT ${NAMES.sun}: `, '').split(', ');
+    fitLine(ctx, [preview, `NEXT: ${parts.join(', ')}`, `NEXT: ${parts[0]}`, parts[0]], x0 + 12, y + 32, PANEL_W - 20, 15, '#FFE27A');
+  }
 }
 
 /**
@@ -389,20 +398,42 @@ function drawTooltip(ctx, run, ui, y0) {
 /** Right column, 20 px apart: SCORE with BEST, QUARTZ, CHARMS, the GLASS legend (the buttons sit under it). */
 function drawRightPanel(ctx, run, ui) {
   const x0 = RIGHT_X;
-  panel(ctx, x0, 8, PANEL_W, 104);
+  panel(ctx, x0, 8, PANEL_W, 128);
   text(ctx, 'SCORE', x0 + 12, 30, 15, INK, 'left', 900);
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 32, '#FFF2A8', 'right', 900);
   // BEST from the save (a difficulty never finished says so: no "BEST 0").
-  text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 92, 15, '#FFD9A0', 'right', 900);
-  panel(ctx, x0, 132, PANEL_W, 62);
-  text(ctx, NAMES.currency, x0 + 12, 160, 15, INK, 'left', 900);
+  text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
+  drawComboLine(ctx, run, x0, 120);
+  panel(ctx, x0, 156, PANEL_W, 62);
+  text(ctx, NAMES.currency, x0 + 12, 184, 15, INK, 'left', 900);
   drawQuartzGem(ctx, QUARTZ_ANCHOR.x, QUARTZ_ANCHOR.y);
   const pulse = Math.max(0, 1 - (run.time - run.feedback.quartzAt) / 0.3);
-  text(ctx, String(run.quartz), x0 + PANEL_W - 10, 180, 32 + pulse * 8, pulse > 0 ? '#FFFFFF' : '#BDF4FF', 'right', 900);
-  panel(ctx, x0, 214, PANEL_W, 82);
-  drawCharmRow(ctx, run, 214);
-  panel(ctx, x0, 316, PANEL_W, 108);
-  drawTooltip(ctx, run, ui, 316);
+  text(ctx, String(run.quartz), x0 + PANEL_W - 10, 204, 32 + pulse * 8, pulse > 0 ? '#FFFFFF' : '#BDF4FF', 'right', 900);
+  panel(ctx, x0, 238, PANEL_W, 82);
+  drawCharmRow(ctx, run, 238);
+  panel(ctx, x0, 340, PANEL_W, 108);
+  drawTooltip(ctx, run, ui, 340);
+}
+
+/** SEAR combo under the score: the live multiplier, popping on each step. */
+function drawComboLine(ctx, run, x0, y) {
+  const mult = chainMultiplier(run.chain.count);
+  const active = run.chain.count >= 2;
+  const pop = Math.max(0, 1 - (run.time - run.feedback.searAt) / 0.25);
+  text(ctx, `${NAMES.combo} x${active ? mult : 1}`, x0 + PANEL_W - 10, y + 8, active ? 26 + pop * 8 : 20, active ? '#FFF2A8' : 'rgba(255,246,223,0.7)', 'right', 900);
+}
+
+/** The play HUD's panels and text rows (props must keep clear of these). */
+export function hudTextBoxes() {
+  const top = BOARD_X - WALL;
+  return [
+    { text: 'left panel', x0: LEFT_X, y0: 8, x1: LEFT_X + PANEL_W, y1: 8 + LEFT_PANEL_H },
+    { text: 'incoming', x0: LEFT_X, y0: 304, x1: LEFT_X + PANEL_W, y1: 304 + INCOMING_H },
+    { text: 'sun bar', x0: top + 4, y0: 4, x1: top + BOARD_W + WALL * 2 - 4, y1: 62 },
+    { text: 'win/lose banner', x0: top, y0: 68, x1: top + BOARD_W + WALL * 2, y1: 106 },
+    { text: 'right panels and buttons', x0: RIGHT_X, y0: 8, x1: RIGHT_X + PANEL_W, y1: HUD_BUTTONS[0].y + HUD_BUTTONS[0].h },
+    { text: 'hotbar and keys', x0: HOTBAR_X, y0: HOTBAR.y, x1: 1200, y1: HOTBAR.y + HOTBAR.h },
+  ];
 }
 
 

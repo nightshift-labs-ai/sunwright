@@ -48,7 +48,7 @@ async function capture(name, state) {
   await page.screenshot({ path: `screenshots/${name}`, type: 'jpeg', quality: QUALITY });
   // Drawn-geometry fields come from the frames just rendered for the screenshot, not the pre-render state.
   if (state.screen === 'play') state.frieze = await page.evaluate(() => window.__test.state().frieze);
-  manifest.shots.push({ name, tick: state.tick ?? null, state, squeeze: await page.evaluate(() => window.__test.squeezes()) });
+  manifest.shots.push({ name, tick: state.tick ?? null, state, squeeze: await page.evaluate(() => window.__test.squeezes()), propOverlaps: await page.evaluate(() => window.__test.propOverlaps()) });
   console.log(`${name}: ${state.phase ?? state.screen} day ${state.day ?? '-'} wave ${state.wave ?? '-'} score ${state.score ?? '-'}`);
 }
 for (const h of history) {

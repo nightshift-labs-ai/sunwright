@@ -358,6 +358,12 @@
   (cover: `WIN: 5 more suns` | gate | `LOSE: fountain dry`, 32 px). check-shot-truth: the segments
   never cover the live gate.
 
+- Restore item 2: SEAR xN under the score again (right column re-stacked 20 px apart: SCORE 8-136,
+  QUARTZ 156, CHARMS 238, legend 340, buttons 468), SUN - W / SUN - E tags on every gate of the day
+  (the live one gold), INCOMING's NEXT: preview line, and a potted palm (under INCOMING) and a vase
+  (under the buttons) on a props layer drawn only in play; the prop-vs-text check (hud.hudTextBoxes
+  + visible overlay text) is back in check-shot-truth.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

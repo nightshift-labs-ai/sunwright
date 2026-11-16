@@ -109,6 +109,9 @@ for (const shot of manifest.shots) {
   if (shot.squeeze.squeezed.length) console.log(`${shot.name} squeezed (>= 92%): ${shot.squeeze.squeezed.join(' | ')}`);
 }
 
+// Props: no palm or vase box touches text on any shot.
+for (const shot of manifest.shots) if (shot.propOverlaps) check(shot.propOverlaps.length === 0, `${shot.name} prop touches text: ${shot.propOverlaps.join(' | ')}`);
+
 // Title: the rules table rows are announce.titleRules() (numbers from config), lines >= 28 px and unclipped.
 for (const shot of manifest.shots) {
   if (!shot.titleText) continue;

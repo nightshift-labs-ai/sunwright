@@ -3,7 +3,7 @@
 // a win floods the courtyard with sunrise, a defeat drains the light.
 import { bannerAtNextGate, drawBeamGhost, drawBeams, drawDecals, drawFx, drawNextSunGhost, drawScreenFx, shakeOffset } from './fx.js';
 import { drawHud } from './hud.js';
-import { drawBoardTags, drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawSandSurround, drawShrine } from './board.js';
+import { drawBoardTags, drawCourtyard, drawMarchLines, drawPiece, drawPieces, drawProps, drawSandSurround, drawShrine } from './board.js';
 import { drawEnemies } from './beetles.js';
 import { drawResultsHero } from './results.js';
 import { shadowVectorFor, sunApertureFor } from '../sun.js';
@@ -71,6 +71,7 @@ export function drawFrame(ctx, frame) {
     ctx.clip();
   }
   drawCourtyard(ctx, run, time, !!frame.titleTraces);
+  if (frame.showHud) drawProps(ctx);
   if (frame.showHud && (phase === 'build' || phase === 'wave')) drawMarchLines(ctx, run, time);
   drawDecals(ctx, fx);
   const shadow = shadowVectorFor(run.aperture.wall);
