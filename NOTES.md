@@ -482,6 +482,12 @@
   to BURNED (232). The Titan is drawn at 0.72 (still over 200 px) and TITAN BURNED IN 0:07 on one line to
   make room; everything else on results is unchanged.
 
+- READY FOR A/B (depth and feedback pass, 04:30 UTC): livelier cover (3 cards lit, 2 greyed by cost),
+  ALMANAC (A), per-sun results chart; README features and keys updated. Verified on the committed state:
+  shot truth OK (cover card counts, Almanac vs config and save, chart vs run), playtest 37/37,
+  measure-shots 4/4, names OK, pack 1.16 MB, kit check (only transcripts_present). The kit takes exactly
+  4 shots, so the Almanac shows on the title as its button and keycap. Nothing removed from any shot.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
