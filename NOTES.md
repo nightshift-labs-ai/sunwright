@@ -410,6 +410,13 @@
   skull); below, the menu card (PLAY, BEST, FEATS, ENTER hint, GENTLE / NORMAL best N / SCORCHED, HOW
   TO PLAY, OPTIONS) and the whole demo courtyard (scale 0.52) side by side. Rules check floor now 28 px.
 
+- READY FOR A/B (look and readability pass, 03:31 UTC), after the 03:15Z field panel (8/8, every ask
+  was look/readability; nothing that won was removed). Verified on a fresh re-shoot (identical to the
+  commit): shot truth OK (incl. the Titan bar on a replayed sun-9 tick), playtest 33/33, measure-shots
+  4/4, names OK, pack 1.14 MB, kit check (only transcripts_present).
+  Open: a Titan frame would make a strong 5th shot but the sheet takes exactly 4; the cover now shows
+  one popup (+60 SEAR x2) because the +20 that covered a Scuttler is no longer placed there.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
