@@ -372,6 +372,12 @@
 - Restore item 4: title keeps the 6-row rules table and one-word difficulty buttons; the selected one
   shows `best 33,090` under its name (20 px; checked against the save and the title-card bounds).
 
+- READY FOR A/B (restore pass, 02:31 UTC): information the 02:23Z A/B missed is back on the new layout
+  (why: on this judge, information and feedback beat minimalism; d8d2149's removals lost 2 of 6).
+  Kept from Bench7: sunlight cone, INCOMING in the left column, flavour line, S ladder, rules table,
+  one-word difficulty buttons. Verified: shot truth OK, playtest 33/33, measure-shots 4/4, names OK,
+  pack 1.14 MB, kit check (only transcripts_present). Cover canvas text items 58 (as 9052725).
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
