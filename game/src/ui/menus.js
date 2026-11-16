@@ -12,10 +12,11 @@ import { draftContext, draftHeal, draftHint, historyChip, nextGoal, titleRules }
 import { drawCharmGlyph } from '../render/charms.js';
 import { drawHowtoPicture } from '../render/howto.js';
 import { drawRuleIcon } from '../render/ruleicons.js';
+import { almanacEntries } from '../almanac.js';
 import { MIN_SQUEEZE, fitScale } from '../render/fit.js';
 
 
-const SCREENS = ['title', 'howto', 'options', 'pause', 'draft', 'results'];
+const SCREENS = ['title', 'howto', 'options', 'almanac', 'pause', 'draft', 'results'];
 
 function el(id) {
   return document.getElementById(id);
@@ -43,6 +44,41 @@ export function showScreen(menus, name) {
   if (name === 'howto') for (const c of document.querySelectorAll('.howto-pic')) drawHowtoPicture(c.getContext('2d'), c.dataset.pic);
   menus.current = name;
   for (const s of SCREENS) el(`${s}-screen`).classList.toggle('hidden', s !== name);
+}
+
+/**
+ * The Almanac: every beetle, glass type and charm with its numbers from config (almanac.js); what the
+ * save has not met yet shows as a "? not met yet" silhouette with the sun it first appears.
+ */
+export function showAlmanac(met) {
+  const a = almanacEntries();
+  const unmet = (first) => `<i class="unmet">? not met yet${first ? ` - first seen ${NAMES.sun.toLowerCase()} ${first}` : ''}</i>`;
+  const beetles = a.beetles
+    .map((b) =>
+      met.enemies.includes(b.id)
+        ? `<div class="alm" data-kind="beetle" data-id="${b.id}" data-hp="${b.hp}" data-speed="${b.speed}" data-armour="${b.armour}" data-first="${b.firstSun}"><b>${escapeHtml(b.name)}</b><span>HP ${b.hp} - speed ${b.speed} - armour ${b.armour} - ${b.trait} - from ${NAMES.sun.toLowerCase()} ${b.firstSun}</span></div>`
+        : `<div class="alm unmet-row" data-kind="beetle" data-id="${b.id}" data-first="${b.firstSun}"><b>???</b>${unmet(b.firstSun)}</div>`,
+    )
+    .join('');
+  const glass = a.glass
+    .map((g) =>
+      met.glass.includes(g.id)
+        ? `<div class="alm" data-kind="glass" data-id="${g.id}" data-cost="${g.cost}" data-levels="${escapeHtml(g.levels.join('|'))}" data-upgrades="${g.upgrades.join('|')}"><b>${escapeHtml(g.name)} - ${g.cost} quartz</b><span>${g.upgrades.length ? g.levels.map((l, k) => `Lv${k + 1} ${escapeHtml(l)}`).join(' / ') : `${escapeHtml(g.levels[0])} (no levels)`}${g.upgrades.length ? ` - U: Lv2 ${g.upgrades[0]}, Lv3 ${g.upgrades[1]}` : ''}</span></div>`
+        : `<div class="alm unmet-row" data-kind="glass" data-id="${g.id}" data-first="${g.firstSun}"><b>???</b>${unmet(g.firstSun)}</div>`,
+    )
+    .join('');
+  const charms = a.charms
+    .map((c) =>
+      met.charms.includes(c.id)
+        ? `<div class="alm charm" data-kind="charm" data-id="${c.id}" data-effect="${escapeHtml(c.effect)}"><b>${escapeHtml(c.name)}</b><span>${escapeHtml(c.effect)}</span><small>${escapeHtml(c.how)}</small></div>`
+        : `<div class="alm charm unmet-row" data-kind="charm" data-id="${c.id}"><b>???</b>${unmet(0)}</div>`,
+    )
+    .join('');
+  const count = (list, ids) => `${list.filter((x) => ids.includes(x.id)).length}/${list.length}`;
+  el('almanac-body').innerHTML =
+    `<section><h3>BEETLES ${count(a.beetles, met.enemies)}</h3>${beetles}</section>` +
+    `<section><h3>GLASS ${count(a.glass, met.glass)}</h3>${glass}</section>` +
+    `<section class="charms"><h3>CHARMS ${count(a.charms, met.charms)}</h3><div class="charm-grid">${charms}</div></section>`;
 }
 
 /** Put the saved settings into the options sliders and boxes. */

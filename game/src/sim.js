@@ -48,6 +48,8 @@ export function createRun(seed, difficultyId = 'normal', mode = 'campaign') {
     chain: { count: 0, timer: 0, best: 0 },
     feedback: { searAt: -9, biteAt: -9, biteHarm: 0, quartzAt: -9 },
     stats: { kills: 0, sunHeal: 0, leaked: 0, wavesCleared: 0, offersSeen: 0 },
+    // What this run has met, for the Almanac: beetle kinds spawned, glass placed, charms offered.
+    met: { enemies: [], glass: [], charms: [] },
     events: [],
     endedAt: 0,
     layoutVersion: 0,
@@ -109,6 +111,7 @@ function applyOrder(run, order) {
         return;
       }
       run.quartz -= cost;
+      if (!run.met.glass.includes(order.piece)) run.met.glass.push(order.piece);
       setPiece(run.grid, order.c, order.r, { type: order.piece, rot: order.rot & 3, prevRot: order.rot & 3, turnedAt: -1, placedAt: run.time, placedWave: run.waveIndex, paid: cost });
       run.flow = buildFlowField(run.grid);
       refreshLight(run);
@@ -208,6 +211,7 @@ function finishWave(run) {
   run.phase = 'draft';
   run.offer = offerBoons(run);
   run.stats.offersSeen += run.offer.length;
+  for (const id of run.offer) if (!run.met.charms.includes(id)) run.met.charms.push(id);
   refreshLight(run);
   for (const type of Object.keys(PIECES)) if (PIECES[type].unlockWave === run.waveIndex) emit(run, { type: 'unlock', piece: type });
 }
@@ -224,6 +228,7 @@ function stepWave(run) {
   while (run.spawnCursor < run.schedule.length && run.schedule[run.spawnCursor].t <= run.waveTime) {
     const s = run.schedule[run.spawnCursor++];
     spawnEnemy(run, s.type, s.gate, s.hpMul);
+    if (!run.met.enemies.includes(s.type)) run.met.enemies.push(s.type);
     if (s.type === 'titan') emit(run, { type: 'boss' });
   }
   moveEnemies(run, DT);
@@ -249,7 +254,7 @@ export function stepSim(run, orders) {
 /** What the save keeps of a finished run (also shown in the results' RUN HISTORY). */
 export function runSummary(run) {
   const feats = FEATS.filter((f) => f.test(run)).map((f) => f.id);
-  return { difficultyId: run.difficultyId, mode: run.mode, outcome: run.phase, score: run.score, suns: run.stats.wavesCleared, day: run.aperture.day, phase: run.aperture.phase.name, feats };
+  return { met: run.met, difficultyId: run.difficultyId, mode: run.mode, outcome: run.phase, score: run.score, suns: run.stats.wavesCleared, day: run.aperture.day, phase: run.aperture.phase.name, feats };
 }
 
 /** Waves still to spawn plus beetles on the board, for the HUD's remaining bar. */

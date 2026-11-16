@@ -106,13 +106,18 @@ manifest.shots.at(-1).titleText = await page.evaluate(() => {
     return { text: parts.join(' '), px: parseFloat(getComputedStyle(line).fontSize), fit, inside: r.right <= table.right - 4 && r.bottom <= table.bottom && line.scrollWidth * fit <= line.clientWidth + 1 };
   });
   const hint = document.getElementById('start-hint');
-  return { rows, hint: hint.textContent.trim(), hintPx: parseFloat(getComputedStyle(hint).fontSize), feats: document.getElementById('feats-count').textContent.trim(), best: document.getElementById('title-best').textContent.trim(), eclipse: document.getElementById('eclipse-line').textContent.trim(), pillBest: document.querySelector('#difficulty-picker .diff.on small')?.textContent.trim() ?? '', cardOverflow: (() => {
+  return { rows, hint: hint.textContent.trim(), hintPx: parseFloat(getComputedStyle(hint).fontSize), feats: document.getElementById('feats-count').textContent.trim(), best: document.getElementById('title-best').textContent.trim(), eclipse: document.getElementById('eclipse-line').textContent.trim(), keycapsOverflow: (() => { const k = document.getElementById('keycaps'); return k.scrollWidth > k.clientWidth + 1; })(), pillBest: document.querySelector('#difficulty-picker .diff.on small')?.textContent.trim() ?? '', cardOverflow: (() => {
     const card = document.querySelector('.title-card').getBoundingClientRect();
     return [...document.querySelectorAll('.title-card button, .title-card span, .title-card p')].filter((n) => { const r = n.getBoundingClientRect(); return r.left < card.left || r.right > card.right; }).map((n) => n.textContent.trim().slice(0, 20));
   })() };
 });
 manifest.shots.at(-1).tagOverlaps = await page.evaluate(() => window.__test.tagOverlaps());
 manifest.shots.at(-1).titleLabels = await page.evaluate(() => window.__test.titleLabels());
+// The Almanac (not a shot): open it on the title and record every row, for check-shot-truth.
+await page.keyboard.press('KeyA');
+await page.waitForTimeout(200);
+manifest.almanac = await page.evaluate(() => [...document.querySelectorAll('#almanac-body .alm')].map((n) => ({ ...n.dataset, met: !n.classList.contains('unmet-row'), text: n.textContent.trim() })));
+await page.keyboard.press('Escape');
 manifest.log = log;
 writeFileSync('tools/shots-manifest.json', JSON.stringify(manifest));
 console.log(errors.length ? `console errors: ${errors.join(' | ')}` : 'no console errors');

@@ -40,6 +40,13 @@ expect(music === 0.3, 'the music slider saves its setting');
 await page.click('#options-screen button[data-action="closeOptions"]');
 await frame();
 expect(await visible('title-screen'), 'Back returns to the title');
+// ALMANAC: A on the title opens it, Esc closes it.
+await page.keyboard.press('KeyA');
+await frame();
+expect(await visible('almanac-screen'), 'A on the title opens the Almanac');
+await page.keyboard.press('Escape');
+await frame();
+expect(!(await visible('almanac-screen')), 'Esc closes the Almanac');
 // ECLIPSE: E does nothing while it is locked; once a win is saved, E starts an endless run.
 await page.keyboard.press('KeyE');
 await frame();

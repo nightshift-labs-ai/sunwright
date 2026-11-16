@@ -40,8 +40,8 @@ button.big:hover { background: #cf3f93; }
 .eclipse-line.locked { color: rgba(255, 246, 223, 0.6); }
 .eclipse-pill { position: absolute; left: 24px; top: 168px; width: 336px; box-sizing: border-box; margin: 0; padding: 3px 0; text-align: center; white-space: nowrap; font: 900 20px system-ui, sans-serif; color: #fff6df; background: #3b1247; border: 3px solid #c9b8ff; border-radius: 18px; }
 .title-links { display: flex; justify-content: center; gap: 12px; }
-.title-links button { font-size: 26px; padding: 2px 18px; }
-.keycaps { position: absolute; left: 24px; right: 24px; bottom: 10px; display: flex; justify-content: center; gap: 26px; padding: 2px 0; font: 900 36px system-ui, sans-serif; color: #fff6df; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 16px; }
+.title-links button { font-size: 22px; padding: 2px 14px; white-space: nowrap; letter-spacing: 0; }
+.keycaps { position: absolute; left: 24px; right: 24px; bottom: 10px; display: flex; justify-content: center; gap: 18px; padding: 2px 0; font: 900 30px system-ui, sans-serif; color: #fff6df; background: rgba(31, 63, 153, 0.8); border: 4px solid #f2c14e; border-radius: 16px; }
 .keycaps span { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 30px system-ui, sans-serif; text-align: center; color: #3b1247; background: #fff6df; border: 2px solid #f2c14e; border-bottom-width: 5px; border-radius: 8px; }
 .row { display: flex; gap: 12px; }
@@ -131,3 +131,17 @@ kbd { display: inline-block; min-width: 34px; padding: 0 6px; font: 900 30px sys
 .buttons button.big { font-size: 44px; padding: 14px 22px; }
 .buttons .minor { display: flex; flex-direction: column; gap: 6px; }
 .buttons .minor button { font-size: 30px; padding: 2px 14px; }
+
+/* Almanac: one sheet, beetles and glass on the left, the 12 charms in a grid on the right. */
+.sheet.almanac { width: 1220px; max-height: 776px; box-sizing: border-box; padding: 10px 18px 12px; gap: 6px; }
+.sheet.almanac h2 { font-size: 36px; }
+.almanac-body { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 6px 18px; width: 100%; text-align: left; }
+.almanac-body section.charms { grid-column: 2; grid-row: 1 / 3; }
+.almanac-body h3 { margin: 2px 0; font: 900 22px system-ui, sans-serif; color: #ffe27a; }
+.alm { display: flex; flex-direction: column; padding: 2px 8px; margin-bottom: 3px; background: rgba(20, 30, 90, 0.6); border: 2px solid rgba(242, 193, 78, 0.6); border-radius: 8px; }
+.alm b { font: 900 18px system-ui, sans-serif; color: #fff6df; }
+.alm span { font: 700 15px system-ui, sans-serif; color: #ffe9b8; }
+.alm small { font: 700 13px system-ui, sans-serif; color: #c9b8ff; }
+.alm.unmet-row b { color: rgba(255, 246, 223, 0.45); letter-spacing: 3px; }
+.alm .unmet { font: 700 15px system-ui, sans-serif; color: rgba(255, 246, 223, 0.6); }
+.charm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; }

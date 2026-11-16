@@ -31,6 +31,7 @@ export function rerollOffer(run) {
   run.rerolls++;
   run.offer = offerBoons(run);
   run.stats.offersSeen += run.offer.length;
+  for (const id of run.offer) if (!run.met.charms.includes(id)) run.met.charms.push(id);
   return true;
 }
 

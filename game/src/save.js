@@ -38,6 +38,9 @@ export function recordRun(summary) {
   data.best[summary.difficultyId] = { score: Math.max(old.score, summary.score), waves: Math.max(old.waves, summary.suns) };
   data.history = [...(data.history ?? []), summary].slice(-HISTORY_KEEP);
   if (summary.outcome === 'won') data.eclipseUnlocked = true;
+  // The Almanac's record: every beetle, glass and charm any finished run has met.
+  data.met ??= { enemies: [], glass: [], charms: [] };
+  for (const k of ['enemies', 'glass', 'charms']) data.met[k] = [...new Set([...data.met[k], ...(summary.met?.[k] ?? [])])];
   if (summary.mode === 'eclipse') data.eclipseBest = Math.max(data.eclipseBest ?? 0, summary.suns);
   data.feats = [...new Set([...(data.feats ?? []), ...(summary.feats ?? [])])];
   writeSave(data);
@@ -48,6 +51,11 @@ export function recordRun(summary) {
 export function loadEclipse() {
   const data = readSave();
   return { unlocked: !!data.eclipseUnlocked || (data.history ?? []).some((h) => h.outcome === 'won'), best: data.eclipseBest ?? 0 };
+}
+
+/** What the Almanac shows as met: { enemies, glass, charms } (ids). */
+export function loadMet() {
+  return { enemies: [], glass: [], charms: [], ...readSave().met };
 }
 
 /** Every FEAT id any finished run has earned. */

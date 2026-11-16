@@ -465,6 +465,16 @@
   splitter, pillar lit; lens 7 and prism 8 greyed), the Lv2 mirror's pips, fountain 6/10. Run still wins
   (36,440, 10/10). check-shot-truth asserts the card counts from the replayed run.
 
+- ALMANAC (A on the title, title button, pause button, A during a sun pauses and opens it): one sheet
+  with every beetle (HP, speed, armour, trait, first sun), every glass type (cost, first sun, effect at
+  Lv1 / Lv2 / Lv3 and upgrade prices; pillar "no levels") and the 12 charms (effect, common/rare pick,
+  repeatable), all built from config at runtime (almanac.js). Unmet entries (save `met`: beetle kinds
+  spawned, glass placed, charms offered, unioned over finished runs) show as `???` with `? not met yet -
+  first seen sun N`. check-shot-truth: staging opens it after the title shot; every row's numbers equal
+  config and its met state equals the replayed runs (22/22 met in the staged save). The kit takes exactly
+  4 screenshots, so the title shows the `A - ALMANAC` button and an `A ALMANAC` keycap (bar now 30 px,
+  6 keys; overflow checked).
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

@@ -34,11 +34,12 @@
       <div class="title-links">
         <button id="howto-button" data-action="howto">HOW TO PLAY</button>
         <button id="options-button" data-action="options">OPTIONS</button>
+        <button id="almanac-button" data-action="almanac">A - ALMANAC</button>
       </div>
     </div>
     <div id="keycaps" class="keycaps">
       <span><kbd>1-5</kbd>GLASS</span><span><kbd>Q/E</kbd>TURN</span><span><kbd>SPACE</kbd>FLARE</span>
-      <span><kbd>X</kbd>SELL</span><span><kbd>M</kbd>MUTE</span>
+      <span><kbd>X</kbd>SELL</span><span><kbd>M</kbd>MUTE</span><span><kbd>A</kbd>ALMANAC</span>
     </div>
   </section>
 
@@ -60,6 +61,7 @@
       <button data-action="resume">RESUME (ESC)</button>
       <button data-action="restart">RESTART RUN</button>
       <button data-action="options">OPTIONS</button>
+      <button data-action="almanac">ALMANAC (A)</button>
       <button data-action="mute">SOUND ON / OFF (M)</button>
       <button data-action="menu">QUIT TO TITLE</button>
     </div>
@@ -76,6 +78,14 @@
       <label>Beam patterns <input id="opt-patterns" type="checkbox" data-setting="patterns"></label>
       <p class="keys">F - fast forward x2 during a sun</p>
       <button data-action="closeOptions">BACK</button>
+    </div>
+  </section>
+
+  <section id="almanac-screen" class="overlay hidden">
+    <div class="sheet almanac">
+      <h2>ALMANAC</h2>
+      <div id="almanac-body" class="almanac-body"></div>
+      <button data-action="closeAlmanac">BACK (ESC)</button>
     </div>
   </section>
 

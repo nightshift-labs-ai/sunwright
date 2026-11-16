@@ -3,11 +3,11 @@
 import { DIFFICULTIES, DIFFICULTY_ORDER, DT, PIECES, PIECE_ORDER } from './config.js';
 import { createRun, pieceCost, pieceUnlocked, runSummary, stepSim } from './sim.js';
 import { playSfx, playSizzle, setBeamHum, setVolume, unlockAudio, updateMusic } from './audio.js';
-import { loadBest, loadEclipse, loadHistory, loadSettings, recordRun, saveSettings } from './save.js';
+import { loadBest, loadEclipse, loadHistory, loadMet, loadSettings, recordRun, saveSettings } from './save.js';
 import { drawFrame } from './render/scene.js';
 import { createFx, fxFromEvent, updateFx } from './render/fx.js';
 import { hotbarHit, hudButtonHit } from './render/hud.js';
-import { createMenus, renderOptions, restartRun, showDraft, showResults, showScreen, showTitle } from './ui/menus.js';
+import { createMenus, renderOptions, restartRun, showAlmanac, showDraft, showResults, showScreen, showTitle } from './ui/menus.js';
 import { createTitleDemo, stepTitleDemo } from './titledemo.js';
 import { createInput, drainIntents } from './input.js';
 import { pieceAt, placementCheck, setPiece } from './grid.js';
@@ -140,6 +140,8 @@ function handleUiAction(action, arg) {
       renderOptions(app.settings);
       break;
     case 'closeOptions': app.showOptions = false; break;
+    case 'almanac': app.showAlmanac = true; break;
+    case 'closeAlmanac': app.showAlmanac = false; break;
     case 'setting':
       app.settings[arg.name] = arg.value;
       setVolume(app.settings);
@@ -160,9 +162,16 @@ function handleKeyInPlay(code) {
   if (code === 'KeyM') return toggleMute();
   const over = run.phase === 'won' || run.phase === 'lost';
   if (code === 'Escape') {
-    if (app.showOptions) app.showOptions = false;
+    if (app.showAlmanac) app.showAlmanac = false;
+    else if (app.showOptions) app.showOptions = false;
     else if (over) goTitle();
     else app.paused = !app.paused;
+    return;
+  }
+  if (code === 'KeyA' && !over) {
+    // The Almanac pauses the sun while it is open.
+    app.paused = true;
+    app.showAlmanac = true;
     return;
   }
   if (code === 'KeyF') {
@@ -235,6 +244,7 @@ function handleIntent(it) {
     else if (it.kind === 'wheel' && !app.paused) rotateAtHover(it.dir);
   } else if (it.kind === 'key') {
     // Title: ENTER (or SPACE) starts the selected difficulty; the arrows move the selection.
+    if (app.showAlmanac && it.code !== 'Escape') return;
     if (it.code === 'Enter' || it.code === 'NumpadEnter' || it.code === 'Space') startRun();
     else if (it.code === 'KeyE' && app.screen === 'title') startRun(undefined, app.settings.difficulty, 'eclipse');
     else if ((it.code === 'ArrowUp' || it.code === 'ArrowDown') && app.screen === 'title') {
@@ -244,8 +254,10 @@ function handleIntent(it) {
     }
     else if (it.code === 'Escape') {
       app.showOptions = false;
+      app.showAlmanac = false;
       app.screen = 'title';
     }
+    else if (it.code === 'KeyA' && app.screen === 'title') app.showAlmanac = true;
     else if (it.code === 'KeyM') toggleMute();
   }
 }
@@ -329,6 +341,7 @@ function syncOverlays() {
   let want = null;
   const run = app.run;
   if (app.showOptions) want = 'options';
+  else if (app.showAlmanac) want = 'almanac';
   else if (app.screen === 'title') want = 'title';
   else if (app.screen === 'howto') want = 'howto';
   else if (app.paused) want = 'pause';
@@ -338,6 +351,7 @@ function syncOverlays() {
   if (want === 'results') showResults(menus, run, app.record, loadHistory().slice(-3));
   if (want !== app.overlay) {
     if (want === 'title') showTitle(menus, loadBest, app.settings.difficulty);
+    if (want === 'almanac') showAlmanac(loadMet());
     showScreen(menus, want);
     app.overlay = want;
   }

@@ -9,6 +9,7 @@ import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, pieceCost, pieceUnlocked, runSummary, stepSim } from '../game/src/sim.js';
 import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, nextGoal, titanStatus, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
 import { bannerLayout } from '../game/src/render/banner.js';
+import { almanacEntries } from '../game/src/almanac.js';
 import { FLOATER_REACH, beamHitAnchor, createFx, fxFromEvent, updateFx } from '../game/src/render/fx.js';
 import { DT } from '../game/src/config.js';
 import { BOARD_W, BOARD_X, BOARD_Y, CELL } from '../game/src/render/layout.js';
@@ -136,6 +137,7 @@ for (const shot of manifest.shots) {
   check(t.eclipse === eclWant, `${shot.name} eclipse line: ${t.eclipse} vs ${eclWant}`);
   check(t.pillBest === bestWant.toLowerCase(), `${shot.name} selected pill: ${t.pillBest} vs ${bestWant.toLowerCase()}`);
   check(!t.cardOverflow || t.cardOverflow.length === 0, `${shot.name} outside the title card: ${t.cardOverflow}`);
+  check(!t.keycapsOverflow, `${shot.name}: the keycap bar overflows`);
   console.log(`${shot.name}: rules ${t.rows.map((r) => `${r.text} (${r.fit.toFixed(2)})`).join(' | ')}; ${t.hint}; ${t.best}; ${t.feats}`);
 }
 
@@ -208,6 +210,28 @@ if (manifest.titan) {
   const bar = manifest.titan.bar;
   check(st && bar && bar.name === st.name && bar.tag === st.tag && Math.abs(bar.frac - st.frac) < 0.01, `Titan bar: drawn ${JSON.stringify(bar)} vs sim ${JSON.stringify(st)}`);
   console.log(`Titan bar at tick ${manifest.titan.tick}: ${st?.name} ${Math.round((st?.frac ?? 0) * 100)}% ${st?.tag}`);
+}
+
+// Almanac: every number on it equals config (almanac.js recomputed here), and what shows as met is
+// exactly what the replayed runs met (the save's union).
+if (manifest.almanac) {
+  const a = almanacEntries();
+  const runsAll = [...(manifest.history ?? []).map((h) => replayTo(h.endTick + 2, h.seed, h.log)), replayTo(manifest.shots.find((s) => s.name === '4-results.jpg').state.tick)];
+  const met = { beetle: new Set(runsAll.flatMap((r) => r.met.enemies)), glass: new Set(runsAll.flatMap((r) => r.met.glass)), charm: new Set(runsAll.flatMap((r) => r.met.charms)) };
+  for (const row of manifest.almanac) {
+    check(row.met === met[row.kind].has(row.id), `Almanac ${row.kind} ${row.id}: shown met ${row.met}, save ${met[row.kind].has(row.id)}`);
+    if (row.kind === 'beetle') {
+      const b = a.beetles.find((x) => x.id === row.id);
+      check(Number(row.first) === b.firstSun, `Almanac ${row.id} first sun ${row.first} vs ${b.firstSun}`);
+      if (row.met) check(Number(row.hp) === b.hp && Number(row.speed) === b.speed && Number(row.armour) === b.armour, `Almanac ${row.id} numbers vs config`);
+    } else if (row.kind === 'glass' && row.met) {
+      const g = a.glass.find((x) => x.id === row.id);
+      check(Number(row.cost) === g.cost && row.levels === g.levels.join('|') && row.upgrades === g.upgrades.join('|'), `Almanac ${row.id} cost/levels/upgrades vs config`);
+    } else if (row.kind === 'charm' && row.met) {
+      check(row.effect === a.charms.find((x) => x.id === row.id).effect, `Almanac charm ${row.id} effect vs config`);
+    }
+  }
+  console.log(`Almanac: ${manifest.almanac.filter((r) => r.met).length}/${manifest.almanac.length} rows met, every number from config`);
 }
 
 // Starbursts: at most 6 big ones, each where the light hits a beetle or a prism splits (replayed).
