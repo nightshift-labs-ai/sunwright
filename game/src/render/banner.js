@@ -2,7 +2,7 @@
 // the gate it talks about (the next sun's window for "NEXT SUN: WEST - REAIM GLASS", else the
 // current sun's), with a nub pointing at that window. DOM-free, so the stage planner and the
 // screenshot checks can place it too.
-import { bannerSun, currentBanner } from '../announce.js';
+import { bannerSun, currentBanner, titanStatus } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL } from './layout.js';
 
@@ -16,7 +16,8 @@ const GAP = 6;
  */
 export function bannerLayout(run) {
   const message = currentBanner(run);
-  if (!message) return null;
+  // While the Titan is on the board her bar takes the banner's place (hud.drawTitanBar).
+  if (!message || titanStatus(run)) return null;
   const cut = message.indexOf(' - ');
   const head = cut > 0 ? message.slice(0, cut) : message;
   const sub = cut > 0 ? message.slice(cut + 3) : '';

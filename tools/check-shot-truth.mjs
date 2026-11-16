@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { ENEMIES, FEATS, WAVE_COUNT } from '../game/src/config.js';
 import { nextSunPreview } from '../game/src/waves.js';
 import { createRun, enemiesRemaining, runSummary, stepSim } from '../game/src/sim.js';
-import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, nextGoal, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
+import { bannerSun, currentBanner, draftContext, draftHeal, draftHint, nextGoal, titanStatus, historyChip, titleRules, winLoseHeadline } from '../game/src/announce.js';
 import { bannerLayout } from '../game/src/render/banner.js';
 import { FLOATER_REACH, beamHitAnchor, createFx, fxFromEvent, updateFx } from '../game/src/render/fx.js';
 import { DT } from '../game/src/config.js';
@@ -194,6 +194,14 @@ for (const shot of manifest.shots) {
     check(fx.searKills > 0 && fx.searKills === fx.searFloaters, `SEAR numbers: ${fx.searFloaters} for ${fx.searKills} combo kills`);
     console.log(`staged run: ${fx.searKills} combo kills, ${fx.searFloaters} SEAR numbers`);
   }
+}
+
+// Titan bar (a sun-9 tick of the staged run, not a shipped shot): name, HP and phase straight from the sim.
+if (manifest.titan) {
+  const st = titanStatus(replayTo(manifest.titan.tick));
+  const bar = manifest.titan.bar;
+  check(st && bar && bar.name === st.name && bar.tag === st.tag && Math.abs(bar.frac - st.frac) < 0.01, `Titan bar: drawn ${JSON.stringify(bar)} vs sim ${JSON.stringify(st)}`);
+  console.log(`Titan bar at tick ${manifest.titan.tick}: ${st?.name} ${Math.round((st?.frac ?? 0) * 100)}% ${st?.tag}`);
 }
 
 // Starbursts: at most 6 big ones, each where the light hits a beetle or a prism splits (replayed).

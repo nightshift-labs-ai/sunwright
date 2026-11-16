@@ -7,6 +7,7 @@ import { DT, WAVE_COUNT } from '../game/src/config.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
 import { routeCells } from '../game/src/pathing.js';
+import { carapaceOpen } from '../game/src/enemies.js';
 import { placementCheck, setPiece } from '../game/src/grid.js';
 import { pieceCost } from '../game/src/sim.js';
 
@@ -182,6 +183,7 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT, scars = null) {
   let draftTick = -1;
   let draftHp = -1;
   let endTick = -1;
+  let titanTick = -1;
   const fx = createFx(); // the same deterministic effects the browser runs, to count real floaters
   const bites = [];
   const { result, log } = playRun(seed, difficulty, bot, (run, events) => {
@@ -204,15 +206,20 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT, scars = null) {
       if (process.env.STAGE_DUMP === '1') console.error(JSON.stringify({ tick: run.tick, score, hp: run.shrineHp, enemies: run.enemies.length, burning, opaque, chain: run.chain.count }));
       if (score > cover.score) cover = { tick: run.tick, score, hp: run.shrineHp, enemies: run.enemies.length, burning, types, opaque, freshBite, atRim };
     }
+    // A sun-9 tick with the Titan on the board, already hurt, her shell open, for the bar check.
+    if (titanTick < 0 && run.phase === 'wave') {
+      const t = run.enemies.find((e) => e.def.boss && e.hp > 0);
+      if (t && t.hp < t.maxHp && carapaceOpen(t)) titanTick = run.tick;
+    }
     if (run.phase === 'draft' && run.waveIndex === COVER_WAVE + 1 && draftTick < 0) {
       draftTick = run.tick;
       draftHp = run.shrineHp;
     }
     if ((run.phase === 'won' || run.phase === 'lost') && endTick < 0) endTick = run.tick;
   }, makeDirector(K, scars));
-  if (scars) return { result, log, cover: scars.cover, draftTick, draftHp, endTick };
+  if (scars) return { result, log, cover: scars.cover, draftTick, draftHp, endTick, titanTick };
   // STAGE_V4: replay the same run, now scarring the fountain after the cover and in the last sun.
   if (process.env.STAGE_V4 === '1') return planRun(seed, K, difficulty, bot, { coverTick: cover.tick, cover });
-  return { result, log, cover, draftTick, draftHp, endTick };
+  return { result, log, cover, draftTick, draftHp, endTick, titanTick };
 }
 

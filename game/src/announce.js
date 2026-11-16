@@ -2,6 +2,7 @@
 // banner over the board. Pure sim state (no DOM), so screenshots can be checked against it.
 import { DIFFICULTIES, DIFFICULTY_ORDER, NAMES, SCORING, WAVE_COUNT } from './config.js';
 import { sunApertureFor } from './sun.js';
+import { armourOf, carapaceOpen } from './enemies.js';
 
 const LOG_LINES = 3;
 const BANNER_SECONDS = 2.5;
@@ -122,4 +123,20 @@ export function nextGoal(run) {
   if (run.phase !== 'won') return `NEXT GOAL: hold ${run.stats.wavesCleared + 1} ${NAMES.suns.toLowerCase()}`;
   const harder = DIFFICULTY_ORDER[DIFFICULTY_ORDER.indexOf(run.difficultyId) + 1];
   return harder ? `NEXT GOAL: win on ${DIFFICULTIES[harder].name}` : `NEXT GOAL: beat ${run.score.toLocaleString('en-US')}`;
+}
+
+/**
+ * The Titan bar while she is on the board, from the sim: her name, HP fraction and her one real phase,
+ * the carapace (open: armour 0, burn now; shut: full armour). null when she is not on the board.
+ */
+export function titanStatus(run) {
+  const t = run.enemies.find((e) => e.def.boss && e.hp > 0);
+  if (!t) return null;
+  const open = carapaceOpen(t);
+  return {
+    name: NAMES.enemy.titan,
+    frac: Math.max(0, t.hp / t.maxHp),
+    open,
+    tag: open ? 'SHELL OPEN - BURN!' : `SHELL SHUT - ARMOUR ${armourOf(t)}`,
+  };
 }

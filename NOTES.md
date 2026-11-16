@@ -396,6 +396,14 @@
   SUN pill docks on whichever side of its gate covers no beetle. Cover: +60 SEAR x2 (the +20 that sat
   on a Scuttler is gone). Panels and buttons re-stacked; palm and vase moved to stay clear.
 
+- Item 4, Titan bar: while the Titan is on the board a boss bar takes the banner's slot at the top of
+  the court (announce.titanStatus): skull, HORNBACK TITAN, HP bar (hp / maxHp) and her one real phase,
+  the carapace (TITAN_CARAPACE): `SHELL OPEN - BURN!` (pink pulse) or `SHELL SHUT - ARMOUR 30`. Floaters
+  and tags avoid it. Not added to the sheet (the kit needs exactly 4 shots; a 5th would shrink them):
+  shots.mjs replays the staged run to a hurt, open-shell Titan tick (14328) and check-shot-truth compares
+  the drawn bar with the sim (`TITAN_SHOT=/tmp/x.jpg` saves that frame to look at). Seen: in seed 2013
+  the Titan takes almost no damage until she reaches the hottest cell, then dies within 0.1 s.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

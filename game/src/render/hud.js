@@ -7,7 +7,7 @@ import { boonById } from '../draft.js';
 import { beamModsFor } from '../beams.js';
 import { chainMultiplier } from '../combat.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
-import { winLoseParts } from '../announce.js';
+import { titanStatus, winLoseParts } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
 import { nextSunPreview, waveRoster } from '../waves.js';
 import { drawEnemy } from './beetles.js';
@@ -746,10 +746,56 @@ function drawHotbar(ctx, run, ui) {
 }
 
 
+/** Where the Titan bar sits: across the top of the courtyard, under the WIN + LOSE banner. */
+export const TITAN_BAR = { x: 640 - 270, y: BOARD_Y + 6, w: 540, h: 66 };
+
+/** The boss bar while the Titan is on the board: skull, name, HP bar and her carapace phase. */
+function drawTitanBar(ctx, run) {
+  const st = titanStatus(run);
+  if (!st) return;
+  const { x, y, w, h } = TITAN_BAR;
+  ctx.fillStyle = 'rgba(42,16,36,0.9)';
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, 14);
+  ctx.fill();
+  ctx.strokeStyle = st.open ? '#FF4D8D' : GOLD;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  drawTitanSkull(ctx, x + 26, y + 22, 11, false, '#FF6B5E');
+  text(ctx, st.name, x + 46, y + 30, 24, INK, 'left', 900);
+  text(ctx, st.tag, x + w - 14, y + 29, 18, st.open ? '#FF4D8D' : '#FFE27A', 'right', 900);
+  const bx = x + 14;
+  const bw = w - 28;
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.fillRect(bx, y + 40, bw, 18);
+  const grad = ctx.createLinearGradient(bx, 0, bx + bw, 0);
+  grad.addColorStop(0, '#FF4D8D');
+  grad.addColorStop(1, '#FF9A3D');
+  ctx.fillStyle = grad;
+  ctx.fillRect(bx, y + 40, bw * st.frac, 18);
+  ctx.strokeStyle = '#2A1608';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(bx, y + 40, bw, 18);
+  if (st.open) {
+    ctx.strokeStyle = `rgba(255,77,141,${0.5 + 0.5 * Math.sin(run.time * 8)})`;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x - 3, y - 3, w + 6, h + 6);
+  }
+  titanBarDrawn = { ...st, box: { x0: x, y0: y, x1: x + w, y1: y + h }, fill: bw * st.frac / bw };
+}
+
+let titanBarDrawn = null;
+/** The Titan bar as last drawn (for checks), or null. */
+export function lastTitanBar() {
+  return titanBarDrawn;
+}
+
 export function drawHud(ctx, run, ui) {
+  titanBarDrawn = null;
   drawSunBar(ctx, run);
   drawWinLoseFrieze(ctx, run);
   drawEventBanner(ctx, run, ui);
+  drawTitanBar(ctx, run);
   drawLeftPanel(ctx, run);
   drawRightPanel(ctx, run, ui);
   drawHotbar(ctx, run, ui);

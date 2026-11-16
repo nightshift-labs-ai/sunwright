@@ -4,7 +4,7 @@
 import { NAMES, WAVE_COUNT } from '../config.js';
 import { beamModsFor, bigStarbursts, traceBeams } from '../beams.js';
 import { sunApertureFor } from '../sun.js';
-import { bannerSun, currentBanner } from '../announce.js';
+import { bannerSun, currentBanner, titanStatus } from '../announce.js';
 import { bannerLayout } from './banner.js';
 import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, QUARTZ_ANCHOR, VIEW_H, VIEW_W, toScreenX, toScreenY } from './layout.js';
 import { boardLabelBoxes } from './board.js';
@@ -501,6 +501,8 @@ export function boardTextBoxes(run) {
   // The event banner pill docked at its gate (render/banner.js, drawn by hud.drawEventBanner).
   const banner = bannerLayout(run);
   if (banner) boxes.push({ text: 'BANNER', x0: banner.x0, x1: banner.x1, y0: banner.y0, y1: banner.y1 });
+  // The Titan bar across the top of the court while she is on the board (hud.drawTitanBar).
+  if (titanStatus(run)) boxes.push({ text: 'TITAN BAR', x0: 370, x1: 910, y0: BOARD_Y + 6, y1: BOARD_Y + 72 });
   if ((run.phase === 'wave' || run.phase === 'build') && run.waveIndex + 1 < WAVE_COUNT && !bannerAtNextGate(run)) {
     const ap = sunApertureFor(run.seed, run.waveIndex + 1);
     const trace = traceBeams(run.grid, ap, beamModsFor(run.boons));

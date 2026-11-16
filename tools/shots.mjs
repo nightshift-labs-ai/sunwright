@@ -82,6 +82,14 @@ manifest.shots.at(-1).textOutside = await page.evaluate(() => {
   }
   return bad;
 });
+// A Titan tick of the same run (not shipped as a shot): the bar as drawn, for check-shot-truth.
+if (plan.titanTick >= 0) {
+  await page.evaluate(([seed, diff]) => window.__test.start(seed, diff), [SEED, DIFF]);
+  await page.evaluate(([l, t]) => window.__test.replay(l, t), [log, plan.titanTick]);
+  await page.waitForTimeout(150);
+  manifest.titan = { tick: plan.titanTick, bar: await page.evaluate(() => window.__test.state().titanBar) };
+  if (process.env.TITAN_SHOT) await page.screenshot({ path: process.env.TITAN_SHOT, type: 'jpeg', quality: 80 });
+}
 // The title last, after every run is saved: its pills and FEATS count read the real save.
 await page.evaluate(() => window.__test.ui('menu'));
 await page.waitForTimeout(150);

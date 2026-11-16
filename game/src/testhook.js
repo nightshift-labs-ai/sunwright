@@ -11,7 +11,7 @@ import { audioProbe } from './audio.js';
 import { squeezeReport } from './render/fit.js';
 import { bannerLayout } from './render/banner.js';
 import { buildIconCount } from './render/results.js';
-import { hudTextBoxes, lastFrieze } from './render/hud.js';
+import { hudTextBoxes, lastFrieze, lastTitanBar } from './render/hud.js';
 import { beetleUnder, boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
 import { boardLabelBoxes, propBoxes, propsVisible } from './render/board.js';
 
@@ -225,6 +225,7 @@ export function installTestHook(app, api) {
         banner: currentBanner(run),
         bannerBox: bannerBox(run),
         frieze: lastFrieze(),
+        titanBar: lastTitanBar(),
         headline: winLoseHeadline(run),
         log: run.log.join(' | '),
         sunsHeld: run.stats.wavesCleared,
