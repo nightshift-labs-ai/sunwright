@@ -23,7 +23,7 @@ const PANEL_W = 212;
 /** The left panel: sun dial, then the FOUNTAIN pips with DRY = RUN LOST under them (the next sun is the pill's). */
 const LEFT_PANEL_H = 282;
 /** INCOMING under it: kind rows, the Titan row and the NEXT SUN preview. */
-const INCOMING_H = 226;
+const INCOMING_H = 248;
 const LEFT_X = 6;
 const RIGHT_X = VIEW_W - PANEL_W - 6;
 
@@ -31,7 +31,7 @@ const HOTBAR = { y: 716, w: 132, h: 76, gap: 6 };
 const HOTBAR_X = 640 - (PIECE_ORDER.length * (HOTBAR.w + HOTBAR.gap) + 150 + 190) / 2;
 
 /** The pause, speed and sound buttons under the right panels: icons only (Esc / F / M on the keyboard). */
-const HUD_BUTTONS = ['pause', 'speed', 'mute'].map((id, k) => ({ id, x: RIGHT_X + 4 + k * 70, y: 468, w: 62, h: 50 }));
+const HUD_BUTTONS = ['pause', 'speed', 'mute'].map((id, k) => ({ id, x: RIGHT_X + 4 + k * 70, y: 494, w: 62, h: 50 }));
 
 /** Which HUD button (pause, speed, mute) is under the mouse, or null. */
 export function hudButtonHit(px, py) {
@@ -218,8 +218,8 @@ function droplet(ctx, x, y, r) {
 /** FOUNTAIN n/10: a droplet per HP, empty ones pulsing red, and how the run is lost. */
 function drawFountainPips(ctx, run, y) {
   const x0 = LEFT_X + 10;
-  text(ctx, NAMES.fountainShort, x0, y, 15, INK, 'left', 900);
-  text(ctx, `${run.shrineHp}/${run.shrineMax}`, LEFT_X + PANEL_W - 10, y + 2, 20, run.shrineHp <= 3 ? '#FF8A8A' : '#7DFFC4', 'right', 900);
+  text(ctx, NAMES.fountainShort, x0, y, 18, INK, 'left', 900);
+  text(ctx, `${run.shrineHp}/${run.shrineMax}`, LEFT_X + PANEL_W - 10, y + 6, 30, run.shrineHp <= 3 ? '#FF8A8A' : '#7DFFC4', 'right', 900);
   const pulse = 0.5 + Math.sin(run.time * 6) * 0.5;
   for (let k = 0; k < run.shrineMax; k++) {
     const x = x0 + 12 + (k % 5) * 38;
@@ -303,30 +303,34 @@ function drawQuartzGem(ctx, x, y) {
 /** INCOMING: what this sun brings (or still has on the way) and the Titan waiting at sun 9. */
 function drawIncoming(ctx, run, x0, y0) {
   const inWave = run.phase === 'wave';
-  text(ctx, inWave ? `INCOMING - ${enemiesRemaining(run)} LEFT` : `${NAMES.sun} ${run.waveIndex + 1} BRINGS`, x0 + 12, y0 + 22, 15, inWave ? '#FFB0D8' : INK, 'left', 900);
+  if (inWave) {
+    text(ctx, 'INCOMING', x0 + 12, y0 + 26, 18, '#FFB0D8', 'left', 900);
+    text(ctx, `${enemiesRemaining(run)}`, x0 + PANEL_W - 46, y0 + 30, 30, '#FFE14D', 'right', 900);
+    text(ctx, 'LEFT', x0 + PANEL_W - 8, y0 + 26, 14, '#FFB0D8', 'right', 900);
+  } else text(ctx, `${NAMES.sun} ${run.waveIndex + 1} BRINGS`, x0 + 12, y0 + 26, 18, INK, 'left', 900);
   const roster = waveRoster(run.waveIndex, run.diff);
   const left = new Map();
   if (inWave) {
     for (let i = run.spawnCursor; i < run.schedule.length; i++) left.set(run.schedule[i].type, (left.get(run.schedule[i].type) ?? 0) + 1);
     for (const e of run.enemies) left.set(e.type, (left.get(e.type) ?? 0) + 1);
   }
-  let y = y0 + 52;
+  let y = y0 + 58;
   for (const row of roster) {
     if (row.type === 'titan') continue;
     drawEnemyIcon(ctx, row.type, x0 + 26, y, 0.62);
-    text(ctx, ENEMIES[row.type].name, x0 + 48, y + 6, 15, INK, 'left', 800);
-    text(ctx, inWave ? `${left.get(row.type) ?? 0}` : `x${row.count}`, x0 + PANEL_W - 10, y + 7, 20, '#FFE14D', 'right', 900);
+    text(ctx, ENEMIES[row.type].name, x0 + 48, y + 7, 18, INK, 'left', 800);
+    text(ctx, inWave ? `${left.get(row.type) ?? 0}` : `x${row.count}`, x0 + PANEL_W - 10, y + 8, 24, '#FFE14D', 'right', 900);
     // The kind's rule in one word (from its stats), and NEW before its first sun.
     const rule = enemyRuleTag(ENEMIES[row.type]);
     const isNew = row.isNew && !inWave;
-    if (rule) text(ctx, rule, x0 + 48, y + 27, 20, '#9FE8FF', 'left', 900);
-    if (isNew) text(ctx, 'NEW', rule ? x0 + PANEL_W - 10 : x0 + 48, y + 27, 15, '#FF8AD0', rule ? 'right' : 'left', 900);
-    y += rule || isNew ? 44 : 32;
+    if (rule) text(ctx, rule, x0 + 48, y + 29, 20, '#9FE8FF', 'left', 900);
+    if (isNew) text(ctx, 'NEW', rule ? x0 + PANEL_W - 10 : x0 + 48, y + 29, 18, '#FF8AD0', rule ? 'right' : 'left', 900);
+    y += rule || isNew ? 46 : 34;
   }
   const titanLeft = run.waveIndex === WAVE_COUNT - 1 && inWave ? left.get('titan') ?? 0 : 1;
   drawTitanSkull(ctx, x0 + 22, y, 9, titanLeft === 0, '#FF6B5E');
-  fitLine(ctx, [`${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, `${NAMES.sun} ${WAVE_COUNT}: THE TITAN`, `${NAMES.sun} ${WAVE_COUNT}: TITAN`], x0 + 38, y + 5, PANEL_W - 104, 15, '#FFB0B0');
-  text(ctx, enemyRuleTag(ENEMIES.titan), x0 + PANEL_W - 10, y + 7, 20, '#FF8A8A', 'right', 900);
+  fitLine(ctx, [`${NAMES.sun} ${WAVE_COUNT}: ${NAMES.enemy.titan}`, `${NAMES.sun} ${WAVE_COUNT}: THE TITAN`, `${NAMES.sun} ${WAVE_COUNT}: TITAN`], x0 + 36, y + 6, PANEL_W - 100, [18, 17, 16], '#FFB0B0');
+  text(ctx, enemyRuleTag(ENEMIES.titan), x0 + PANEL_W - 10, y + 7, 18, '#FF8A8A', 'right', 900);
   const preview = nextSunPreview(run.waveIndex, run.diff, (t) => ENEMIES[t].name);
   if (preview) {
     // Shorter wordings of the same preview: drop SUN, then keep only the first change.
@@ -351,10 +355,11 @@ function fitLine(ctx, options, x, y, maxW, sizes, color, align = 'left') {
 
 /** Owned glass charms as small medallions. */
 function drawCharmRow(ctx, run, y0) {
-  text(ctx, `${NAMES.charmsShort} (${run.boons.length})`, RIGHT_X + 12, y0 + 20, 15, INK, 'left', 900);
+  text(ctx, NAMES.charmsShort, RIGHT_X + 12, y0 + 22, 18, INK, 'left', 900);
+  text(ctx, `${run.boons.length}`, RIGHT_X + PANEL_W - 10, y0 + 26, 30, '#FFF2A8', 'right', 900);
   run.boons.forEach((id, k) => {
     const b = boonById(id);
-    drawCharmBadge(ctx, b, RIGHT_X + 24 + (k % 6) * 33, y0 + 46 + Math.floor(k / 6) * 32, 15);
+    drawCharmBadge(ctx, b, RIGHT_X + 24 + (k % 6) * 33, y0 + 54 + Math.floor(k / 6) * 32, 15);
   });
 }
 
@@ -362,14 +367,14 @@ function drawCharmRow(ctx, run, y0) {
 /** The GLASS legend: each piece's icon and what it does, one verb each (the lens with this run's focus). */
 function drawGlassLegend(ctx, run, y0) {
   PIECE_ORDER.forEach((type, k) => {
-    const y = y0 + 20 + k * 20;
+    const y = y0 + 24 + k * 23;
     ctx.save();
-    ctx.translate(RIGHT_X + 26, y - 6);
+    ctx.translate(RIGHT_X + 26, y - 7);
     ctx.scale(0.5, 0.5);
     drawPieceIcon(ctx, type, 0, 0);
     ctx.restore();
     const verb = type === 'lens' ? `focuses x${beamModsFor(run.boons).lensMult}` : PIECES[type].verb;
-    text(ctx, verb, RIGHT_X + 52, y, 15, pieceUnlocked(run, type) ? INK : 'rgba(255,246,223,0.5)', 'left', 800);
+    text(ctx, verb, RIGHT_X + 52, y, 18, pieceUnlocked(run, type) ? INK : 'rgba(255,246,223,0.5)', 'left', 800);
   });
 }
 
@@ -399,20 +404,20 @@ function drawTooltip(ctx, run, ui, y0) {
 function drawRightPanel(ctx, run, ui) {
   const x0 = RIGHT_X;
   panel(ctx, x0, 8, PANEL_W, 128);
-  text(ctx, 'SCORE', x0 + 12, 30, 15, INK, 'left', 900);
+  text(ctx, 'SCORE', x0 + 12, 30, 18, INK, 'left', 900);
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 32, '#FFF2A8', 'right', 900);
   // BEST from the save (a difficulty never finished says so: no "BEST 0").
-  text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 90, 15, '#FFD9A0', 'right', 900);
+  text(ctx, ui.best > 0 ? `BEST ${ui.best.toLocaleString('en-US')}` : 'NO BEST YET', x0 + PANEL_W - 10, 90, 18, '#FFD9A0', 'right', 900);
   drawComboLine(ctx, run, x0, 120);
   panel(ctx, x0, 156, PANEL_W, 62);
-  text(ctx, NAMES.currency, x0 + 12, 184, 15, INK, 'left', 900);
+  text(ctx, NAMES.currency, x0 + 12, 184, 18, INK, 'left', 900);
   drawQuartzGem(ctx, QUARTZ_ANCHOR.x, QUARTZ_ANCHOR.y);
   const pulse = Math.max(0, 1 - (run.time - run.feedback.quartzAt) / 0.3);
   text(ctx, String(run.quartz), x0 + PANEL_W - 10, 204, 32 + pulse * 8, pulse > 0 ? '#FFFFFF' : '#BDF4FF', 'right', 900);
-  panel(ctx, x0, 238, PANEL_W, 82);
+  panel(ctx, x0, 238, PANEL_W, 90);
   drawCharmRow(ctx, run, 238);
-  panel(ctx, x0, 340, PANEL_W, 108);
-  drawTooltip(ctx, run, ui, 340);
+  panel(ctx, x0, 348, PANEL_W, 126);
+  drawTooltip(ctx, run, ui, 348);
 }
 
 /** SEAR combo under the score: the live multiplier, popping on each step. */

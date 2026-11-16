@@ -389,6 +389,13 @@
   `turns light 90°`, splitter `splits light in 2`, lens `x2.5 for 3 cells` from this run's beam mods,
   pillar `blocks beetles`, prism `burn/slow/pierce`). The right-hand GLASS legend stays.
 
+- Item 3, HUD readability: side-panel text 15 -> 18 px (counts 20 -> 24, legend rows 18 px); one big
+  key number per panel (FOUNTAIN 7/10, INCOMING 16 LEFT, CHARMS 4 at 30 px; SCORE and QUARTZ already 32);
+  popups get a dark pill; a popup spot that covers a beetle is skipped (plain numbers then drop, SEAR
+  numbers fall back), and the conflict checks (planner, check-shot-truth) count beetles too; the NEXT
+  SUN pill docks on whichever side of its gate covers no beetle. Cover: +60 SEAR x2 (the +20 that sat
+  on a Scuttler is gone). Panels and buttons re-stacked; palm and vase moved to stay clear.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

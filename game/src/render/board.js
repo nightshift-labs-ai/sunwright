@@ -175,8 +175,8 @@ function drawUrn(g, x, y) {
  * prop touches text. Only the play screen shows them (draft and results put text there).
  */
 const PROPS = [
-  { kind: 'palm', x: 92, y: 600 },
-  { kind: 'urn', x: 1168, y: 596 },
+  { kind: 'palm', x: 92, y: 618 },
+  { kind: 'urn', x: 1168, y: 622 },
 ];
 
 /** Each prop's bounding box, shadow and fronds included. */

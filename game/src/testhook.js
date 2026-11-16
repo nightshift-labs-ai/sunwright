@@ -12,7 +12,7 @@ import { squeezeReport } from './render/fit.js';
 import { bannerLayout } from './render/banner.js';
 import { buildIconCount } from './render/results.js';
 import { hudTextBoxes, lastFrieze } from './render/hud.js';
-import { boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
+import { beetleUnder, boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
 import { boardLabelBoxes, propBoxes, propsVisible } from './render/board.js';
 
 
@@ -55,6 +55,7 @@ function floaterOverlaps(app) {
     boxes.slice(i + 1).forEach((o) => hit(b, o) && bad.push(`${b.text} / ${o.text}`));
     boardTextBoxes(run).forEach((l) => hit(b, l) && bad.push(`${b.text} / label ${l.text}`));
     if (boxTouchesBeam(b, run.trace.legs)) bad.push(`${b.text} / beam`);
+    if (beetleUnder(b, run)) bad.push(`${b.text} / beetle`);
   });
   return bad;
 }

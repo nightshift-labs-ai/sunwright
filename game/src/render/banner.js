@@ -4,7 +4,7 @@
 // screenshot checks can place it too.
 import { bannerSun, currentBanner } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
-import { BOARD_W, BOARD_X, BOARD_Y, CELL } from './layout.js';
+import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL } from './layout.js';
 
 /** The pill's width: under 40% of the board (780 px -> 312). */
 export const BANNER_W = 304;
@@ -23,30 +23,37 @@ export function bannerLayout(run) {
   const ap = sunApertureFor(run.seed, bannerSun(run));
   const w = BANNER_W;
   const h = sub ? 74 : 48;
-  let x0;
-  let y0;
-  let nub;
+  // Two docking spots per gate (above / below it on a side wall, right / left of it on the north wall):
+  // the first that covers no beetle wins, else the first.
+  const spots = [];
   if (ap.wall === 'north') {
-    // Row 0, right of the window's column (left of it near the east wall); the nub points up at it.
-    y0 = BOARD_Y + GAP;
-    const right = BOARD_X + (ap.c + 1) * CELL + GAP;
-    const toRight = right + w <= BOARD_X + BOARD_W - GAP;
-    x0 = toRight ? right : BOARD_X + ap.c * CELL - GAP - w;
-    const edge = toRight ? x0 : x0 + w;
-    const out = toRight ? -1 : 1;
-    nub = [[edge, y0 + 12], [edge, y0 + 34], [edge + out * 14, y0 - 2]];
+    const y0 = BOARD_Y + GAP;
+    for (const toRight of [true, false]) {
+      const x0 = toRight ? BOARD_X + (ap.c + 1) * CELL + GAP : BOARD_X + ap.c * CELL - GAP - w;
+      if (x0 < BOARD_X + GAP || x0 + w > BOARD_X + BOARD_W - GAP) continue;
+      const edge = toRight ? x0 : x0 + w;
+      const out = toRight ? -1 : 1;
+      spots.push({ x0, y0, nub: [[edge, y0 + 12], [edge, y0 + 34], [edge + out * 14, y0 - 2]] });
+    }
   } else {
-    // Hugging the side wall, in the row above the window (below it at the top row); the nub points at it.
     const west = ap.wall === 'west';
-    x0 = west ? BOARD_X + GAP : BOARD_X + BOARD_W - GAP - w;
-    const above = BOARD_Y + ap.r * CELL - GAP - h;
-    const below = above < BOARD_Y + GAP;
-    y0 = below ? BOARD_Y + (ap.r + 1) * CELL + GAP : above;
-    const edge = below ? y0 : y0 + h;
-    const out = below ? -1 : 1;
-    const side = west ? x0 : x0 + w;
-    const inward = west ? 1 : -1;
-    nub = [[side + inward * 12, edge], [side + inward * 36, edge], [side - inward * 2, edge + out * 16]];
+    const x0 = west ? BOARD_X + GAP : BOARD_X + BOARD_W - GAP - w;
+    for (const below of [false, true]) {
+      const y0 = below ? BOARD_Y + (ap.r + 1) * CELL + GAP : BOARD_Y + ap.r * CELL - GAP - h;
+      if (y0 < BOARD_Y + GAP || y0 + h > BOARD_Y + BOARD_H - GAP) continue;
+      const edge = below ? y0 : y0 + h;
+      const out = below ? -1 : 1;
+      const side = west ? x0 : x0 + w;
+      const inward = west ? 1 : -1;
+      spots.push({ x0, y0, nub: [[side + inward * 12, edge], [side + inward * 36, edge], [side - inward * 2, edge + out * 16]] });
+    }
   }
+  const covers = (sp) => run.enemies.some((e) => {
+    const r = e.def.size * CELL;
+    const ex = BOARD_X + e.x * CELL;
+    const ey = BOARD_Y + e.y * CELL;
+    return sp.x0 < ex + r && ex - r < sp.x0 + w && sp.y0 < ey + r && ey - r < sp.y0 + h;
+  });
+  const { x0, y0, nub } = spots.find((sp) => !covers(sp)) ?? spots[0];
   return { head, sub, wall: ap.wall, x0, y0, x1: x0 + w, y1: y0 + h, nub };
 }

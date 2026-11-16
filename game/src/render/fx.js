@@ -82,6 +82,16 @@ export function floaterBox(t, rising = false) {
   return { x0: t.x - w / 2, x1: t.x + w / 2, y0: t.y - t.size * 1.15 - (rising ? 24 * t.life : 0), y1: t.y + t.size * 0.3 };
 }
 
+/** Does a box cover a live beetle's sprite? */
+export function beetleUnder(box, run) {
+  return run.enemies.some((e) => {
+    const r = e.def.size * CELL;
+    const x = toScreenX(e.x);
+    const y = toScreenY(e.y);
+    return box.x0 < x + r && x - r < box.x1 && box.y0 < y + r && y - r < box.y1;
+  });
+}
+
 /** Floaters (as boxes now) that overlap another floater, a floor label or a beam core. */
 export function floaterConflicts(fx, run) {
   const labels = boardTextBoxes(run);
@@ -89,7 +99,7 @@ export function floaterConflicts(fx, run) {
   fx.texts.forEach((t, i) => {
     const box = floaterBox(t);
     if (fx.texts.slice(i + 1).some((o) => overlaps(box, floaterBox(o)))) n++;
-    if (labels.some((l) => overlaps(box, l)) || boxTouchesBeam(box, run.trace.legs)) n++;
+    if (labels.some((l) => overlaps(box, l)) || boxTouchesBeam(box, run.trace.legs) || beetleUnder(box, run)) n++;
   });
   return n;
 }
@@ -167,6 +177,7 @@ function placeFloater(fx, t, run, force = false) {
     if (path.x0 < BOARD_X + 4 || path.x1 > BOARD_X + BOARD_W - 4 || path.y0 < BOARD_Y + 4 || box.y1 > BOARD_Y + BOARD_H - 4) continue;
     if (labels.some((l) => overlaps(path, l))) continue;
     lastResort ??= cand;
+    if (run && beetleUnder(box, run)) continue;
     if (boxTouchesBeam(box, legs)) continue;
     fallback ??= cand;
     if (fx.texts.some((o) => overlaps(box, floaterBox(o)))) continue;
@@ -576,6 +587,13 @@ export function drawFx(ctx, fx, texts = true) {
     ctx.globalAlpha = k > 0.3 ? 1 : Math.max(0, k / 0.3);
     const pop = age < 0.15 ? 1.4 - (age / 0.15) * 0.4 : 1;
     ctx.font = `900 ${Math.round(t.size * pop)}px system-ui, sans-serif`;
+    // A dark pill behind the number so it reads on sand, light and beetles alike.
+    const pw = ctx.measureText(t.text).width + 18;
+    const ph = t.size * pop * 1.05;
+    ctx.fillStyle = 'rgba(42,22,8,0.55)';
+    ctx.beginPath();
+    ctx.roundRect(t.x - pw / 2, t.y - ph * 0.82, pw, ph, ph / 2);
+    ctx.fill();
     outlinedText(ctx, t.text, t.x, t.y, t.color);
   }
   ctx.globalAlpha = 1;
