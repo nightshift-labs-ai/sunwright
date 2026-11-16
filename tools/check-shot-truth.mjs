@@ -222,6 +222,10 @@ for (const shot of manifest.shots) {
       if (shot.state.phase === 'won') check(strip.capElsewhere === 0, `${shot.name} lose title shown outside the strip on a win`);
       const featWant = runSummary(replayTo(shot.state.tick)).feats.map((id) => FEATS.find((f) => f.id === id).name);
       check(JSON.stringify(strip.feats) === JSON.stringify(featWant) && strip.featsLabel === `FEATS ${featWant.length}/${FEATS.length}`, `${shot.name} FEATS: shown ${strip.featsLabel} ${strip.feats} vs ${featWant}`);
+      const endRun = replayTo(shot.state.tick);
+      check(strip.buildIcons === new Set(endRun.boons).size, `${shot.name} YOUR BUILD icons ${strip.buildIcons} vs ${new Set(endRun.boons).size} charms`);
+      check(strip.nineOfNine <= 2, `${shot.name}: 9/9 shown ${strip.nineOfNine} times`);
+      console.log(`${shot.name}: ${strip.sub}; ${strip.buildIcons} build icons; 9/9 x${strip.nineOfNine}`);
       const lad = rankLadder(replayTo(shot.state.tick));
       check(JSON.stringify({ head: strip.ladder.head, marks: strip.ladder.marks }) === JSON.stringify(lad), `${shot.name} S ladder: shown ${JSON.stringify(strip.ladder)} vs ${JSON.stringify(lad)}`);
       check(strip.ladder.px >= 28 && strip.ladder.fit >= 0.92 && strip.ladder.fits, `${shot.name} S ladder: ${strip.ladder.px}px, fit ${strip.ladder.fit}`);

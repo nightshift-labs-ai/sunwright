@@ -11,6 +11,7 @@ import { audioProbe } from './audio.js';
 import { squeezeReport } from './render/fit.js';
 import { bannerLayout } from './render/banner.js';
 import { propBoxes, propsVisible } from './render/board.js';
+import { buildIconCount } from './render/results.js';
 import { hudTextBoxes } from './render/hud.js';
 import { boardTagOverlaps, boardTextBoxes, boxTouchesBeam, drawnStarbursts } from './render/fx.js';
 
@@ -98,6 +99,9 @@ function resultsText() {
     chips: [...strip.querySelectorAll('.chip')].map((n) => ({ text: n.textContent.trim(), won: n.classList.contains('won') })),
     featsLabel: document.querySelector('#results-feats b')?.textContent.trim() ?? '',
     next: document.getElementById('results-next').textContent.trim(),
+    buildIcons: buildIconCount(),
+    nineOfNine: [...screen.querySelectorAll('*')].filter((n) => !n.childElementCount && n.textContent.includes('9/9')).length,
+    sub: document.getElementById('results-sub').textContent.trim(),
     ladder: (() => {
       const meta = document.getElementById('results-meta');
       const spans = [...meta.children].filter((n) => n.tagName === 'SPAN');

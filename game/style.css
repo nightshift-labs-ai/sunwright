@@ -91,7 +91,7 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
 .lost #results-title { color: #ff8a8a; }
 .sheet.results { position: absolute; right: 24px; top: 164px; width: 876px; box-sizing: border-box; margin: 0; padding: 8px 12px 10px; gap: 4px; background: linear-gradient(#fdf0d0, #f0d39c); border: 5px solid #f2c14e; box-shadow: 0 8px 0 rgba(91, 58, 30, 0.45); }
 .lost .sheet.results { border-color: #ff8a8a; }
-.results .sub { margin: 0; font-size: 34px; font-weight: 900; color: #3b1247; text-shadow: none; }
+.results .sub { margin: 0; font-size: 30px; font-weight: 900; color: #3b1247; text-shadow: none; }
 .score { font: 900 76px system-ui, sans-serif; line-height: 1; color: #7a2e14; display: flex; align-items: center; gap: 18px; }
 .rank { display: inline-flex; align-items: center; justify-content: center; width: 112px; height: 112px; border-radius: 50%; font: 900 76px system-ui, sans-serif; background: #2d5bd0; border: 8px solid #f2c14e; color: #ffe27a; -webkit-text-stroke: 2px #3b1247; paint-order: stroke fill; }
 .rank-S { background: #b0307a; color: #fff6df; }
@@ -110,7 +110,7 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
 .feats b { font: 900 24px system-ui, sans-serif; color: #7a2e14; white-space: nowrap; }
 .feats .feat { display: flex; align-items: center; gap: 5px; padding: 1px 9px 1px 4px; font: 900 20px system-ui, sans-serif; color: #3b1247; background: #ffe27a; border: 3px solid #b8862c; border-radius: 16px; white-space: nowrap; }
 .feats .feat i { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff6df, #f2c14e 45%, #b8862c); border: 2px solid #7a2e14; }
-.history { display: flex; flex-direction: column; gap: 2px; width: 100%; box-sizing: border-box; padding: 0 10px 6px; background: rgba(122, 46, 20, 0.08); border: 3px solid #c99a5b; border-radius: 14px; }
+.history { margin-top: 6px; display: flex; flex-direction: column; gap: 2px; width: 100%; box-sizing: border-box; padding: 0 10px 6px; background: rgba(122, 46, 20, 0.08); border: 3px solid #c99a5b; border-radius: 14px; }
 .history:empty { display: none; }
 .history .strip-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .history .strip-head b { font: 900 30px system-ui, sans-serif; color: #3b1247; line-height: 1.15; }
@@ -118,7 +118,7 @@ kbd { display: inline-block; min-width: 30px; padding: 0 5px; font: 900 24px sys
 .history .chip { font: 900 26px system-ui, sans-serif; padding: 1px 12px; border-radius: 20px; border: 3px solid #f2c14e; white-space: nowrap; }
 .history .fell { color: #fff6df; background: #c0303a; }
 .history .won { color: #3b1247; background: #ffe27a; }
-.buttons { display: flex; justify-content: center; gap: 8px; align-items: center; width: 100%; }
+.buttons { margin-top: 6px; display: flex; justify-content: center; gap: 8px; align-items: center; width: 100%; }
 .buttons button { font-size: 30px; padding: 6px 10px; white-space: nowrap; letter-spacing: 0; }
 .buttons button.big { font-size: 44px; padding: 14px 22px; }
 .buttons .minor { display: flex; flex-direction: column; gap: 6px; }

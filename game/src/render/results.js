@@ -150,22 +150,42 @@ function drawYourBuild(ctx, run) {
   ctx.font = '900 30px system-ui, sans-serif';
   ctx.fillStyle = '#FFE27A';
   ctx.fillText('YOUR BUILD', 40, 570);
+  // One 56 px icon per charm taken (4 + 3 grid), an xN badge on repeats; no name labels.
   const counts = new Map();
   for (const id of run.boons) counts.set(id, (counts.get(id) ?? 0) + 1);
-  [...counts].slice(0, 8).forEach(([id, n], k) => {
-    const x = 40 + (k % 2) * 164;
-    const y = 604 + Math.floor(k / 2) * 38;
-    const boon = boonById(id);
-    drawCharmBadge(ctx, boon, x + 15, y, 15);
-    ctx.font = '800 20px system-ui, sans-serif';
-    ctx.fillStyle = '#FFF6DF';
-    ctx.textAlign = 'left';
-    const times = n > 1 ? ` x${n}` : '';
-    fitText(ctx, [`${boon.name}${times}`, `${NAMES.charmShort[id]}${times}`], x + 36, y + 7, 120);
+  const icons = [...counts].slice(0, 8);
+  icons.forEach(([id, n], k) => {
+    const row = Math.floor(k / 4);
+    const inRow = Math.min(4, icons.length - row * 4);
+    const x = 192 + (k % 4 - (inRow - 1) / 2) * 74;
+    const y = 620 + row * 68;
+    drawCharmBadge(ctx, boonById(id), x, y, 28);
+    if (n > 1) {
+      ctx.fillStyle = '#F2C14E';
+      ctx.beginPath();
+      ctx.arc(x + 22, y - 20, 13, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#3B1247';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.font = '900 15px system-ui, sans-serif';
+      ctx.fillStyle = '#3B1247';
+      ctx.textAlign = 'center';
+      ctx.fillText(`x${n}`, x + 22, y - 15);
+    }
   });
+  lastBuildIcons = icons.length;
+  ctx.textAlign = 'left';
   ctx.font = '800 22px system-ui, sans-serif';
   ctx.fillStyle = '#FFE27A';
   fitText(ctx, `${run.boons.length} picked from ${run.stats.offersSeen} offers`, 40, 762, 300);
+}
+
+let lastBuildIcons = 0;
+
+/** How many charm icons YOUR BUILD drew last (for the screenshot checks). */
+export function buildIconCount() {
+  return lastBuildIcons;
 }
 
 function clock(seconds) {
@@ -178,21 +198,22 @@ export function drawResultsHero(ctx, run, time) {
   ctx.fillStyle = 'rgba(70,40,15,0.35)';
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
   const won = run.phase === 'won';
-  ctx.fillStyle = 'rgba(31,63,153,0.92)';
-  ctx.beginPath();
-  ctx.roundRect(24, 164, 336, 58, 14);
-  ctx.fill();
-  ctx.strokeStyle = '#F2C14E';
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  drawSunTrack(ctx, 48, 193, 36, 12, run.stats.wavesCleared, won ? -1 : run.waveIndex);
   if (won) {
-    drawTitanCarcass(ctx, HERO.x, HERO.y, 0.82, time);
+    // A won run needs no sun track (SUNS 9/9 and the WON chip say it): the Titan takes the space.
+    drawTitanCarcass(ctx, HERO.x, HERO.y - 40, 0.82, time);
     if (run.stats.titanSeconds !== undefined) {
-      caption(ctx, 'TITAN BURNED IN', 192, 474, 30, '#FFE27A');
-      caption(ctx, clock(run.stats.titanSeconds), 192, 514, 40, '#FFFFFF');
+      caption(ctx, 'TITAN BURNED IN', 192, 448, 30, '#FFE27A');
+      caption(ctx, clock(run.stats.titanSeconds), 192, 492, 40, '#FFFFFF');
     }
   } else {
+    ctx.fillStyle = 'rgba(31,63,153,0.92)';
+    ctx.beginPath();
+    ctx.roundRect(24, 164, 336, 58, 14);
+    ctx.fill();
+    ctx.strokeStyle = '#F2C14E';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    drawSunTrack(ctx, 48, 193, 36, 12, run.stats.wavesCleared, run.waveIndex);
     drawDrainedFountain(ctx, HERO.x, HERO.y, 0.8);
   }
   ctx.fillStyle = 'rgba(31,63,153,0.92)';

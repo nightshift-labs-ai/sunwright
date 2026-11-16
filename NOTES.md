@@ -299,6 +299,11 @@
   tick / red cross); TOP RANK - S on an S run; NORMAL - m:ss on a loss. Seed and "over best" dropped
   (S - SAME SEED and NEW BEST say them). Fitted at 93% (904 px natural in 842). check-shot-truth
   recomputes the head and each mark from the replayed run and checks size and fit.
+- Bench7 item 2: results lower third calmer: YOUR BUILD is 7 charm icons at 56 px in a 4+3 grid
+  (Mend has an x2 badge, the name labels are gone; heading and "8 picked from 24 offers" stay); a won
+  run drops the top-left sun strip (the Titan moves up) and its subline reads `The fountain still
+  runs. The courtyard is yours.` (30 px; lost runs keep theirs); +6 px above LAST 3 RUNS and the
+  buttons. check-shot-truth: icon count = distinct charms (7), 9/9 shown at most twice.
 
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,

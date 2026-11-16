@@ -161,7 +161,7 @@ export function showResults(menus, run, record, history) {
   title.textContent = won ? RESULT_WIN_TITLE : RESULT_LOSE_TITLE;
   fitHeading(title, 104, 1180);
   el('results-sub').textContent = won
-    ? `Courtyard held - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`
+    ? `The ${NAMES.fountainShort.toLowerCase()} still runs. The courtyard is yours.`
     : `Fell on Day ${run.aperture.day} ${run.aperture.phase.name.toLowerCase()} - ${run.stats.wavesCleared}/${WAVE_COUNT} ${NAMES.suns.toLowerCase()}`;
   const rank = rankFor(run);
   el('results-score').innerHTML = `<span class="rank rank-${rank}">${rank}</span>${run.score.toLocaleString('en-US')}${record.isBest ? '<em>NEW BEST</em>' : ''}`;
