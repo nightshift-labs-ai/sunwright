@@ -436,19 +436,26 @@ function drawWinLoseFrieze(ctx, run) {
   else {
     const [[l0, l1], [r0, r1]] = segs;
     const loses = [lose, lose.replace('the ', ''), lose.replace('the ', '').replace(' runs', '')];
-    let pick = { size: 24, lose: loses[2] };
+    const fits = (str, room) => ctx.measureText(str).width * 0.92 <= room - 20;
+    let pick = null;
     search: for (const size of [32, 28, 26, 24]) {
       ctx.font = `900 ${size}px ${FONT}`;
-      if (ctx.measureText(win).width * 0.92 > l1 - l0 - 20) continue;
+      if (!fits(win, l1 - l0)) continue;
       for (const l of loses) {
-        if (ctx.measureText(l).width * 0.92 <= r1 - r0 - 20) {
+        if (fits(l, r1 - r0)) {
           pick = { size, lose: l };
           break search;
         }
       }
     }
-    fitLine(ctx, win, (l0 + l1) / 2, 98, l1 - l0 - 20, pick.size, '#FFF2A8', 'center');
-    fitLine(ctx, pick.lose, (r0 + r1) / 2, 98, r1 - r0 - 20, pick.size, '#FFB0B0', 'center');
+    if (pick) {
+      fitLine(ctx, win, (l0 + l1) / 2, 98, l1 - l0 - 20, pick.size, '#FFF2A8', 'center');
+      fitLine(ctx, pick.lose, (r0 + r1) / 2, 98, r1 - r0 - 20, pick.size, '#FFB0B0', 'center');
+    } else {
+      // A gate near one end leaves one side too narrow: the wider side carries the whole sentence.
+      const [a, b] = l1 - l0 >= r1 - r0 ? [l0, l1] : [r0, r1];
+      fitLine(ctx, loses.map((l) => `${win} - ${l}`), (a + b) / 2, 98, b - a - 20, [32, 28, 26, 24, 22], '#FFF2A8', 'center');
+    }
   }
   friezeBox = { segs, notch };
 }
