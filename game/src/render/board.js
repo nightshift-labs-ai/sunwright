@@ -7,14 +7,14 @@ import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, VIEW_H, VIEW_W, WALL, WALL_FR
 import { bannerLayout } from './banner.js';
 
 export const PALETTE = {
-  sandA: '#D8A86A',
-  sandB: '#C99559',
-  grout: '#B9824A',
+  sandA: '#D29E5E',
+  sandB: '#C38B4F',
+  grout: '#AE7642',
   lapis: '#2D5BD0',
   lapisDark: '#1F3F99',
   gold: '#F2C14E',
   jade: '#34C38F',
-  shadow: 'rgba(91,58,30,0.38)',
+  shadow: 'rgba(84,48,20,0.42)',
   plinthTop: '#EBC68C',
   plinthFront: '#B47E48',
 };
@@ -39,6 +39,29 @@ function buildFloorTexture() {
     for (let c = 0; c < BOARD.cols; c++) {
       g.fillStyle = (r + c) % 2 ? PALETTE.sandB : PALETTE.sandA;
       g.fillRect(c * CELL, r * CELL, CELL, CELL);
+      // Each stone a little lighter or darker than its neighbours, so the floor is not a flat checker.
+      const tint = rand() - 0.5;
+      g.fillStyle = tint > 0 ? `rgba(255,236,200,${tint * 0.16})` : `rgba(110,60,25,${-tint * 0.16})`;
+      g.fillRect(c * CELL, r * CELL, CELL, CELL);
+      // Worn edges: a lit top-left lip, a shaded bottom-right lip, and a chipped corner now and then.
+      g.fillStyle = 'rgba(255,236,200,0.22)';
+      g.fillRect(c * CELL + 1, r * CELL + 1, CELL - 2, 2);
+      g.fillRect(c * CELL + 1, r * CELL + 1, 2, CELL - 2);
+      g.fillStyle = 'rgba(100,55,20,0.2)';
+      g.fillRect(c * CELL + 1, r * CELL + CELL - 4, CELL - 2, 3);
+      g.fillRect(c * CELL + CELL - 4, r * CELL + 1, 3, CELL - 2);
+      if (rand() < 0.35) {
+        const cx = c * CELL + (rand() < 0.5 ? 1 : CELL - 1);
+        const cy = r * CELL + (rand() < 0.5 ? 1 : CELL - 1);
+        const s = 4 + rand() * 5;
+        g.fillStyle = 'rgba(95,52,18,0.28)';
+        g.beginPath();
+        g.moveTo(cx, cy);
+        g.lineTo(cx + (cx % CELL < 2 ? s : -s), cy);
+        g.lineTo(cx, cy + (cy % CELL < 2 ? s : -s));
+        g.closePath();
+        g.fill();
+      }
       for (let k = 0; k < 26; k++) {
         g.fillStyle = rand() < 0.5 ? 'rgba(255,236,200,0.18)' : 'rgba(150,95,45,0.16)';
         g.fillRect(c * CELL + rand() * CELL, r * CELL + rand() * CELL, 1 + rand() * 3, 1 + rand() * 2);
@@ -455,16 +478,34 @@ function hull(points) {
   return lower.slice(0, -1).concat(upper.slice(0, -1));
 }
 
+/** A soft cast shadow, thrown away from the current sun (sun.shadowVectorFor), longer for taller pieces. */
 export function drawBlockShadow(ctx, x, y, w, d, height, shadow) {
-  const len = Math.max(CELL * 0.6, height * 1.7);
+  const len = Math.max(CELL * 0.7, height * 1.9);
   const ox = shadow.x * len;
   const oy = shadow.y * len;
   const pts = hull([[x, y], [x + w, y], [x, y + d], [x + w, y + d], [x + ox, y + oy], [x + w + ox, y + oy], [x + ox, y + d + oy], [x + w + ox, y + d + oy]]);
+  ctx.save();
+  ctx.filter = 'blur(3px)';
   ctx.fillStyle = PALETTE.shadow;
   ctx.beginPath();
   for (const [px, py] of pts) ctx.lineTo(px, py);
   ctx.closePath();
   ctx.fill();
+  ctx.restore();
+}
+
+/** The sun's light pooling on the stones it reaches: a warm wash under the beams (play screen). */
+export function drawLitFloor(ctx, trace, cols) {
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < trace.lit.length; i++) {
+    if (trace.lit[i] <= 0) continue;
+    const c = i % cols;
+    const r = Math.floor(i / cols);
+    ctx.fillStyle = `rgba(255,180,80,${Math.min(0.2, 0.08 + trace.lit[i] / 200)})`;
+    ctx.fillRect(BOARD_X + c * CELL + 2, BOARD_Y + r * CELL + 2, CELL - 4, CELL - 4);
+  }
+  ctx.restore();
 }
 
 /** An oblique block: lit top face raised by `height`, darker front face below it. */

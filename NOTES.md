@@ -378,6 +378,12 @@
   one-word difficulty buttons. Verified: shot truth OK, playtest 33/33, measure-shots 4/4, names OK,
   pack 1.14 MB, kit check (only transcripts_present). Cover canvas text items 58 (as 9052725).
 
+- Field panel 03:15Z (88dcfa2 vs the 4 strongest rivals: 8/8 for us); remaining asks are look and
+  readability. Item 1, board lighting: sand a touch darker and warmer (#D29E5E / #C38B4F), each stone a
+  random lighter/darker tint, worn lit/shaded lips and chipped corners; cast shadows longer (0.7 cell
+  min) and blurred, still thrown away from the live sun (sun.shadowVectorFor); lit cells get a warm
+  wash under the beams (board.drawLitFloor). Cover mean luminance 0.51 (gate 0.45), still warm.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
