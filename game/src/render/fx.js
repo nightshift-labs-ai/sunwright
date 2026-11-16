@@ -216,7 +216,9 @@ export function fxFromEvent(fx, ev, run = null) {
   if (ev.type === 'kill') {
     const x = toScreenX(ev.x);
     const y = toScreenY(ev.y);
-    burst(fx, x, y, 10, 'smoke', 'rgba(110,80,70,', 40, 0.9, 9);
+    // An ash puff where it fell: pale grey ash rising, a ring of ember flecks.
+    burst(fx, x, y, 14, 'smoke', 'rgba(150,135,125,', 46, 1.1, 12);
+    burst(fx, x, y, 8, 'spark', '#FF8A2E', 120, 0.5, 3);
     burst(fx, x, y, 14, 'spark', '#FFD34D', 160, 0.45, 3);
     fx.decals.push({ x, y, life: DECAL_LIFE, max: DECAL_LIFE, size: ev.boss ? 40 : 18, enemy: ev.enemy });
     for (let k = 0; k < ev.quartz; k++) {
@@ -227,7 +229,7 @@ export function fxFromEvent(fx, ev, run = null) {
     // else where it died; a plain kill only beside a live beam hit.
     const combo = ev.mult >= 2;
     const hit = beamHitAnchor(ev, run) ?? (combo ? { x, y } : null);
-    const placed = hit && placeFloater(fx, { x: hit.x, y: hit.y - 18, ax: hit.x, ay: hit.y, kind: 'kill', text: label, life: FLOATER_LIFE, max: FLOATER_LIFE, color: ev.mult >= 4 ? '#FFFFFF' : '#F2C14E', size: 28 + (Math.min(ev.mult, 5) - 1) * 4 }, run, combo);
+    const placed = hit && placeFloater(fx, { x: hit.x, y: hit.y - 18, ax: hit.x, ay: hit.y, kind: 'kill', text: label, life: FLOATER_LIFE, max: FLOATER_LIFE, color: ev.mult >= 4 ? '#FFFFFF' : '#F2C14E', size: 30 + (Math.min(ev.mult, 5) - 1) * 5 }, run, combo);
     if (combo) {
       fx.searKills = (fx.searKills ?? 0) + 1;
       if (placed) fx.searFloaters = (fx.searFloaters ?? 0) + 1;

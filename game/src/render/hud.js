@@ -5,7 +5,7 @@
 import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, UPGRADES, WAVE_COUNT, enemyRuleTag } from '../config.js';
 import { boonById } from '../draft.js';
 import { beamModsFor } from '../beams.js';
-import { chainMultiplier } from '../combat.js';
+import { chainMultiplier, chainWindow } from '../combat.js';
 import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked, upgradeCost } from '../sim.js';
 import { titanStatus, winLoseParts } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
@@ -431,7 +431,7 @@ function drawTooltip(ctx, run, ui, y0) {
 /** Right column, 20 px apart: SCORE with BEST, QUARTZ, CHARMS, the GLASS legend (the buttons sit under it). */
 function drawRightPanel(ctx, run, ui) {
   const x0 = RIGHT_X;
-  panel(ctx, x0, 8, PANEL_W, 128);
+  panel(ctx, x0, 8, PANEL_W, 138);
   text(ctx, 'SCORE', x0 + 12, 30, 18, INK, 'left', 900);
   text(ctx, run.score.toLocaleString('en-US'), x0 + PANEL_W - 10, 66, 32, '#FFF2A8', 'right', 900);
   // BEST from the save (a difficulty never finished says so: no "BEST 0").
@@ -454,6 +454,18 @@ function drawComboLine(ctx, run, x0, y) {
   const active = run.chain.count >= 2;
   const pop = Math.max(0, 1 - (run.time - run.feedback.searAt) / 0.25);
   text(ctx, `${NAMES.combo} x${active ? mult : 1}`, x0 + PANEL_W - 10, y + 8, active ? 26 + pop * 8 : 20, active ? '#FFF2A8' : 'rgba(255,246,223,0.7)', 'right', 900);
+  // The streak meter: how much of the SEAR window is left before the combo drops; it flashes on each kill.
+  const frac = run.chain.count > 0 ? Math.max(0, Math.min(1, run.chain.timer / chainWindow(run))) : 0;
+  const mx = x0 + 12;
+  const mw = PANEL_W - 22;
+  const my = y + 14;
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.fillRect(mx, my, mw, 6);
+  ctx.fillStyle = pop > 0 ? '#FFFFFF' : active ? '#FF9A3D' : 'rgba(255,154,61,0.5)';
+  ctx.fillRect(mx, my, mw * frac, 6);
+  ctx.strokeStyle = FRAME.rim;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(mx, my, mw, 6);
 }
 
 /** The play HUD's panels and text rows (props must keep clear of these). */

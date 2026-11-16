@@ -500,6 +500,12 @@
   long at morning/evening, 0.85x at noon, still thrown away from the live sun. The floor was already
   darkened in the earlier lighting pass; cover mean luminance stays 0.47.
 
+- Item 3, hit feedback: a kill leaves a pale ash puff (14 smoke particles, 1.1 s) and a ring of ember
+  flecks; floating numbers are bigger (30 px + 5 per SEAR step, was 28 + 4); a SEAR streak meter under the
+  SEAR line shows how much of the combo window is left and flashes white on each kill. Searing embers were
+  already in. Cover tick now 4484: three numbers (+120 SEAR x4, +40 SEAR x2, +20), ash puffs, SEAR x4,
+  quartz 7 (4 of 5 cards lit, prism greyed), run still wins.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
