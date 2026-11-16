@@ -648,6 +648,7 @@ export function drawPieces(ctx, grid, shadow, time, lit = null, next = null) {
       if (!p) continue;
       const litNow = !!lit && lit[i] > 0 && p.type !== 'pillar';
       drawPiece(ctx, p, c, r, shadow, time, 1, litNow);
+      drawLevelPips(ctx, p, c, r);
       if (!lit || p.type === 'pillar' || litNow) continue;
       const x = BOARD_X + c * CELL;
       const y = BOARD_Y + r * CELL;
@@ -667,6 +668,28 @@ export function drawPieces(ctx, grid, shadow, time, lit = null, next = null) {
         ctx.fillText(next.wall, x + CELL - 10, y + 15);
       }
     }
+  }
+}
+
+/** Upgraded glass (Lv2, Lv3) shows that many gold pips along its plinth's front. */
+export function drawLevelPips(ctx, piece, c, r) {
+  const level = piece.level ?? 1;
+  if (level < 2) return;
+  const cx = BOARD_X + c * CELL + CELL / 2;
+  const y = BOARD_Y + r * CELL + CELL - 8;
+  for (let k = 0; k < level; k++) {
+    const x = cx + (k - (level - 1) / 2) * 12;
+    ctx.fillStyle = PALETTE.gold;
+    ctx.strokeStyle = '#2A1608';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 6);
+    ctx.lineTo(x + 5, y);
+    ctx.lineTo(x, y + 6);
+    ctx.lineTo(x - 5, y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
   }
 }
 

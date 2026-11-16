@@ -417,6 +417,19 @@
   Open: a Titan frame would make a strong 5th shot but the sheet takes exactly 4; the cover now shows
   one popup (+60 SEAR x2) because the +20 that covered a Scuttler is no longer placed there.
 
+- Glass upgrades (operator 03:32Z, "visible scale"): U on a placed glass piece upgrades it Lv1 -> Lv2
+  (4 quartz) -> Lv3 (7) (config UPGRADES; pillars do not upgrade; the price joins what selling refunds).
+  Per level, in beams.js: mirror bounce loss x1 / x0.5 / none; splitter halves keep 50 / 55 / 60%;
+  lens focus +0 / +0.3 / +0.6 (x2.5 -> x2.8 -> x3.1); prism side branches +0 / +10 / +20% light (cap 95%).
+  Upgraded pieces show 2 or 3 gold pips on the plinth (Lv1 shows none, to keep the board calm); build
+  cards show `U+4`, the tooltip `... - U +4` and `LENS Lv2`, the key line `U up`, How to play explains it.
+  Balance, 40 seeds per difficulty (tools/balance.mjs 40 <bot>): greedy (never upgrades) before
+  6 / 2 / 2 wins (gentle / normal / scorched), after 6 / 2 / 2 (unchanged); greedy-up (spends leftover
+  quartz on the best upgrade) 3 / 3 / 2. Not easier, so costs stay 4 / 7.
+  Staging: any upgrade during seed 2013's sun 5 (one Lv2 or Lv2+Lv3, at any tick 4400-4780) makes the
+  run lose later (it is a rare greedy-bot win); STAGE_UPGRADES=1 (+ STAGE_UPGRADE_TICK / _COUNT) keeps
+  that experiment; off by default, so the cover has no upgraded glass yet.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

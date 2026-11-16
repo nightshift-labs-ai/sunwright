@@ -1,18 +1,20 @@
 // Staging plan, headless: one directed bot run through the real sim modules, with the ticks the
 // screenshots are taken at. tools/shots.mjs replays the plan in the browser; tools/stage-search
 // style loops can call planRun over many seeds without a browser.
-import { layoutValue, playRun } from './balance.mjs';
+import { bestUpgrade, layoutValue, playRun } from './balance.mjs';
 import { boardTagOverlaps, createFx, floaterConflicts, fxFromEvent, updateFx } from '../game/src/render/fx.js';
-import { DT, WAVE_COUNT } from '../game/src/config.js';
+import { DT, UPGRADES, WAVE_COUNT } from '../game/src/config.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
 import { routeCells } from '../game/src/pathing.js';
 import { carapaceOpen } from '../game/src/enemies.js';
 import { placementCheck, setPiece } from '../game/src/grid.js';
-import { pieceCost } from '../game/src/sim.js';
+import { pieceCost, upgradeCost } from '../game/src/sim.js';
 
 /** The sun the cover shows (index; 4 = sun 5, Day 2 noon). STAGE_COVER_WAVE overrides it for experiments. */
 export const COVER_WAVE = Number(process.env.STAGE_COVER_WAVE ?? 4);
+/** The staged upgrades: from this tick of the cover sun, this many (Lv2, then Lv3) on the most-lit glass. */
+const UPGRADE_PLAN = { tick: Number(process.env.STAGE_UPGRADE_TICK ?? 4700), count: Number(process.env.STAGE_UPGRADE_COUNT ?? 2) };
 const DIFF = 'normal';
 const BOT = 'greedy';
 
@@ -136,11 +138,40 @@ function aimMirror(run) {
   return best ? [{ type: 'place', piece: 'mirror', c: best.c, r: best.r, rot: best.rot }] : [];
 }
 
+/** Upgrade orders for the glass taking the most light right now: Lv2, then Lv3, as quartz allows. */
+function upgradeOrders(run, n) {
+  const lit = run.trace.lit;
+  let best = -1;
+  run.grid.pieces.forEach((p, i) => {
+    if (p && p.type !== 'pillar' && lit[i] > 0 && (best < 0 || lit[i] > lit[best])) best = i;
+  });
+  if (best < 0) return [];
+  const p = run.grid.pieces[best];
+  const c = best % run.grid.cols;
+  const r = Math.floor(best / run.grid.cols);
+  const orders = [];
+  let quartz = run.quartz;
+  for (let level = p.level ?? 1; orders.length < n && level < 3; level++) {
+    const cost = UPGRADES.cost[level - 1];
+    if (cost > quartz) break;
+    quartz -= cost;
+    orders.push({ type: 'upgrade', c, r });
+  }
+  return orders;
+}
+
 export function makeDirector(K, scars = null) {
+  let upgradesDone = 0;
   let wave = -1;
   let turned = null;
   const director = (run) => {
     const orders = [];
+    // During the cover sun, spend quartz as it comes on the most-lit glass, up to Lv3 (the cover shows its pips).
+    if (run.phase === 'wave' && run.waveIndex === COVER_WAVE && process.env.STAGE_UPGRADES === '1' && upgradesDone < UPGRADE_PLAN.count && run.tick >= UPGRADE_PLAN.tick) {
+      const up = upgradeOrders(run, 1);
+      upgradesDone += up.length;
+      orders.push(...up);
+    }
     // STAGE_CHASE=1: on the cover sun, turn glass live onto the swarm (every half second at most).
     if (process.env.STAGE_CHASE === '1' && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.tick % 30 === 0) {
       const turn = bestChaseTurn(run);
@@ -166,6 +197,8 @@ export function makeDirector(K, scars = null) {
   // The panes swapped for pillars before the cover go back in at the next build phase.
   const swapped = [];
   // Off by default: no seed found yet where the pruned plan still wins (STAGE_PRUNE=1 to try).
+  // After the bot's build for the cover sun: upgrade the glass that helps most, up to twice (the cover
+  // shows its pips). STAGE_PRUNE=1 also swaps unused panes for pillars.
   if (process.env.STAGE_PRUNE === '1') director.afterBuild = (run) => pruneForCover(run, swapped);
   director.beforeBuild = (run) => {
     if (process.env.STAGE_AIM === '1' && run.waveIndex === COVER_WAVE) return aimMirror(run);
@@ -194,7 +227,8 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT, scars = null) {
     updateFx(fx, run, DT);
     // Only ticks the screenshot checks would pass: no floater on a label, beam or floater, no covered tag.
     const litLive = run.enemies.filter((e) => e.litPower > 0 && !e.shielded && e.hp > 0).length;
-    if (!scars && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0 && floaterConflicts(fx, run) === 0 && boardTagOverlaps(run).length === 0 && (process.env.STAGE_AIM !== '1' || litLive >= 3)) {
+    const upgraded = process.env.STAGE_UPGRADES !== '1' || run.grid.pieces.some((p) => p && (p.level ?? 1) > 1);
+    if (!scars && upgraded && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0 && floaterConflicts(fx, run) === 0 && boardTagOverlaps(run).length === 0 && (process.env.STAGE_AIM !== '1' || litLive >= 3)) {
       const opaque = floaterConflicts(fx, run) === 0 ? fx.texts.filter((t) => t.life / t.max > 0.3).length : 0;
       const freshBite = bites.some((t) => run.time - t < 0.9);
       const s = run.grid.shrine;

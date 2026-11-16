@@ -107,6 +107,12 @@ function liftAtHover() {
   if (cell && pieceAt(app.run.grid, cell.c, cell.r)) order({ type: 'lift', c: cell.c, r: cell.r });
 }
 
+/** U: upgrade the glass under the mouse to its next level (price shown on its card and tooltip). */
+function upgradeAtHover() {
+  const cell = app.ui.hoverCell;
+  if (cell && pieceAt(app.run.grid, cell.c, cell.r)) order({ type: 'upgrade', c: cell.c, r: cell.r });
+}
+
 function selectPiece(type) {
   app.ui.selected = type;
   playSfx('click');
@@ -180,6 +186,7 @@ function handleKeyInPlay(code) {
   }
   if (digit >= 1 && digit <= PIECE_ORDER.length) selectPiece(PIECE_ORDER[digit - 1]);
   else if (code === 'KeyX') liftAtHover();
+  else if (code === 'KeyU') upgradeAtHover();
   else if (code === 'KeyQ') rotateAtHover(-1);
   else if (code === 'KeyE') rotateAtHover(1);
   else if (code === 'Space') order({ type: run.phase === 'wave' ? 'flare' : 'startWave' });

@@ -225,6 +225,7 @@ export function installTestHook(app, api) {
         banner: currentBanner(run),
         bannerBox: bannerBox(run),
         frieze: lastFrieze(),
+        upgraded: run.grid.pieces.map((p, i) => (p && (p.level ?? 1) > 1 ? `${i % run.grid.cols},${Math.floor(i / run.grid.cols)}:Lv${p.level}` : null)).filter(Boolean).join(' '),
         titanBar: lastTitanBar(),
         headline: winLoseHeadline(run),
         log: run.log.join(' | '),

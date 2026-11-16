@@ -146,6 +146,18 @@ export const DIFFICULTY_ORDER = ['gentle', 'normal', 'scorched'];
 /** The Sun Fountain always holds 10 HP; the run is lost when it runs dry. */
 export const FOUNTAIN_MAX = 10;
 
+/**
+ * Glass upgrades: a placed glass piece goes Lv1 -> Lv2 -> Lv3 for quartz (pillars do not upgrade).
+ * cost[k]: price of level k+2. Per level: the mirror's bounce loss is scaled (x1, x0.5, none), each
+ * splitter half keeps more light, the lens focuses harder, the prism's side branches keep more light.
+ */
+export const UPGRADES = {
+  cost: [4, 7],
+  mirror: { lossScale: [1, 0.5, 0] },
+  splitter: { half: [0.5, 0.55, 0.6] },
+  lens: { multAdd: [0, 0.3, 0.6] },
+  prism: { shareAdd: [0, 0.1, 0.2] },
+};
 export const ECONOMY = { waveQuartz: 5, waveQuartzPerWave: 1, rerollCost: 3, oldPieceRefund: 0.5 };
 export const SCORING = { perShrineHp: 50, waveClear: 100, chainWindow: 1, chainMaxMult: 5 };
 /** A won run's rank: the best tier whose score, fountain left and Titan burn time it all meets (else C). */

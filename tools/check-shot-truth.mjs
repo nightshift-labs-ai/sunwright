@@ -56,6 +56,7 @@ function hudFacts(run) {
     banner: currentBanner(run),
     bannerBox: JSON.stringify(bannerBox(run)),
     headline: winLoseHeadline(run),
+    upgraded: run.grid.pieces.map((p, i) => (p && (p.level ?? 1) > 1 ? `${i % run.grid.cols},${Math.floor(i / run.grid.cols)}:Lv${p.level}` : null)).filter(Boolean).join(' '),
     log: run.log.join(' | '),
     sunsHeld: run.stats.wavesCleared,
     offersSeen: run.stats.offersSeen,
@@ -225,6 +226,7 @@ for (const shot of manifest.shots) {
   // Reported, not yet enforced: the solved-plan staging (STAGE_PRUNE=1) has no winning seed so far.
   if (lit.length < 0.7 * glass.length || stray.length) console.log(`NOTE ${shot.name}: solved plan not met (${stray.length} stray panes)`);
   check(shot.state.shrineHp < shot.state.shrineMax, `${shot.name} fountain is full: no lose threat on the cover`);
+  console.log(`${shot.name}: upgraded glass ${shot.state.upgraded}`);
   console.log(`${shot.name}: ${lit.length}/${glass.length} glass lit, ${glass.length - lit.length - stray.length} on the next sun's ghost, ${stray.length} stray, fountain ${shot.state.shrineHp}/${shot.state.shrineMax}`);
 }
 

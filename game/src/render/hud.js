@@ -2,11 +2,11 @@
 // the event banner, the 9-sun track with HOLD n MORE SUNS, the sun dial (NOW / NEXT), fountain
 // droplets with the lose rule, SEAR, score with BEST, quartz, INCOMING (with the Titan's row),
 // glass charms, the hovered piece's tooltip and keys, the event log, and the hotbar.
-import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, WAVE_COUNT, enemyRuleTag } from '../config.js';
+import { BEAM, ENEMIES, NAMES, PIECES, PIECE_ORDER, UPGRADES, WAVE_COUNT, enemyRuleTag } from '../config.js';
 import { boonById } from '../draft.js';
 import { beamModsFor } from '../beams.js';
 import { chainMultiplier } from '../combat.js';
-import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked } from '../sim.js';
+import { enemiesRemaining, liftRefund, pieceCost, pieceUnlocked, upgradeCost } from '../sim.js';
 import { titanStatus, winLoseParts } from '../announce.js';
 import { sunApertureFor } from '../sun.js';
 import { nextSunPreview, waveRoster } from '../waves.js';
@@ -388,15 +388,16 @@ function drawTooltip(ctx, run, ui, y0) {
   ctx.globalAlpha = 0.85;
   drawPieceIcon(ctx, type, RIGHT_X + 30, y0 + 40);
   ctx.globalAlpha = 1;
-  text(ctx, `${PIECES[type].name}`, RIGHT_X + 58, y0 + 26, 15, GOLD, 'left', 900);
+  text(ctx, hover && hover.type !== 'pillar' ? `${PIECES[type].name} Lv${hover.level ?? 1}` : PIECES[type].name, RIGHT_X + 58, y0 + 26, 15, GOLD, 'left', 900);
   text(ctx, `${pieceCost(run, type)} ${NAMES.currency.toLowerCase()}`, RIGHT_X + 58, y0 + 46, 15, '#BDF4FF', 'left', 800);
   fitLine(ctx, PIECES[type].short, RIGHT_X + 12, y0 + 74, PANEL_W - 20, 15, INK);
+  const up = hover ? upgradeCost(hover) : null;
   const keys = hover
-    ? `${hover.type === 'pillar' ? '' : 'Q/E turn - '}X sell +${liftRefund(run, hover)}`
+    ? [`${hover.type === 'pillar' ? '' : 'Q/E turn - '}X sell +${liftRefund(run, hover)}${up !== null ? ` - U +${up}` : ''}`, `X sell +${liftRefund(run, hover)}${up !== null ? ` - U up ${up}` : ''}`]
     : `${PIECE_ORDER.indexOf(type) + 1} select - click place`;
   // A placement the rules refuse says why (e.g. "Would seal the fountain").
   if (ui.hintBad && ui.hint) fitLine(ctx, ui.hint, RIGHT_X + 12, y0 + 96, PANEL_W - 20, 15, '#FF8A8A');
-  else text(ctx, keys, RIGHT_X + 12, y0 + 96, 15, '#FFF2A8', 'left', 900);
+  else fitLine(ctx, keys, RIGHT_X + 12, y0 + 96, PANEL_W - 20, 15, '#FFF2A8');
 }
 
 
@@ -624,7 +625,7 @@ function drawSpeaker(ctx, x, y, muted, color) {
 
 /** Two short key lines beside the hotbar during a sun. */
 function drawKeyLine(ctx, x, ui) {
-  text(ctx, 'Click sand: place - Q/E turn - X sell', x, HOTBAR.y + 32, 15, INK, 'left', 800);
+  fitLine(ctx, ['Click sand: place - Q/E turn - X sell - U upgrade', 'Click: place - Q/E turn - X sell - U upgrade', 'Click: place - Q/E turn - X sell - U up', 'Click sand: place - Q/E turn - X sell'], x, HOTBAR.y + 32, 1272 - x, 15, INK);
   if (ui.restartArmed) text(ctx, 'PRESS R AGAIN TO RESTART', x, HOTBAR.y + 58, 15, '#FF8A8A', 'left', 900);
   else text(ctx, 'R restart - SPACE flare - ESC pause', x, HOTBAR.y + 58, 15, INK, 'left', 800);
 }
@@ -703,6 +704,10 @@ function drawHotbar(ctx, run, ui) {
       ctx.lineTo(x + HOTBAR.w - 18, HOTBAR.y + 40);
       ctx.closePath();
       ctx.fill();
+    }
+    // Glass upgrades with U once placed: the Lv2 price, left of the piece.
+    if (type !== 'pillar') {
+      text(ctx, `U+${UPGRADES.cost[0]}`, x + 8, HOTBAR.y + 48, 15, GOLD, 'left', 900);
     }
     ctx.save();
     ctx.translate(x + HOTBAR.w / 2, HOTBAR.y + 41);

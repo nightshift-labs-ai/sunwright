@@ -3,7 +3,7 @@
 // was applied on, so tools/shots.mjs can replay the exact run in the browser.
 //   node tools/balance.mjs [runsPerDifficulty=8] [bot=greedy|careful]
 import { DIFFICULTY_ORDER, PIECE_ORDER, WAVE_COUNT } from '../game/src/config.js';
-import { createRun, pieceCost, pieceUnlocked, stepSim } from '../game/src/sim.js';
+import { createRun, pieceCost, pieceUnlocked, stepSim, upgradeCost } from '../game/src/sim.js';
 import { placementCheck, setPiece } from '../game/src/grid.js';
 import { buildFlowField, routeCells } from '../game/src/pathing.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
@@ -15,11 +15,12 @@ const BOON_TASTE = ['highsun', 'silvered', 'burning', 'spreading', 'sunstone', '
  * How much burning a layout does: beam power summed over the walking route cells, plus light
  * near the shrine for Veerwings. The careful bot also values light that pierces armour (12+).
  */
-export function layoutValue(run, grid, careful) {
+/** cap: how much light per path cell counts (placements: 30; upgrades: 100, so stronger light shows). */
+export function layoutValue(run, grid, careful, cap = 30) {
   const flow = buildFlowField(grid);
   const trace = traceBeams(grid, run.aperture, beamModsFor(run.boons));
   let v = 0;
-  for (const i of routeCells(grid, flow)) v += Math.min(trace.lit[i], 30) + (careful && trace.lit[i] >= 12 ? 12 : 0);
+  for (const i of routeCells(grid, flow)) v += Math.min(trace.lit[i], cap) + (careful && trace.lit[i] >= 12 ? 12 : 0);
   const s = grid.shrine;
   for (let r = s.r; r <= s.r + 2; r++) for (let c = s.c - 1; c <= s.c + 1; c++) if (r < grid.rows) v += trace.lit[r * grid.cols + c] * 0.5;
   return v;
@@ -68,9 +69,24 @@ function reaimOrders(run) {
  * run's tick just before the step that applied them. onTick(run, events) is called after every step;
  * director(run), if given, returns extra orders for each wave tick (holdFlare: true to save the Flare).
  */
+/** The affordable upgrade that raises the layout's value most, or null. */
+export function bestUpgrade(run, careful) {
+  const base = layoutValue(run, run.grid, careful, 100);
+  let best = null;
+  run.grid.pieces.forEach((p, i) => {
+    const cost = upgradeCost(p);
+    if (cost === null || cost > run.quartz) return;
+    p.level = (p.level ?? 1) + 1;
+    const gain = layoutValue(run, run.grid, careful, 100) - base;
+    p.level -= 1;
+    if (gain > 0 && (!best || gain > best.gain)) best = { c: i % run.grid.cols, r: Math.floor(i / run.grid.cols), gain };
+  });
+  return best;
+}
+
 export function playRun(seed, difficulty, bot = 'greedy', onTick = null, director = null) {
   const run = createRun(seed, difficulty);
-  const careful = bot === 'careful';
+  const careful = bot.startsWith('careful');
   const log = [];
   const step = (orders) => {
     if (orders.length) log.push({ tick: run.tick, orders });
@@ -86,6 +102,14 @@ export function playRun(seed, difficulty, bot = 'greedy', onTick = null, directo
         const p = bestPlacement(run, careful);
         if (!p) break;
         step([{ type: 'place', piece: p.type, c: p.c, r: p.r, rot: p.rot }]);
+      }
+      // Bot "greedy-up" / "careful-up": spend what is left on the upgrade that helps the layout most.
+      if (bot.endsWith('-up')) {
+        for (let k = 0; k < 6; k++) {
+          const u = bestUpgrade(run, careful);
+          if (!u) break;
+          step([{ type: 'upgrade', c: u.c, r: u.r }]);
+        }
       }
       if (director?.afterBuild) for (const o of director.afterBuild(run)) step([o]);
       step([{ type: 'startWave' }]);

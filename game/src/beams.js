@@ -2,7 +2,7 @@
 // lenses, prisms and pillars. Produces the power and tint on every cell (what burns beetles),
 // the beam legs to draw, and the bounce points that get a starburst. Glassback shells stop
 // any light but gold. Loops are cut by tracking visited (cell, direction) pairs.
-import { BEAM, CHARM_FX, DX, DY } from './config.js';
+import { BEAM, CHARM_FX, DX, DY, UPGRADES } from './config.js';
 import { cellIndex, inBounds, isShrineCell, pieceAt } from './grid.js';
 
 /** Beam tints (bit flags on lit cells): plain sunlight is 0. */
@@ -31,6 +31,11 @@ export function prismFan(rot, dir) {
     { dir: rot % 2 === 0 ? left : right, tint: TINT_RED },
     { dir: rot % 2 === 0 ? right : left, tint: TINT_BLUE },
   ];
+}
+
+/** A piece's upgrade level, 1-3 (pieces from before upgrades existed are Lv1). */
+export function levelOf(piece) {
+  return piece.level ?? 1;
 }
 
 /** Light modifiers from boons: { power, bounceLoss, lensMult, lensReach, prismShare }. */
@@ -105,20 +110,20 @@ export function traceBeams(grid, aperture, mods, blockers = null) {
         if (piece.type === 'mirror') {
           bursts.push({ x: cx, y: cy, power, kind: 'mirror' });
           dir = reflectDirection(piece.rot, dir);
-          power *= 1 - mods.bounceLoss;
+          power *= 1 - mods.bounceLoss * UPGRADES.mirror.lossScale[levelOf(piece) - 1];
         } else if (piece.type === 'splitter') {
           bursts.push({ x: cx, y: cy, power, kind: 'splitter' });
           const turned = reflectDirection(piece.rot, dir);
-          power *= 0.5;
+          power *= UPGRADES.splitter.half[levelOf(piece) - 1];
           rays.push({ c: c + DX[turned], r: r + DY[turned], dir: turned, power, focus, tint, x: cx, y: cy });
         } else if (piece.type === 'lens') {
           bursts.push({ x: cx, y: cy, power: power * 0.6, kind: 'lens' });
-          power *= mods.lensMult;
+          power *= mods.lensMult + UPGRADES.lens.multAdd[levelOf(piece) - 1];
           focus = mods.lensReach + 1;
         } else if (piece.type === 'prism') {
           bursts.push({ x: cx, y: cy, power, kind: 'prism' });
           const fan = prismFan(piece.rot, dir);
-          power *= mods.prismShare;
+          power *= Math.min(0.95, mods.prismShare + UPGRADES.prism.shareAdd[levelOf(piece) - 1]);
           for (const branch of fan.slice(1)) rays.push({ c: c + DX[branch.dir], r: r + DY[branch.dir], dir: branch.dir, power, focus: 0, tint: branch.tint, x: cx, y: cy });
           tint = TINT_GOLD;
           focus = 0;

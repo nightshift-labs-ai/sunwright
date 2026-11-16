@@ -1,8 +1,8 @@
 // The run state and its fixed-step update. Input never touches this state directly: it queues
 // orders, and stepSim applies them at the start of the next 60 Hz tick, then advances the phase
 // machine build -> wave -> draft -> build ... -> won | lost.
-import { BEAM, CHARM_FX, DIFFICULTIES, FEATS, DT, ECONOMY, FLARE_CHARGES, FOUNTAIN_MAX, PIECES, WAVE_COUNT } from './config.js';
-import { beamModsFor, traceBeams } from './beams.js';
+import { BEAM, CHARM_FX, DIFFICULTIES, FEATS, DT, ECONOMY, FLARE_CHARGES, FOUNTAIN_MAX, PIECES, UPGRADES, WAVE_COUNT } from './config.js';
+import { beamModsFor, levelOf, traceBeams } from './beams.js';
 import { sunApertureFor } from './sun.js';
 import { moveEnemies, shellBlockers, spawnEnemy } from './enemies.js';
 import { buildWaveSchedule } from './waves.js';
@@ -78,6 +78,12 @@ export function pieceCost(run, type) {
 }
 
 /** Quartz returned when lifting a piece: all of it if placed this build phase, else half. */
+/** The price of a placed piece's next level, or null (pillars and Lv3 glass cannot upgrade). */
+export function upgradeCost(piece) {
+  if (!piece || piece.type === 'pillar' || levelOf(piece) >= 3) return null;
+  return UPGRADES.cost[levelOf(piece) - 1];
+}
+
 export function liftRefund(run, piece) {
   return piece.placedWave === run.waveIndex ? piece.paid : Math.floor(piece.paid * ECONOMY.oldPieceRefund);
 }
@@ -125,6 +131,21 @@ function applyOrder(run, order) {
       run.flow = buildFlowField(run.grid);
       refreshLight(run);
       emit(run, { type: 'lifted', c: order.c, r: order.r });
+      return;
+    }
+    case 'upgrade': {
+      const piece = pieceAt(run.grid, order.c, order.r);
+      const cost = upgradeCost(piece);
+      if (cost === null || !(building || run.phase === 'wave')) return;
+      if (run.quartz < cost) {
+        emit(run, { type: 'denied', c: order.c, r: order.r, reason: 'Not enough quartz' });
+        return;
+      }
+      run.quartz -= cost;
+      piece.level = levelOf(piece) + 1;
+      piece.paid += cost;
+      refreshLight(run);
+      emit(run, { type: 'upgraded', c: order.c, r: order.r, level: piece.level });
       return;
     }
     case 'startWave':
