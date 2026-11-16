@@ -14,7 +14,7 @@ import { drawEnemy } from './beetles.js';
 import { drawCharmBadge } from './charms.js';
 import { fitSized } from './fit.js';
 import { bannerLayout } from './banner.js';
-import { BOARD_W, BOARD_X, BOARD_Y, CELL, QUARTZ_ANCHOR, VIEW_W, WALL } from './layout.js';
+import { BOARD_H, BOARD_W, BOARD_X, BOARD_Y, CELL, QUARTZ_ANCHOR, VIEW_W, WALL } from './layout.js';
 
 const INK = '#FFF6DF';
 const GOLD = '#F2C14E';
@@ -64,14 +64,40 @@ function text(ctx, str, x, y, size, color = INK, align = 'left', weight = 700) {
   ctx.fillText(str, x, y);
 }
 
+/** The HUD frame's colours: recessed terracotta panels with a sandstone rim (one frame round the courtyard). */
+const FRAME = { fill: 'rgba(96,42,20,0.9)', rim: '#D9A86A', shade: 'rgba(40,16,6,0.55)' };
+
+/** One recessed terracotta panel: a dark inner shadow on its top edge, a sandstone rim. */
 function panel(ctx, x, y, w, h) {
-  ctx.fillStyle = 'rgba(31,63,153,0.8)';
+  ctx.fillStyle = FRAME.fill;
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, 10);
   ctx.fill();
-  ctx.strokeStyle = GOLD;
+  ctx.save();
+  ctx.clip();
+  ctx.fillStyle = FRAME.shade;
+  ctx.fillRect(x, y, w, 5);
+  ctx.restore();
+  ctx.strokeStyle = FRAME.rim;
   ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, 10);
   ctx.stroke();
+}
+
+/** Everything outside the courtyard's walls sinks into one darker terracotta frame, so the court is brightest. */
+function drawFrame(ctx) {
+  const x0 = BOARD_X - WALL - 2;
+  const y0 = 106;
+  const x1 = BOARD_X + BOARD_W + WALL + 2;
+  const y1 = BOARD_Y + BOARD_H + WALL + 10;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, VIEW_W, 800);
+  ctx.rect(x1, y0, x0 - x1, y1 - y0);
+  ctx.fillStyle = 'rgba(110,48,22,0.42)';
+  ctx.fill('evenodd');
+  ctx.restore();
 }
 
 function sunGlyph(ctx, x, y, r, lit, color = '#FFE27A') {
@@ -464,9 +490,9 @@ function drawWinLoseFrieze(ctx, run) {
   const notch = ap.wall === 'north' ? [BOARD_X + ap.c * CELL - 4, BOARD_X + (ap.c + 1) * CELL + 84] : null;
   const segs = notch ? [[x, notch[0]], [notch[1], x + w]] : [[x, x + w]];
   for (const [a, b] of segs) {
-    ctx.fillStyle = 'rgba(31,63,153,0.96)';
+    ctx.fillStyle = FRAME.fill;
     ctx.fillRect(a, 68, b - a, 38);
-    ctx.strokeStyle = GOLD;
+    ctx.strokeStyle = FRAME.rim;
     ctx.lineWidth = 2;
     ctx.strokeRect(a + 1, 69, b - a - 2, 36);
   }
@@ -635,8 +661,8 @@ function drawKeyLine(ctx, x, ui) {
 function drawHudButtons(ctx, ui) {
   for (const b of HUD_BUTTONS) {
     const on = (b.id === 'speed' && ui.fast) || (b.id === 'mute' && ui.muted);
-    ctx.fillStyle = on ? (b.id === 'mute' ? '#7A2A3A' : GOLD) : 'rgba(31,63,153,0.85)';
-    ctx.strokeStyle = GOLD;
+    ctx.fillStyle = on ? (b.id === 'mute' ? '#7A2A3A' : GOLD) : FRAME.fill;
+    ctx.strokeStyle = FRAME.rim;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.roundRect(b.x, b.y, b.w, b.h, 12);
@@ -798,6 +824,7 @@ export function lastTitanBar() {
 
 export function drawHud(ctx, run, ui) {
   titanBarDrawn = null;
+  drawFrame(ctx);
   drawSunBar(ctx, run);
   drawWinLoseFrieze(ctx, run);
   drawEventBanner(ctx, run, ui);

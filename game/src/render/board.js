@@ -776,7 +776,8 @@ export function drawShrine(ctx, run, shadow, time, hurtAgo) {
 export function drawMarchLines(ctx, run, time) {
   const { grid, flow } = run;
   ctx.save();
-  ctx.strokeStyle = 'rgba(200,28,28,0.72)';
+  // March chevrons stay, quieter than the light.
+  ctx.strokeStyle = 'rgba(200,28,28,0.42)';
   ctx.lineWidth = 4;
   ctx.lineCap = 'round';
   const shift = (time * 0.6) % 1;

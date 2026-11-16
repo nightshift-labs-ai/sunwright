@@ -531,7 +531,7 @@ export function drawNextSunGhost(ctx, trace, label, time) {
   ctx.lineCap = 'round';
   ctx.setLineDash([12, 12]);
   ctx.lineDashOffset = -time * 30;
-  for (const [width, stroke] of [[7, 'rgba(60,30,10,0.35)'], [4, 'rgba(255,255,255,0.8)']]) {
+  for (const [width, stroke] of [[7, 'rgba(60,30,10,0.22)'], [4, 'rgba(255,255,255,0.5)']]) {
     ctx.lineWidth = width;
     ctx.strokeStyle = stroke;
     for (const leg of trace.legs) {
