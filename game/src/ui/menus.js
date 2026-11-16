@@ -53,12 +53,10 @@ export function renderOptions(settings) {
   el('opt-patterns').checked = !!settings.patterns;
 }
 
-/** Difficulty buttons with each difficulty's best score, the scope line and the rules table. */
+/** Difficulty buttons (one word each; the BEST chip shows the selected one's best), the scope line, the rules table. */
 export function showTitle(menus, bestFor, selected) {
   el('difficulty-picker').innerHTML = DIFFICULTY_ORDER.map((id) => {
-    const best = bestFor(id);
-    return `<button class="diff ${id === selected ? 'on' : ''}" data-action="difficulty" data-arg="${id}">
-      <b>${DIFFICULTIES[id].name}</b><small>${best.played ? `best ${best.score.toLocaleString('en-US')}` : 'not played yet'}</small></button>`;
+    return `<button class="diff ${id === selected ? 'on' : ''}" data-action="difficulty" data-arg="${id}"><b>${DIFFICULTIES[id].name}</b></button>`;
   }).join('');
   el('rule-scope').textContent = SCOPE_LINE;
   el('feats-count').textContent = `FEATS ${loadFeats().length}/${FEATS.length}`;

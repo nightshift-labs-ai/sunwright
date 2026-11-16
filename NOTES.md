@@ -304,6 +304,11 @@
   run drops the top-left sun strip (the Titan moves up) and its subline reads `The fountain still
   runs. The courtyard is yours.` (30 px; lost runs keep theirs); +6 px above LAST 3 RUNS and the
   buttons. check-shot-truth: icon count = distinct charms (7), 9/9 shown at most twice.
+- Bench7 item 3: title bottom half: the difficulty buttons are single 40 px words (GENTLE / NORMAL /
+  SCORCHED, selected one gold, content-sized in an 8 px padded card); `not played yet` and NORMAL's
+  `best` line are gone (the BEST chip shows the selected best); the keycap bar has 5 keys (1-5 GLASS,
+  Q/E TURN, SPACE FLARE, X SELL, M MUTE) at 36 px. Playtest: ENTER starts the selected difficulty,
+  arrows move it, M mutes and saves; check-shot-truth: BEST = saved best, nothing outside the card.
 
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
