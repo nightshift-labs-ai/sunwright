@@ -27,7 +27,7 @@ const INCOMING_H = 226;
 const LEFT_X = 6;
 const RIGHT_X = VIEW_W - PANEL_W - 6;
 
-const HOTBAR = { y: 716, w: 104, h: 76, gap: 8 };
+const HOTBAR = { y: 716, w: 132, h: 76, gap: 6 };
 const HOTBAR_X = 640 - (PIECE_ORDER.length * (HOTBAR.w + HOTBAR.gap) + 150 + 190) / 2;
 
 /** The pause, speed and sound buttons under the right panels: icons only (Esc / F / M on the keyboard). */
@@ -432,7 +432,7 @@ export function hudTextBoxes() {
     { text: 'sun bar', x0: top + 4, y0: 4, x1: top + BOARD_W + WALL * 2 - 4, y1: 62 },
     { text: 'win/lose banner', x0: top, y0: 68, x1: top + BOARD_W + WALL * 2, y1: 106 },
     { text: 'right panels and buttons', x0: RIGHT_X, y0: 8, x1: RIGHT_X + PANEL_W, y1: HUD_BUTTONS[0].y + HUD_BUTTONS[0].h },
-    { text: 'hotbar and keys', x0: HOTBAR_X, y0: HOTBAR.y, x1: 1200, y1: HOTBAR.y + HOTBAR.h },
+    { text: 'hotbar and keys', x0: HOTBAR_X, y0: HOTBAR.y, x1: 1270, y1: HOTBAR.y + HOTBAR.h },
   ];
 }
 
@@ -661,6 +661,16 @@ function drawHudButtons(ctx, ui) {
   }
 }
 
+/** A build card's one-line effect, true to beams.js (the lens with this run's focus and reach). */
+function cardEffect(run, type) {
+  const mods = beamModsFor(run.boons);
+  if (type === 'mirror') return ['turns light 90°', 'turns light'];
+  if (type === 'splitter') return ['splits light in two', 'splits light in 2', 'splits in two'];
+  if (type === 'lens') return [`x${mods.lensMult} for ${mods.lensReach} cells`, `focus x${mods.lensMult}`];
+  if (type === 'pillar') return ['blocks beetles', 'blocks'];
+  return ['burn, slow, pierce', 'burn/slow/pierce', 'fans 3 colours'];
+}
+
 function drawHotbar(ctx, run, ui) {
   PIECE_ORDER.forEach((type, i) => {
     const x = HOTBAR_X + i * (HOTBAR.w + HOTBAR.gap);
@@ -675,18 +685,26 @@ function drawHotbar(ctx, run, ui) {
       ctx.lineWidth = 4;
       ctx.strokeRect(x - 2, HOTBAR.y - 2, HOTBAR.w + 4, HOTBAR.h + 4);
     }
-    drawPieceIcon(ctx, type, x + 32, HOTBAR.y + 36);
-    text(ctx, String(i + 1), x + 9, HOTBAR.y + 19, 15, GOLD, 'left', 900);
-    text(ctx, PIECES[type].name, x + HOTBAR.w / 2, HOTBAR.y + 70, 15, INK, 'center', 700);
-    text(ctx, unlocked ? `${cost}` : 'DAY 2', x + (unlocked ? 80 : 72), HOTBAR.y + 40, unlocked ? 24 : 14, afford ? '#BDF4FF' : '#FF8A8A', 'center', 900);
-    ctx.fillStyle = unlocked ? '#7FE8FF' : 'rgba(0,0,0,0)';
-    ctx.beginPath();
-    ctx.moveTo(x + 94, HOTBAR.y + 22);
-    ctx.lineTo(x + 99, HOTBAR.y + 29);
-    ctx.lineTo(x + 94, HOTBAR.y + 37);
-    ctx.lineTo(x + 89, HOTBAR.y + 29);
-    ctx.closePath();
-    ctx.fill();
+    // Card: hotkey and name on top, the piece with its cost (quartz) beside it, what it does underneath.
+    text(ctx, String(i + 1), x + 8, HOTBAR.y + 19, 15, GOLD, 'left', 900);
+    text(ctx, PIECES[type].name, x + 22, HOTBAR.y + 19, 15, INK, 'left', 900);
+    text(ctx, unlocked ? `${cost}` : 'DAY 2', x + HOTBAR.w - (unlocked ? 22 : 8), HOTBAR.y + 49, unlocked ? 22 : 14, afford ? '#BDF4FF' : '#FF8A8A', 'right', 900);
+    if (unlocked) {
+      ctx.fillStyle = '#7FE8FF';
+      ctx.beginPath();
+      ctx.moveTo(x + HOTBAR.w - 13, HOTBAR.y + 33);
+      ctx.lineTo(x + HOTBAR.w - 8, HOTBAR.y + 40);
+      ctx.lineTo(x + HOTBAR.w - 13, HOTBAR.y + 48);
+      ctx.lineTo(x + HOTBAR.w - 18, HOTBAR.y + 40);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.save();
+    ctx.translate(x + HOTBAR.w / 2, HOTBAR.y + 41);
+    ctx.scale(0.72, 0.72);
+    drawPieceIcon(ctx, type, 0, 0);
+    ctx.restore();
+    fitLine(ctx, cardEffect(run, type), x + HOTBAR.w / 2, HOTBAR.y + 70, HOTBAR.w - 10, 14, '#FFF2A8', 'center');
     ctx.globalAlpha = 1;
   });
   const fx = HOTBAR_X + PIECE_ORDER.length * (HOTBAR.w + HOTBAR.gap);

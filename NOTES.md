@@ -384,6 +384,11 @@
   min) and blurred, still thrown away from the live sun (sun.shadowVectorFor); lit cells get a warm
   wash under the beams (board.drawLitFloor). Cover mean luminance 0.51 (gate 0.45), still warm.
 
+- Item 2, build bar: 132 px cards (bar re-centred, key line still fits): hotkey + name on top, the
+  piece with its quartz cost beside it, and a one-line effect underneath, true to beams.js (mirror
+  `turns light 90°`, splitter `splits light in 2`, lens `x2.5 for 3 cells` from this run's beam mods,
+  pillar `blocks beetles`, prism `burn/slow/pierce`). The right-hand GLASS legend stays.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:
