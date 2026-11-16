@@ -318,6 +318,14 @@
 - CHECKPOINT A (Bench7 items 1-4, 02:12 UTC): shot truth OK, playtest 32/32, measure-shots 4/4, shots
   refreshed (seed 2013 staging unchanged; cover untouched by items 1-4).
 
+- Bench7 item 5 (hero shot), fell back to (c): seed 2013 sun 5 cover kept. (a) tools/hero-scan.mjs over
+  the 23 seeds that won the K=1 scan, cover on sun 9: no tick has Titan open + 35-75% HP + 2 beams on
+  her + 8 escorts / 2 burning + 2 floaters + SEAR x2 at once (with the director many seeds lose; without
+  it 11 win, still 0 passing; floaters are the usual miss). (b) STAGE_AIM=1 (stageplan.aimMirror: before
+  the cover sun's build, the one mirror lighting the most lower-path cells of the coming sun) places
+  the same mirror the greedy bot would; seed 2013's sun 5 never has more than 1 lit live beetle (beetles
+  in the light die within about a second), so no cover tick with >= 3. Both flags off by default.
+
 ## Next
 - READY FOR A/B (01:00 UTC): bold beams + the three cues on top of 61673e1 (FEATS, GLASS legend,
   INCOMING tags, HUD buttons, SUNSTONE chip, title rules table kept). Verified on the final state:

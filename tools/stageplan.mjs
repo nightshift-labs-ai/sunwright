@@ -6,6 +6,9 @@ import { boardTagOverlaps, createFx, floaterConflicts, fxFromEvent, updateFx } f
 import { DT, WAVE_COUNT } from '../game/src/config.js';
 import { beamModsFor, traceBeams } from '../game/src/beams.js';
 import { sunApertureFor } from '../game/src/sun.js';
+import { routeCells } from '../game/src/pathing.js';
+import { placementCheck, setPiece } from '../game/src/grid.js';
+import { pieceCost } from '../game/src/sim.js';
 
 /** The sun the cover shows (index; 4 = sun 5, Day 2 noon). STAGE_COVER_WAVE overrides it for experiments. */
 export const COVER_WAVE = Number(process.env.STAGE_COVER_WAVE ?? 4);
@@ -103,6 +106,35 @@ function bestChaseTurn(run) {
   return best;
 }
 
+/**
+ * STAGE_AIM=1: before the bot builds for the cover sun, place the one mirror (any free cell, any turn)
+ * whose light covers the most cells of the swarm's lower path (rows 4+) on the coming sun, if it adds >= 3.
+ */
+function aimMirror(run) {
+  if (run.waveIndex !== COVER_WAVE || run.quartz < pieceCost(run, 'mirror')) return [];
+  const grid = run.grid;
+  const path = routeCells(grid, run.flow).filter((i) => Math.floor(i / grid.cols) >= 4);
+  const mods = beamModsFor(run.boons);
+  const lit = () => {
+    const t = traceBeams(grid, sunApertureFor(run.seed, run.waveIndex), mods);
+    return path.filter((i) => t.lit[i] > 0).length;
+  };
+  const base = lit();
+  let best = null;
+  for (let r = 0; r < grid.rows; r++) {
+    for (let c = 0; c < grid.cols; c++) {
+      if (!placementCheck(grid, c, r).ok) continue;
+      for (let rot = 0; rot < 4; rot++) {
+        setPiece(grid, c, r, { type: 'mirror', rot, prevRot: rot, turnedAt: -1, placedWave: run.waveIndex, paid: 0 });
+        const n = lit();
+        setPiece(grid, c, r, null);
+        if (n >= base + 3 && (!best || n > best.n)) best = { c, r, rot, n };
+      }
+    }
+  }
+  return best ? [{ type: 'place', piece: 'mirror', c: best.c, r: best.r, rot: best.rot }] : [];
+}
+
 export function makeDirector(K, scars = null) {
   let wave = -1;
   let turned = null;
@@ -135,6 +167,7 @@ export function makeDirector(K, scars = null) {
   // Off by default: no seed found yet where the pruned plan still wins (STAGE_PRUNE=1 to try).
   if (process.env.STAGE_PRUNE === '1') director.afterBuild = (run) => pruneForCover(run, swapped);
   director.beforeBuild = (run) => {
+    if (process.env.STAGE_AIM === '1' && run.waveIndex === COVER_WAVE) return aimMirror(run);
     if (run.waveIndex !== COVER_WAVE + 1 || !swapped.length) return [];
     return swapped.splice(0).flatMap((p) => [{ type: 'lift', c: p.c, r: p.r }, { type: 'place', piece: p.piece, c: p.c, r: p.r, rot: p.rot }]);
   };
@@ -158,7 +191,8 @@ export function planRun(seed, K, difficulty = DIFF, bot = BOT, scars = null) {
     }
     updateFx(fx, run, DT);
     // Only ticks the screenshot checks would pass: no floater on a label, beam or floater, no covered tag.
-    if (!scars && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0 && floaterConflicts(fx, run) === 0 && boardTagOverlaps(run).length === 0) {
+    const litLive = run.enemies.filter((e) => e.litPower > 0 && !e.shielded && e.hp > 0).length;
+    if (!scars && run.phase === 'wave' && run.waveIndex === COVER_WAVE && run.flareLeft <= 0 && floaterConflicts(fx, run) === 0 && boardTagOverlaps(run).length === 0 && (process.env.STAGE_AIM !== '1' || litLive >= 3)) {
       const opaque = floaterConflicts(fx, run) === 0 ? fx.texts.filter((t) => t.life / t.max > 0.3).length : 0;
       const freshBite = bites.some((t) => run.time - t < 0.9);
       const s = run.grid.shrine;
